@@ -1,4 +1,4 @@
-#include "../include/errorLog.hpp"
+#include "../include/ErrorLog.hpp"
 
 // Default Constructor
 errorLog::errorLog() {}

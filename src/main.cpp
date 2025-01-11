@@ -6,11 +6,11 @@
 /*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:34:29 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 10:29:14 by mcatalan         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:34:35 by mcatalan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/irc.hpp"
+#include "../include/Irc.hpp"
 
 
 

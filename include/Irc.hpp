@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc.hpp                                            :+:      :+:    :+:   */
+/*   Irc.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
+/*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 12:22:30 by mcatalan@st      ###   ########.fr       */
+/*   Updated: 2025/01/11 13:33:39 by mcatalan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRC_HPP
 # define IRC_HPP
 
+// System includes
 # include <string>
 # include <map>
 # include <iostream>
@@ -31,7 +32,8 @@
 # include <algorithm>
 # include <vector>		// -> vector
 
-# include "socket.hpp"
-# include "errorLog.hpp"
+// Own includes
+# include "Server.hpp"
+# include "ErrorLog.hpp"
 
 #endif

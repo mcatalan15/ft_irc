@@ -1,7 +1,7 @@
 #ifndef ERROR_LOG_HPP
 # define ERROR_LOG_HPP
 
-# include "irc.hpp"
+# include "Irc.hpp"
 
 class errorLog {
 	private:
