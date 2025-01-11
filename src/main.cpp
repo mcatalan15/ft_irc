@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
+/*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:34:29 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 12:25:42 by mcatalan@st      ###   ########.fr       */
+/*   Updated: 2025/01/11 10:29:14 by mcatalan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/irc.hpp"
+
+
 
 int main(int argc, char **argv)
 {
