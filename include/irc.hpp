@@ -6,7 +6,7 @@
 /*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 07:21:17 by mcatalan@st      ###   ########.fr       */
+/*   Updated: 2025/01/11 12:22:30 by mcatalan@st      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,8 @@
 # include <csignal>		// -> signal()
 # include <algorithm>
 # include <vector>		// -> vector
+
+# include "socket.hpp"
+# include "errorLog.hpp"
 
 #endif
