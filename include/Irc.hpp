@@ -6,12 +6,14 @@
 /*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 13:33:39 by mcatalan         ###   ########.fr       */
+/*   Updated: 2025/01/11 19:58:56 by jpaul-kr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef IRC_HPP
 # define IRC_HPP
+
+
 
 // System includes
 # include <string>
@@ -32,7 +34,10 @@
 # include <algorithm>
 # include <vector>		// -> vector
 
+using std::string;
+
 // Own includes
+# include "Client.hpp"
 # include "Server.hpp"
 # include "ErrorLog.hpp"
 

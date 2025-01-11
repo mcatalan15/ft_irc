@@ -6,12 +6,12 @@
 #    By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/16 08:03:29 by mcatalan@st       #+#    #+#              #
-#    Updated: 2025/01/11 06:34:05 by mcatalan@st      ###   ########.fr        #
+#    Updated: 2025/01/11 18:23:40 by jpaul-kr         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ircserv
-SRC =		main.cpp
+SRC =	main.cpp Server.cpp
 SRC_DIR = ./src/
 PATH_OBJ = ./src/obj/
 PATH_DEPS = ./src/obj/
@@ -32,9 +32,9 @@ $(PATH_OBJ)%.o: $(SRC_DIR)%.cpp
 	@mkdir -p $(PATH_OBJ)/commands
 	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 
-$(BOT_PATH_OBJ)%.o: $(BOT_SRC_DIR)%.cpp
-	@mkdir -p $(BOT_PATH_OBJ)	
-	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
+#$(BOT_PATH_OBJ)%.o: $(BOT_SRC_DIR)%.cpp
+#	@mkdir -p $(BOT_PATH_OBJ)	
+#	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 
 $(NAME): $(OBJ) 
 	$(CC) $(CFLAGS) $(OBJ) -o $@
