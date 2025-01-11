@@ -5,11 +5,11 @@
 
 class Client{
     private:
-        string 			nickname;
-        string  		name;
-	string			password;
+        //string 			nickname;
+        //string  		name;
+	//string			password;
 	//struct sockaddr_in6     address;
-       // bool    registered;
+	bool    registered;
 
     public:
 	Client();

@@ -9,6 +9,7 @@ class Client;
 class Server {
 	private:
 		int                     fd;
+		int			epoll_fd;
 		int			opt;
 		std::map<int, Client>   clients_connected;
 		struct sockaddr_in6     address;

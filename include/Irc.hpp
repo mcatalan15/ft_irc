@@ -6,7 +6,7 @@
 /*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 19:58:56 by jpaul-kr         ###   ########.fr       */
+/*   Updated: 2025/01/11 23:40:59 by jpaul-kr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <iostream>
 # include <cstdlib>
 # include <sys/poll.h>	// -> poll()
+# include <sys/epoll.h>	// -> epoll()
 # include <sys/socket.h>// -> socket(), bind(), listen(), accept(), connect()
 # include <netinet/in.h>// -> sockaddr_in()
 # include <errno.h>		// -> errno
