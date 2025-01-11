@@ -6,7 +6,7 @@
 /*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 06:48:57 by mcatalan@st      ###   ########.fr       */
+/*   Updated: 2025/01/11 07:21:17 by mcatalan@st      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,18 @@
 # include <map>
 # include <iostream>
 # include <cstdlib>
-# include <sys/poll.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <errno.h>
-# include <unistd.h>
+# include <sys/poll.h>	// -> poll()
+# include <sys/socket.h>// -> socket(), bind(), listen(), accept(), connect()
+# include <netinet/in.h>// -> sockaddr_in()
+# include <errno.h>		// -> errno
+# include <unistd.h>	
 # include <sstream>
+# include <fcntl.h>		// -> fcntl()		
 # include <ctime>
 # include <cstring>
+# include <arpa/inet.h> // -> inet_ntoa()
+# include <csignal>		// -> signal()
 # include <algorithm>
-# include <vector>
+# include <vector>		// -> vector
 
 #endif
