@@ -1,0 +1,22 @@
+#include "../include/Irc.hpp"
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+Client::Client(int server_fd)
+{
+    struct sockaddr_in6 addr;
+    this->address = addr;
+    socklen_t   client_len = sizeof(this->address);
+    
+    this->fd = accept(server_fd, (struct sockaddr*)this->address, &client_len);
+}
+
+struct sockaddr	Client::getAddr()
+{
+	return (this->address);
+}
+
+int Client::getFd()
+{
+    return this->fd;
+}

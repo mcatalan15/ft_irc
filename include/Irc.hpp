@@ -38,8 +38,6 @@
 using std::string;
 
 // Own includes
-# include "Client.hpp"
 # include "Server.hpp"
-# include "ErrorLog.hpp"
-
+//# include "ErrorLog.hpp"
 #endif

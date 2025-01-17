@@ -12,8 +12,6 @@
 
 #include "../include/Irc.hpp"
 
-
-
 int main(int argc, char **argv)
 {
 	if (argc != 3 || std::atoi(argv[1]) < 1 || std::atoi(argv[1]) > 65535) 

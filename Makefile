@@ -11,12 +11,12 @@
 # **************************************************************************** #
 
 NAME = ircserv
-SRC =	main.cpp Server.cpp
 SRC_DIR = ./src/
+SRC = $(wildcard $(SRC_DIR)*.cpp)
 PATH_OBJ = ./src/obj/
 PATH_DEPS = ./src/obj/
-OBJ = $(addprefix $(PATH_OBJ), $(SRC:.cpp=.o))
-DEPS = $(addprefix $(PATH_DEPS), $(SRC:.cpp=.d))
+OBJ = $(addprefix $(PATH_OBJ), $(notdir $(SRC:.cpp=.o)))
+DEPS = $(addprefix $(PATH_DEPS), $(notdir $(SRC:.cpp=.d)))
 
 INCLUDE = -I./
 RM = rm -f
@@ -29,12 +29,7 @@ all: $(NAME)
 
 $(PATH_OBJ)%.o: $(SRC_DIR)%.cpp
 	@mkdir -p $(PATH_OBJ)
-	@mkdir -p $(PATH_OBJ)/commands
 	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
-
-#$(BOT_PATH_OBJ)%.o: $(BOT_SRC_DIR)%.cpp
-#	@mkdir -p $(BOT_PATH_OBJ)	
-#	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 
 $(NAME): $(OBJ) 
 	$(CC) $(CFLAGS) $(OBJ) -o $@
@@ -44,10 +39,9 @@ $(NAME): $(OBJ)
 clean:
 	@rm -rf $(PATH_OBJ)
 		
-fclean:
-	@rm -rf $(PATH_OBJ)
+fclean: clean
 	$(RM) $(NAME)
 
 re: fclean all
 
-.PHONY: all bot clean fclean re 
+.PHONY: all clean fclean re
