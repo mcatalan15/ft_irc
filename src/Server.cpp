@@ -3,8 +3,10 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 
-void cleanexit(int signal)
-{
+/*
+    Prints a messege in the server as disconnected 
+*/
+void cleanexit(int signal) {
 	(void) signal;
 	std::cout << "\b\b\r   Server disconnected - See you soon!\n\n";
 	std::cout << "\033[?25h";
@@ -12,8 +14,8 @@ void cleanexit(int signal)
 	exit(0);
 }
 
-Server::Server(int port, string password)
-{
+/**/
+Server::Server(int port, string password) {
 	this->fd = socket(AF_INET6, SOCK_STREAM, 0); //creates listening FD for the server
 	if (this->fd < 0)
 		std::cerr << "error: socket connection" << std::endl;
@@ -28,8 +30,6 @@ Server::Server(int port, string password)
 	this->address.sin6_port = htons(port); // gets port number in bytes (abre puerto input)
 
 	signal(SIGINT,cleanexit);
-
-	
 	
 	if (bind(this->fd, (struct sockaddr*)&this->address, sizeof(this->address)) < 0)
 		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
@@ -50,7 +50,6 @@ Server::Server(int port, string password)
 */
 void Server::new_client(int &numfd) {    
     //Client  newClient(this->fd);
-	//std::cout << "entra en newclient" << std::endl;
     struct sockaddr_in client_addr; // Struct needed to save the client address.
     socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
     int client_fd = accept(this->fd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
@@ -76,32 +75,26 @@ void    Server::client_exist(int &numfd, int i) {
     numfd--;
     } else {
     // Print received message
-    std::cout << "Client (" << i + 1 << "): " << buffer << std::endl;
+    std::cout << "Client (" << i << "): " << buffer << std::endl;
     // Echo the message back to the client
     send(fds[i].fd, buffer, bytes_read, 0);
     }
 }
 
-void	Server::client_process()
-{
+void	Server::client_process() {
     int numfd = 1; //empieza en 1 pq server es 0
-    while (true)
-    {
+    while (true) {
         int numEvents = poll(this->fds, numfd, -1); //
-	std::cout << "entra" << std::endl;
         if (numEvents < 0)
             std::cerr << "polling failed" << std::endl;
         
-        for (int i = 0; i < numfd; i++) //si hay eventos entra (si hay clientes conectados)
-        {
-		//std::cout << i << " \n";
-		if (this->fds[i].revents & POLLIN) //mira si el evento (cliente) es de input (POLLIN) 
-            	{
-                	if (this->fds[i].fd == this->fd) //mira si el evento es alguien nuevo?
-                    		new_client(numfd);
-                	else 
-				client_exist(numfd, i);
-            	}
+        for (int i = 0; i < numfd; i++) { //si hay eventos entra (si hay clientes conectados)
+            if (this->fds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
+                if (this->fds[i].fd == this->fd) //mira si el evento es alguien nuevo?
+                    new_client(numfd);
+                else 
+                    client_exist(numfd, i);
+            }
         }
     }
 }
