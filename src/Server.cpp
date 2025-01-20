@@ -48,15 +48,16 @@ Server::Server(int port, string password)
     This function  is used when the fd[0] (the server) is detected with an event (a new client whants to connect).
     Creates
 */
-void Server::new_client(int &numfd, int i) {    
+void Server::new_client(int &numfd) {    
     //Client  newClient(this->fd);
+	//std::cout << "entra en newclient" << std::endl;
     struct sockaddr_in client_addr; // Struct needed to save the client address.
     socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
     int client_fd = accept(this->fd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
                 
     //this->fds[i].fd = newClient.getFd();
-    this->fds[i].fd = client_fd; // Adds the new client fd to the list of monitored fd's.
-    this->fds[i].events = POLLIN; // Marks the fd
+    this->fds[numfd].fd = client_fd; // Adds the new client fd to the list of monitored fd's.
+    this->fds[numfd].events = POLLIN; // Marks the fd
     numfd++;
 }
 
@@ -87,18 +88,20 @@ void	Server::client_process()
     while (true)
     {
         int numEvents = poll(this->fds, numfd, -1); //
+	std::cout << "entra" << std::endl;
         if (numEvents < 0)
             std::cerr << "polling failed" << std::endl;
         
         for (int i = 0; i < numfd; i++) //si hay eventos entra (si hay clientes conectados)
         {
-            if (this->fds[i].revents & POLLIN) //mira si el evento (cliente) es de input (POLLIN) 
-            {
-                if (this->fds[i].fd == this->fd) //mira si el evento es alguien nuevo?
-                    new_client(numfd, i);
-                else 
-                    client_exist(numfd, i);
-            }
+		//std::cout << i << " \n";
+		if (this->fds[i].revents & POLLIN) //mira si el evento (cliente) es de input (POLLIN) 
+            	{
+                	if (this->fds[i].fd == this->fd) //mira si el evento es alguien nuevo?
+                    		new_client(numfd);
+                	else 
+				client_exist(numfd, i);
+            	}
         }
     }
 }

@@ -21,6 +21,6 @@ class Server {
 
 		void      client_process();
 		void      client_exist(int &numfd, int i);
-		void      new_client(int &numfd, int i);
+		void      new_client(int &numfd);
 };
 #endif
