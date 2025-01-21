@@ -57,7 +57,7 @@ std::string Client::getPrefix() const
     std::string prefix = ":" + getNickname();
     if (!getUsername().empty())
         prefix += "!" + getUsername();
-    if (!getHostname().empty());
+    if (!getHostname().empty())
         prefix += "@" + getHostname();
     return (prefix);
 }

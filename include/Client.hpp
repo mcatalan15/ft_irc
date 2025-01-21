@@ -18,7 +18,7 @@ enum State
 class Client
 {
     private:
-        int                     _serverFd;
+        int                     _fd;
         /*std::string 	        _nickname;
         std::string  	        _username;
         std::string             _realname;
