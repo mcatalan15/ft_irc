@@ -11,16 +11,18 @@
 /* ************************************************************************** */
 
 #include "../include/Irc.hpp"
+#include <csignal>
 
 int main(int argc, char **argv)
 {
-	if (argc != 3 || std::atoi(argv[1]) < 1 || std::atoi(argv[1]) > 65535) 
+	if (argc != 3 || std::atoi(argv[1]) < 1024 || std::atoi(argv[1]) > 49151) 
 	{
 		std::cerr << "Usage: ./irc <port> <password>" << std::endl;
 		return (1);
 	}
 	Server	server(std::atoi(argv[1]), (string)argv[2]);
-
+	signal(SIGINT, server.signalHandler);
+	signal(SIGINT, server.signalHandler);
 	server.client_process();
 	return (0);
 }

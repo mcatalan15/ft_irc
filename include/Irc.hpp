@@ -35,6 +35,8 @@
 # include <algorithm>
 # include <vector>		// -> vector
 
+# define MAX_CLIENTS 1024
+
 using std::string;
 
 // Own includes

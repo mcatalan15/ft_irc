@@ -1,20 +1,11 @@
 #include "../include/Irc.hpp"
+#include <cstddef>
 #include <fcntl.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 
-/*
-    Prints a messege in the server as disconnected 
-*/
-void cleanexit(int signal) {
-	(void) signal;
-	std::cout << "\b\b\r   Server disconnected - See you soon!\n\n";
-	std::cout << "\033[?25h";
-	std::system("stty echo");
-	exit(0);
-}
+bool    Server::_signal = false;
 
-/**/
 Server::Server(int port, string password) {
     struct pollfd   s_poll;
     
@@ -31,8 +22,6 @@ Server::Server(int port, string password) {
 	_address.sin6_addr = in6addr_any; // accepts any IP
 	_address.sin6_port = htons(port); // gets port number in bytes (abre puerto input)
 
-	signal(SIGINT,cleanexit);
-	
 	if (bind(_fd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
 		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
 	if (listen(_fd, 5) < 0) // deja abierto el puerto
@@ -46,12 +35,19 @@ Server::Server(int port, string password) {
 }
 
 Server::~Server() 
-{
- /*   for (int i = 0; i < _fds.size(); i++)
+{/*
+    for (size_t i = 0; i < _fds.size(); i++)
     {
-        
-    }*/
+        close(_fds[i].fd);
+    }
+    close(_fd);
+*/
+    }
+void Server::signalHandler(int signum) {
+    (void)signum;
+    _signal = true;
 }
+
 /*
     New client
     This function  is used when the fd[0] (the server) is detected with an event (a new client whants to connect).
@@ -59,13 +55,17 @@ Server::~Server()
 */
 void Server::new_client(int &numfd) {    
     //Client  newClient(_fd);
+    struct pollfd      newpoll;
     struct sockaddr_in client_addr; // Struct needed to save the client address.
     socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
     int client_fd = accept(_fd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
-                
+    
+    std::cout << "clientfd: " << client_fd << std::endl;
     //_fds[i].fd = newClient.getFd();
-    _fds[numfd].fd = client_fd; // Adds the new client fd to the list of monitored fd's.
-    _fds[numfd].events = POLLIN; // Marks the fd
+    fcntl(client_fd, F_SETFL, O_NONBLOCK);
+    newpoll.fd = client_fd; // Adds the new client fd to the list of monitored fd's.
+    newpoll.events = POLLIN; // Marks the fd
+    _fds.push_back(newpoll);
     numfd++;
 }
 
@@ -92,13 +92,16 @@ void    Server::client_exist(int &numfd, int i) {
 
 void	Server::client_process() {
     int numfd = 1; //empieza en 1 pq server es 0
-    while (true) {
+    while (!(this->_signal)) 
+    {
         int numEvents = poll(&_fds[0], numfd, -1); //
-        if (numEvents < 0)
+        if (numEvents < 0 && _signal != true)
             std::cerr << "polling failed" << std::endl;
         
-        for (int i = 0; i < numfd; i++) { //si hay eventos entra (si hay clientes conectados)
-            if (_fds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
+        for (int i = 0; i < numfd; i++) 
+        { //si hay eventos entra (si hay clientes conectados)
+            if (_fds[i].revents & POLLIN) 
+            { //mira si el evento (cliente) es de input (POLLIN) 
                 if (_fds[i].fd == _fd) //mira si el evento es alguien nuevo?
                     new_client(numfd);
                 else 
@@ -106,4 +109,15 @@ void	Server::client_process() {
             }
         }
     }
+    std::cout << "size "<< _fds.size() << std::endl;
+    for (size_t i = 0; i < _fds.size(); i++)
+    {
+        std::cout << "deleted fd: " << _fds[i].fd << std::endl;
+        close(_fds[i].fd);
+        _fds.erase(_fds.begin() + i);
+    }
+    if (_fd != -1) {
+        std::cout << "entra last if" << std::endl;
+        close(_fd);}
+    _fds.clear();
 }
