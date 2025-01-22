@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Irc.hpp"
-#include <csignal>
+#include "../include/Server.hpp"
 
 int main(int argc, char **argv) {
 	if (argc != 3 || std::atoi(argv[1]) < 1024 || std::atoi(argv[1]) > 49151) {

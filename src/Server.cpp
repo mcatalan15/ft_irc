@@ -1,9 +1,4 @@
-#include "../include/Irc.hpp"
-#include <cstddef>
-#include <fcntl.h>
-#include <iostream>
-#include <sys/poll.h>
-#include <sys/socket.h>
+#include "../include/Server.hpp"
 
 bool	Server::_signal = false;
 
@@ -21,21 +16,21 @@ Server::Server(int port, string password) {
 	_password = password; //contrasena del input
 	_opt = 1; //opciones que se le puede dar al server en setsocketopt
 
-	if ((_fd = socket(AF_INET6, SOCK_STREAM, 0)) < 0) //creates listening FD for the server
+	if ((_serverFd = socket(AF_INET6, SOCK_STREAM, 0)) < 0) //creates listening FD for the server
 		std::cerr << "error: socket connection" << std::endl;
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
+	if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
 		std::cerr << "error: setstockopt error" << std::endl;
-	if (fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
+	if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) == -1)
 		std::cerr << "error: failed to set option (O_NONBLOCK) on socket" << std::endl;
-	if (bind(_fd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
+	if (bind(_serverFd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
 		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
-	if (listen(_fd, 5) < 0) // deja abierto el puerto
+	if (listen(_serverFd, 5) < 0) // deja abierto el puerto
 		std::cerr << "error: server not listening" << std::endl;
 
-	s_poll.fd = _fd;
+	s_poll.fd = _serverFd;
 	s_poll.events = POLLIN; //cada input al terminal
 	s_poll.revents = 0;
-	_fds.push_back(s_poll);
+	_pollFds.push_back(s_poll);
 	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
 }
 
@@ -45,9 +40,9 @@ Server::Server(int port, string password) {
 	with the server
 */
 Server::~Server() {
-	for (size_t i = 0; i < _fds.size(); i++)
-		close(_fds[i].fd);
-	close(_fd);
+	for (size_t i = 0; i < _pollFds.size(); i++)
+		close(_pollFds[i].fd);
+	close(_serverFd);
 }
 
 /*
@@ -67,73 +62,119 @@ void Server::signalHandler(int signum) {
 	Creates
 */
 void Server::new_client(int &numfd) {    
-	//Client  newClient(_fd);
 	struct pollfd		newpoll;
 	struct sockaddr_in	client_addr; // Struct needed to save the client address.
 	socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
-	int client_fd = accept(_fd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
-
+	int client_fd = accept(_serverFd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
+	if (client_fd == -1) {
+		std::cerr << "accept() failed" << std::endl;
+		return;
+	}
 	std::cout << "clientfd: " << client_fd << std::endl;
-	//_fds[i].fd = newClient.getFd();
-	fcntl(client_fd, F_SETFL, O_NONBLOCK);
+	Client	newClient(client_fd);
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1) {
+		std::cerr << "fcntl failed" << std::endl;
+	}
 	newpoll.fd = client_fd; // Adds the new client fd to the list of monitored fd's.
 	newpoll.events = POLLIN; // Marks the fd
-	_fds.push_back(newpoll);
+	_pollFds.push_back(newpoll);
+	_clients.push_back(newClient);
 	numfd++;
+
+	std::cout << GREEN << "Client <" << client_fd << "> Connected" << WHITE << std::endl;
 }
 
 // If client exists
-void	Server::client_exist(int &numfd, int i) {
-	char buffer[512] = {};
-	int bytes_read = recv(_fds[i].fd, buffer, 512, 0);
+void	Server::client_exist(int fd) {
+	char buffer[512];
+	int bytes_read = recv(fd, buffer, 512, 0);
+	//Client *Client = getClient(fd);
 
 	if (bytes_read <= 0) {
-	// Client disconnected or error occurred
-	std::cout << "Client disconnected, fd: " << _fds[i].fd << std::endl;
-	close(_fds[i].fd);
- 
-	// Remove the client from the monitored list
-	_fds[i] = _fds[numfd - 1]; // Replace with the last active descriptor
-	numfd--;
+		// Client disconnected or error occurred
+		std::cout << "Client disconnected, fd: " << fd << std::endl;
+		close(fd);
+
+		// Remove the client from the monitored list
+		// removeClientChannel(fd);
+		removeClient(fd);
+		removeFd(fd);
 	} else {
-	// Print received message
-	std::cout << "Client (" << i << "): " << buffer << std::endl;
-	// Echo the message back to the client
-	send(_fds[i].fd, buffer, bytes_read, 0);
-	/*
-		!!!!!!!!!!!!!!!!!!!!!!!!
-		AQUI VA LA MANDANGA
-		!!!!!!!!!!!!!!!!!!!!!!!!!
-	*/
+		// Print received message
+		std::cout << "Client (" << getClient(fd) << "): " << buffer << std::endl;
+		// Echo the message back to the client
+		send(fd, buffer, bytes_read, 0);
+		/*
+			!!!!!!!!!!!!!!!!!!!!!!!!
+			AQUI VA LA MANDANGA
+			!!!!!!!!!!!!!!!!!!!!!!!!!
+		*/
+		//Client->setMsg(buffer);
+		//if (Client->getMsg().find_first_of("\r\n") == string::npos)
+		//	return;
+		
 	}
 }
 
 void	Server::client_process() {
 	int numfd = 1; //empieza en 1 pq server es 0
 	while (!(this->_signal)) {
-		int numEvents = poll(&_fds[0], numfd, -1); //
+		int numEvents = poll(&_pollFds[0], numfd, -1); //
 		if (numEvents < 0 && _signal == false)
 			std::cerr << "polling failed" << std::endl;
 
 		for (int i = 0; i < numfd; i++) 
 		{ //si hay eventos entra (si hay clientes conectados)
-			if (_fds[i].revents & POLLIN) 
+			if (_pollFds[i].revents & POLLIN) 
 			{ //mira si el evento (cliente) es de input (POLLIN) 
-				if (_fds[i].fd == _fd) //mira si el evento es alguien nuevo?
+				if (_pollFds[i].fd == _serverFd) //mira si el evento es alguien nuevo?
 					new_client(numfd);
 				else 
-					client_exist(numfd, i);
+					client_exist(_pollFds[i].fd);
 			}
 		}
 	}
-	for (size_t i = 0; i < _fds.size(); i++) {
-		std::cout << "Client <" << _fds[i].fd << "> Disconnected" << std::endl;
-		std::string message = "Server has disconnected\n";
-		send(_fds[i].fd, message.c_str(), message.size(), 0);
-		close(_fds[i].fd);
+	closeFds();
+}
+
+// Getters
+string	Server::getPassword() { return this->_password; }
+
+Client *Server::getClient(int fd) {
+	for (size_t i = 0; i < this->_clients.size(); i++) {
+		if (this->_clients[i].getFd() == fd)
+			return &this->_clients[i];
 	}
-	if (_fd != -1) {
-		std::cout << "Server <" << _fd << "> Disconnected" << std::endl;
-		close(_fd);
+	return NULL;
+}
+
+void Server::closeFds() {
+	for (size_t i = 1; i < _pollFds.size(); i++) {
+		std::cout << "Client <" << _pollFds[i].fd << "> Disconnected" << std::endl;
+		string message = "Server has disconnected\n";
+		send(_pollFds[i].fd, message.c_str(), message.size(), 0);
+		close(_pollFds[i].fd);
+	}
+	if (_serverFd != -1) {
+		std::cout << "Server <" << _serverFd << "> Disconnected" << std::endl;
+		close(_serverFd);
+	}
+}
+
+void	Server::removeClient(int fd) {
+	for (size_t i = 0; i < _clients.size(); i++) {
+		if (_clients[i].getFd() == fd) {
+			_clients.erase(_clients.begin() + i);
+			break;
+		}
+	}
+}
+
+void	Server::removeFd(int fd) {
+	for (size_t i = 0; i < _pollFds.size(); i++) {
+		if (_pollFds[i].fd == fd) {
+			_pollFds.erase(_pollFds.begin() + i);
+			break;
+		}
 	}
 }

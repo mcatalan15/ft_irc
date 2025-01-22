@@ -19,7 +19,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <sys/poll.h>	// -> poll()
-#include <sys/epoll.h>	// -> epoll()
 #include <sys/socket.h>// -> socket(), bind(), listen(), accept(), connect()
 #include <netinet/in.h>// -> sockaddr_in()
 #include <errno.h>		// -> errno
@@ -27,17 +26,22 @@
 #include <sstream>
 #include <fcntl.h>		// -> fcntl()		
 #include <ctime>
-#include <cstring>
+#include <string>
 #include <arpa/inet.h> // -> inet_ntoa()
 #include <csignal>		// -> signal()
 #include <algorithm>
 #include <vector>		// -> vector
+#include <cstddef>		// -> size_t
 
 #define MAX_CLIENTS 1024
 
 using std::string;
 
 // Own includes
-#include "Server.hpp"
 //# include "ErrorLog.hpp"
+
+// Colors
+#define GREEN "\033[32m"
+#define WHITE "\033[0m"
+
 #endif
