@@ -1,6 +1,7 @@
 #include "../include/Irc.hpp"
 #include <cstddef>
 #include <fcntl.h>
+#include <iostream>
 #include <sys/poll.h>
 #include <sys/socket.h>
 
@@ -33,6 +34,7 @@ Server::Server(int port, string password) {
 
 	s_poll.fd = _fd;
 	s_poll.events = POLLIN; //cada input al terminal
+	s_poll.revents = 0;
 	_fds.push_back(s_poll);
 	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
 }
@@ -55,6 +57,7 @@ Server::~Server() {
 */
 void Server::signalHandler(int signum) {
 	(void)signum;
+	std::cout << "Signal received, shutting down..." << std::endl;
 	_signal = true;
 }
 
@@ -97,6 +100,11 @@ void	Server::client_exist(int &numfd, int i) {
 	std::cout << "Client (" << i << "): " << buffer << std::endl;
 	// Echo the message back to the client
 	send(_fds[i].fd, buffer, bytes_read, 0);
+	/*
+		!!!!!!!!!!!!!!!!!!!!!!!!
+		AQUI VA LA MANDANGA
+		!!!!!!!!!!!!!!!!!!!!!!!!!
+	*/
 	}
 }
 
@@ -104,7 +112,7 @@ void	Server::client_process() {
 	int numfd = 1; //empieza en 1 pq server es 0
 	while (!(this->_signal)) {
 		int numEvents = poll(&_fds[0], numfd, -1); //
-		if (numEvents < 0 && _signal != true)
+		if (numEvents < 0 && _signal == false)
 			std::cerr << "polling failed" << std::endl;
 
 		for (int i = 0; i < numfd; i++) 
@@ -118,13 +126,14 @@ void	Server::client_process() {
 			}
 		}
 	}
-	std::cout << "size "<< _fds.size() << std::endl;
-	for (size_t i = 1; i < _fds.size(); ++i) { // Start from 1 to skip the server socket
-		std::string shutdown_message = "Server is shutting down for client\n";
-
-		send(_fds[i].fd, shutdown_message.c_str(), shutdown_message.size(), 0);
-		std::cout << "Closing client fd: " << _fds[i].fd << std::endl;
+	for (size_t i = 0; i < _fds.size(); i++) {
+		std::cout << "Client <" << _fds[i].fd << "> Disconnected" << std::endl;
+		std::string message = "Server has disconnected\n";
+		send(_fds[i].fd, message.c_str(), message.size(), 0);
 		close(_fds[i].fd);
 	}
-	_fds.clear(); // Clear the entire vector after cleanup
+	if (_fd != -1) {
+		std::cout << "Server <" << _fd << "> Disconnected" << std::endl;
+		close(_fd);
+	}
 }

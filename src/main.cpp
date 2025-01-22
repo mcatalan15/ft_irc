@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/Irc.hpp"
+#include <csignal>
 
 int main(int argc, char **argv) {
 	if (argc != 3 || std::atoi(argv[1]) < 1024 || std::atoi(argv[1]) > 49151) {
@@ -20,7 +21,8 @@ int main(int argc, char **argv) {
 	Server	server(std::atoi(argv[1]), (string)argv[2]);
 	try {
 		signal(SIGINT, Server::signalHandler);
-		//signal(SIGINT, Server::signalHandler); -> sigquit!!!!
+		signal(SIGQUIT, Server::signalHandler);
+		signal(SIGPIPE, SIG_IGN);
 		server.client_process();
 	} catch (const std::exception &e) {
 		//server.closeFds(); -> uncomment + finish...

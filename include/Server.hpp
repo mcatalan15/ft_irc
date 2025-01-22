@@ -12,7 +12,7 @@ class Server {
 	private:
 		int							_fd;
 		int							_opt;
-		int							_port;
+//		int							_port;
 		static bool					_signal;
 		std::vector<Client>			_clients_connected;
 		std::vector<struct pollfd>	_fds; //buffer. Structura para manejar mas de 1 fd(cliente)
