@@ -6,6 +6,10 @@
 
 bool	Server::_signal = false;
 
+/*
+	Constructor
+	This constructor
+*/
 Server::Server(int port, string password) {
 	struct pollfd   s_poll;
 
@@ -33,12 +37,22 @@ Server::Server(int port, string password) {
 	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
 }
 
+/*
+	Destructor
+	This destructor iterates through all the fds(clients) connected/opened and close the fd in order to finalize the connection
+	with the server
+*/
 Server::~Server() {
 	for (size_t i = 0; i < _fds.size(); i++)
 		close(_fds[i].fd);
 	close(_fd);
 }
 
+/*
+	Signal Handler
+	This function is used when a signal is detected. Sets the privat variable _signal to true, this way the infinite loop
+	is stoped and with that the ircserv.
+*/
 void Server::signalHandler(int signum) {
 	(void)signum;
 	_signal = true;
