@@ -30,7 +30,7 @@ class Channel
         void removeClient(Client* client);
         bool hasClient(Client *client) const;
 
-        // Operator management
+        /*---------- CHANNEL OPERATORS ---------------*/
         const std::set<Client*> &getOperators() const;
         void addOperator(Client* client);
         void removeOperator(Client* client);
