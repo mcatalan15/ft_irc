@@ -44,4 +44,9 @@ using std::string;
 #define GREEN "\033[32m"
 #define WHITE "\033[0m"
 
+//Utils functions
+std::vector<string>	splitMsg(string str);
+string				getCommandInUper(const string &cmd);
+std::vector<string>	splitCommand(string &cmd);
+
 #endif

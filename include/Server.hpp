@@ -27,7 +27,10 @@ class Server {
 		void			new_client(int &numfd);
 		void			removeClient(int fd);
 		void			removeFd(int fd);
-		
+		void			msgManagement(string &command, int fd);
+		bool			isRegistered(int fd);
+		void			sendMsg(string msg, int fd);
+
 		//Fds management
 		void			closeFds();
 		
@@ -36,6 +39,24 @@ class Server {
 		string		getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
+		
+		//Commands
+		void		passCmd(string cmd, int fd);
+		void		nickCmd(string cmd, int fd);
+		void		userCmd(string cmd, int fd);
+		void		quitCmd(string cmd, int fd);
+		void		modeCmd(string cmd, int fd);
+		void		joinCmd(string cmd, int fd);
+		void		partCmd(string cmd, int fd);
+		void		topicCmd(string cmd, int fd);
+		void		kickCmd(string cmd, int fd);
+		void		privmsgCmd(string cmd, int fd);
+		void		inviteCmd(string cmd, int fd);
+		void		whoisCmd(string cmd, int fd);
+		void		adminCmd(string cmd, int fd);
+		void		infoCmd(string cmd, int fd);
+		void		pongCmd(string cmd, int fd);
+		void		pingCmd(string cmd, int fd);
 };
 
 #endif

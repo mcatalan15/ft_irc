@@ -1,4 +1,7 @@
 #include "../include/Server.hpp"
+#include <cstddef>
+#include <sys/types.h>
+#include <vector>
 
 bool	Server::_signal = false;
 
@@ -87,8 +90,9 @@ void Server::new_client(int &numfd) {
 // If client exists
 void	Server::client_exist(int fd) {
 	char buffer[512];
-	int bytes_read = recv(fd, buffer, 512, 0);
-	//Client *Client = getClient(fd);
+	ssize_t	bytes_read = recv(fd, buffer, 512, 0);
+	Client *Client = getClient(fd);
+	std::vector<string>	command;
 
 	if (bytes_read <= 0) {
 		// Client disconnected or error occurred
@@ -109,10 +113,14 @@ void	Server::client_exist(int fd) {
 			AQUI VA LA MANDANGA
 			!!!!!!!!!!!!!!!!!!!!!!!!!
 		*/
-		//Client->setMsg(buffer);
-		//if (Client->getMsg().find_first_of("\r\n") == string::npos)
-		//	return;
-		
+		Client->setMsg(buffer);
+		if (Client->getMsg().find_first_of("\r\n") == string::npos)
+			return;
+		command = splitMsg(Client->getMsg());
+		for (size_t i = 0; i < command.size(); i++)
+			msgManagement(command[i], fd);
+		if (getClient(fd))
+			getClient(fd)->clearSpecMsg();
 	}
 }
 
@@ -123,10 +131,8 @@ void	Server::client_process() {
 		if (numEvents < 0 && _signal == false)
 			std::cerr << "polling failed" << std::endl;
 
-		for (int i = 0; i < numfd; i++) 
-		{ //si hay eventos entra (si hay clientes conectados)
-			if (_pollFds[i].revents & POLLIN) 
-			{ //mira si el evento (cliente) es de input (POLLIN) 
+		for (int i = 0; i < numfd; i++) { //si hay eventos entra (si hay clientes conectados)
+			if (_pollFds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
 				if (_pollFds[i].fd == _serverFd) //mira si el evento es alguien nuevo?
 					new_client(numfd);
 				else 
@@ -177,4 +183,61 @@ void	Server::removeFd(int fd) {
 			break;
 		}
 	}
+}
+
+void	Server::msgManagement(string &command, int fd) {
+	if (command.empty())
+		return ;
+	
+	//Normalize the input by removing leading spaces
+	size_t	found = command.find_first_not_of(" \t\v");
+	if (found != string::npos)
+		command = command.substr(found);
+
+	// Use getCommandInUpper to extract and normalize the command
+	string cmd = getCommandInUper(command);
+	std::vector<string>	splited = splitCommand(command);
+	
+	if (splited.empty())
+		return ;
+
+	static const std::map<string>, std::function<void()>> cmdMap = {
+		{"PASS", [&]() { passCmd(cmd, fd);}},
+		{"NICK", [&]() { nickCmd(cmd, fd);}},
+		{"USER", [&]() { userCmd(cmd, fd);}},
+		{"QUIT", [&]() { quitCmd(cmd, fd);}},
+		{"MODE", [&]() { modeCmd(cmd, fd);}},
+		{"JOIN", [&]() { joinCmd(cmd, fd);}},
+		{"PART", [&]() { partCmd(cmd, fd);}},
+		{"TOPIC", [&]() { topicCmd(cmd, fd);}},
+		{"KICK", [&]() { kickCmd(cmd, fd);}},
+		{"PRIVMSG", [&]() { privmsgCmd(cmd, fd);}},
+		{"INVITE", [&]() { inviteCmd(cmd, fd);}},
+		{"WHOIS", [&]() { whoisCmd(cmd, fd);}},
+		{"ADMIN", [&]() { adminCmd(cmd, fd);}},
+		{"INFO", [&]() { infoCmd(cmd, fd);}},
+		{"PONG", [&]() { pongCmd(cmd, fd);}},
+		{"PING", [&]() { pingCmd(cmd,fd);}}
+	}
+
+	// REVISAR ORDEN Y COMO DIVIDIR PARA Q MAPA HAGA PRIMERO EL RESTO
+	// Search for the comman in the map
+	auto it = cmdMap.find(command);
+	if (it != cmdMap.end())
+		it->second(); // Execute the associated function
+	else if (isRegistered(fd)) {
+		// can send the command
+		sendResponse(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), splited[0], fd);)
+	} else if {
+		// no registered error
+		sendResponse(ERR_NOTREGISTERED(string("*")), fd);
+	}
+		
+}
+
+bool Server::isRegistered(int fd) {
+	//
+	if (getClient(fd)->getState() == REGISTERED)
+		return true;
+	return false;
 }

@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include <cstddef>
 
 // Default constructor
 Client::Client() : _fd(-1), _isOper(false), _state(HANDSHAKE) {}
@@ -81,4 +82,13 @@ void Client::welcome()
     setState(REGISTERED);
     // NEED TO IMPLEMENT WELCOME MESSAGE
     std::cout << getNickname() << " is registered and ready to start !" << std::endl;
+}
+
+void	Client::clearSpecMsg() {
+	size_t	lp = this->_msg.find_last_of("\r\n");
+	
+	if (lp != string::npos)
+		this->_msg.erase(0, lp + 1);
+	else
+		this->_msg.clear();
 }
