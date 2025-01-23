@@ -24,13 +24,22 @@ string	getCommandInUpper(const string &cmd) {
 	if (start == string::npos)
 		return "";
 		
-	size_t end = cmd.find_first_of(" \t\v", start); // Search end of the first word
-	string command = cmd.substr(start, end - start);
-	
-	// Verify if its already Uppercase
-	if (std::all_of(command.begin(), command.end(), ::isupper))
+	size_t end = cmd.find_first_of(" \t\v", start); // Find the end of the first word
+	std::string command = cmd.substr(start, end - start);
+
+	// Check if the command is already uppercase
+	bool isUpper = true;
+	for (size_t i = 0; i < command.size(); ++i) {
+		if (!std::isupper(command[i])) {
+			isUpper = false;
+			break;
+		}
+	}
+	if (isUpper)
 		return command;
-	std::transform(command.begin(),command.end(), command.begin(), ::toupper);
+
+	// Convert the command to uppercase
+	std::transform(command.begin(), command.end(), command.begin(), ::toupper);
 	return command;
 }
 
@@ -45,5 +54,3 @@ std::vector<string>	splitCommand(string &cmd) {
 	}
 	return splited;
 }
-
-void	

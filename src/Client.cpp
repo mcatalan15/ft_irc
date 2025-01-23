@@ -47,6 +47,8 @@ bool Client::getIsOper() const { return (_isOper); }
 
 State Client::getState() const { return (_state); }
 
+string Client::getMsg() const { return (_msg); }
+
 // To build the prefix in IRC format: ":nickname!username@hostname"
 string Client::getPrefix() const {
     string prefix = ":" + getNickname();
@@ -69,6 +71,8 @@ void Client::setHostname(const std::string& hostname) { _hostname = hostname; }
 void Client::setState(State newState) { _state = newState; }
 
 void Client::setIsOper(bool isOper) { _isOper = isOper; }
+
+void Client::setMsg(const std::string& msg) { _msg = msg; }
 
 //FONCTIONS
 void Client::welcome()

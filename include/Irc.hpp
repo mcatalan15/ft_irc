@@ -46,7 +46,13 @@ using std::string;
 
 //Utils functions
 std::vector<string>	splitMsg(string str);
-string				getCommandInUper(const string &cmd);
+string				getCommandInUpper(const string &cmd);
 std::vector<string>	splitCommand(string &cmd);
+
+
+// Defines
+#define ERR_NOTREGISTERED(x) ("You are not registered: " + (x))
+#define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd))
+#define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd))
 
 #endif

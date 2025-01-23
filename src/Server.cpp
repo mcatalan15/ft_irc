@@ -1,5 +1,7 @@
 #include "../include/Server.hpp"
 #include <cstddef>
+#include <map>
+#include <sys/socket.h>
 #include <sys/types.h>
 #include <vector>
 
@@ -185,52 +187,65 @@ void	Server::removeFd(int fd) {
 	}
 }
 
+// Define the map outside the function
+const std::map<std::string, void (Server::*)(std::string&, int)> Server::cmdMap = Server::createCmdMap();
+
+std::map<std::string, void (Server::*)(std::string&, int)> Server::createCmdMap() {
+    std::map<std::string, void (Server::*)(std::string&, int)> map;
+    map["PASS"] = &Server::passCmd;
+    map["NICK"] = &Server::nickCmd;
+    map["USER"] = &Server::userCmd;
+    map["QUIT"] = &Server::quitCmd;
+    map["MODE"] = &Server::modeCmd;
+    map["JOIN"] = &Server::joinCmd;
+    map["PART"] = &Server::partCmd;
+    map["TOPIC"] = &Server::topicCmd;
+    map["KICK"] = &Server::kickCmd;
+    map["PRIVMSG"] = &Server::privmsgCmd;
+    map["INVITE"] = &Server::inviteCmd;
+    map["WHOIS"] = &Server::whoisCmd;
+    map["ADMIN"] = &Server::adminCmd;
+    map["INFO"] = &Server::infoCmd;
+    map["PONG"] = &Server::pongCmd;
+    map["PING"] = &Server::pingCmd;
+    return map;
+}
+
+
 void	Server::msgManagement(string &command, int fd) {
 	if (command.empty())
 		return ;
 	
 	//Normalize the input by removing leading spaces
+	std::vector<string>	splited = splitCommand(command);
 	size_t	found = command.find_first_not_of(" \t\v");
 	if (found != string::npos)
 		command = command.substr(found);
-
-	// Use getCommandInUpper to extract and normalize the command
-	string cmd = getCommandInUper(command);
-	std::vector<string>	splited = splitCommand(command);
 	
 	if (splited.empty())
 		return ;
-
-	static const std::map<string>, std::function<void()>> cmdMap = {
-		{"PASS", [&]() { passCmd(cmd, fd);}},
-		{"NICK", [&]() { nickCmd(cmd, fd);}},
-		{"USER", [&]() { userCmd(cmd, fd);}},
-		{"QUIT", [&]() { quitCmd(cmd, fd);}},
-		{"MODE", [&]() { modeCmd(cmd, fd);}},
-		{"JOIN", [&]() { joinCmd(cmd, fd);}},
-		{"PART", [&]() { partCmd(cmd, fd);}},
-		{"TOPIC", [&]() { topicCmd(cmd, fd);}},
-		{"KICK", [&]() { kickCmd(cmd, fd);}},
-		{"PRIVMSG", [&]() { privmsgCmd(cmd, fd);}},
-		{"INVITE", [&]() { inviteCmd(cmd, fd);}},
-		{"WHOIS", [&]() { whoisCmd(cmd, fd);}},
-		{"ADMIN", [&]() { adminCmd(cmd, fd);}},
-		{"INFO", [&]() { infoCmd(cmd, fd);}},
-		{"PONG", [&]() { pongCmd(cmd, fd);}},
-		{"PING", [&]() { pingCmd(cmd,fd);}}
-	}
+	// Use getCommandInUpper to extract and normalize the command
+	string upperCmd = getCommandInUpper(command);
 
 	// REVISAR ORDEN Y COMO DIVIDIR PARA Q MAPA HAGA PRIMERO EL RESTO
-	// Search for the comman in the map
-	auto it = cmdMap.find(command);
-	if (it != cmdMap.end())
-		it->second(); // Execute the associated function
-	else if (isRegistered(fd)) {
-		// can send the command
-		sendResponse(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), splited[0], fd);)
-	} else if {
-		// no registered error
-		sendResponse(ERR_NOTREGISTERED(string("*")), fd);
+	// Handle commands for unregistered users
+	/*if (!isRegistered(fd)) {
+		if (cmdMap.find(upperCmd) == cmdMap.end() || upperCmd == "PASS" || upperCmd == "NICK" || upperCmd == "USER") {
+			sendMsg(ERR_NOTREGISTERED(string("*")), fd);
+		} else {
+			sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), splited[0]), fd);
+		}
+		return ;
+		}*/
+	
+	// Handle commands for registered users
+	std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
+	if (it != cmdMap.end()) {
+		// Execute the command
+		(this->*(it->second))(command, fd);
+	} else {
+		// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
+		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), splited[0]), fd);
 	}
 		
 }
@@ -240,4 +255,8 @@ bool Server::isRegistered(int fd) {
 	if (getClient(fd)->getState() == REGISTERED)
 		return true;
 	return false;
+}
+
+void Server::sendMsg(string msg, int fd) {
+	send(fd, msg.c_str(), msg.size(), 0);
 }
