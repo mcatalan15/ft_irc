@@ -90,9 +90,9 @@ void Client::welcome()
 
 void	Client::clearSpecMsg() {
 	size_t	lp = this->_msg.find_last_of("\r\n");
-	
-	if (lp != string::npos)
-		this->_msg.erase(0, lp + 1);
+
+	if (lp != this->_msg.size())
+		this->_msg.erase(lp, this->_msg.size());
 	else
 		this->_msg.clear();
 }

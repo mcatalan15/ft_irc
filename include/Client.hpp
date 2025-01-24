@@ -27,7 +27,7 @@ class Client
 		//std::vector<Channel>	_channels;		// Not sure we need that
 		//std::vector<Client>	_clients;		// List of all clients
 
-		string				_password;		// HACE FALTA ?*/
+		//string				_password;		// HACE FALTA ?*/
 		struct sockaddr_in6		address;		// DE QUE SIRVE ??
 		//struct pollfd			*fds;
 		bool					_registered;

@@ -12,7 +12,7 @@ class Server {
 		int							_opt;
 //		int							_port;
 		static bool					_signal;
-		std::vector<Client>			_clients;
+		std::vector<Client>			_clients; // Poner puntero?????????!!!!!!!
 		std::vector<struct pollfd>	_pollFds; //buffer. Structura para manejar mas de 1 fd(cliente)
 		struct sockaddr_in6			_address;
 		string						_password;
@@ -30,7 +30,7 @@ class Server {
 		void			new_client(int &numfd);
 		void			removeClient(int fd);
 		void			removeFd(int fd);
-		void			msgManagement(string &command, int fd);
+		void			msgManagement(int fd);
 		bool			isRegistered(int fd);
 		void			sendMsg(string msg, int fd);
 

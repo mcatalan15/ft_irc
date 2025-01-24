@@ -92,7 +92,7 @@ void Server::new_client(int &numfd) {
 // If client exists
 void	Server::client_exist(int fd) {
 	char buffer[512];
-	ssize_t	bytes_read = recv(fd, buffer, 512, 0);
+	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0);
 	Client *Client = getClient(fd);
 	std::vector<string>	command;
 
@@ -107,7 +107,7 @@ void	Server::client_exist(int fd) {
 		removeFd(fd);
 	} else {
 		// Print received message
-		std::cout << "Client (" << getClient(fd) << "): " << buffer << std::endl;
+//	std::cout << "Client (" << getClient(fd) << "): " << buffer << std::endl;
 		// Echo the message back to the client
 		send(fd, buffer, bytes_read, 0);
 		/*
@@ -116,11 +116,8 @@ void	Server::client_exist(int fd) {
 			!!!!!!!!!!!!!!!!!!!!!!!!!
 		*/
 		Client->setMsg(buffer);
-		if (Client->getMsg().find_first_of("\r\n") == string::npos)
-			return;
-		command = splitMsg(Client->getMsg());
-		for (size_t i = 0; i < command.size(); i++)
-			msgManagement(command[i], fd);
+		Client->clearSpecMsg();
+		msgManagement(fd);
 		if (getClient(fd))
 			getClient(fd)->clearSpecMsg();
 	}
@@ -191,41 +188,44 @@ void	Server::removeFd(int fd) {
 const std::map<std::string, void (Server::*)(std::string&, int)> Server::cmdMap = Server::createCmdMap();
 
 std::map<std::string, void (Server::*)(std::string&, int)> Server::createCmdMap() {
-    std::map<std::string, void (Server::*)(std::string&, int)> map;
-    map["PASS"] = &Server::passCmd;
-    map["NICK"] = &Server::nickCmd;
-    map["USER"] = &Server::userCmd;
-    map["QUIT"] = &Server::quitCmd;
-    map["MODE"] = &Server::modeCmd;
-    map["JOIN"] = &Server::joinCmd;
-    map["PART"] = &Server::partCmd;
-    map["TOPIC"] = &Server::topicCmd;
-    map["KICK"] = &Server::kickCmd;
-    map["PRIVMSG"] = &Server::privmsgCmd;
-    map["INVITE"] = &Server::inviteCmd;
-    map["WHOIS"] = &Server::whoisCmd;
-    map["ADMIN"] = &Server::adminCmd;
-    map["INFO"] = &Server::infoCmd;
-    map["PONG"] = &Server::pongCmd;
-    map["PING"] = &Server::pingCmd;
-    return map;
+	std::map<std::string, void (Server::*)(std::string&, int)> map;
+	map["PASS"] = &Server::passCmd;
+	map["NICK"] = &Server::nickCmd;
+	map["USER"] = &Server::userCmd;
+	map["QUIT"] = &Server::quitCmd;
+	map["MODE"] = &Server::modeCmd;
+	map["JOIN"] = &Server::joinCmd;
+	map["PART"] = &Server::partCmd;
+	map["TOPIC"] = &Server::topicCmd;
+	map["KICK"] = &Server::kickCmd;
+	map["PRIVMSG"] = &Server::privmsgCmd;
+	map["INVITE"] = &Server::inviteCmd;
+	map["WHOIS"] = &Server::whoisCmd;
+	map["ADMIN"] = &Server::adminCmd;
+	map["INFO"] = &Server::infoCmd;
+	map["PONG"] = &Server::pongCmd;
+	map["PING"] = &Server::pingCmd;
+	return map;
 }
 
-
-void	Server::msgManagement(string &command, int fd) {
+void	Server::msgManagement( int fd) {
+	string command = getClient(fd)->getMsg();
 	if (command.empty())
 		return ;
 	
+	std::vector<string> cmd = splitMsg(command);
+	for (size_t i = 0; i < cmd.size(); i++) 
+		std::cout << "Command[" << i << "] <" << cmd[i] << "> ";
+/*	std::cout << std::endl;
+	string cmd = command.substr(0, i);
+	string msg = command.substr(i + 1, command.size() - i + 1);
+	std::cout << "Esto es el cmd con substr <" << cmd << ">" << std::endl;
+	std::cout << "Esto es el msg con substr <" << msg << ">" << std::endl;*/
 	//Normalize the input by removing leading spaces
-	std::vector<string>	splited = splitCommand(command);
-	size_t	found = command.find_first_not_of(" \t\v");
-	if (found != string::npos)
-		command = command.substr(found);
 	
-	if (splited.empty())
-		return ;
+
 	// Use getCommandInUpper to extract and normalize the command
-	string upperCmd = getCommandInUpper(command);
+//	string upperCmd = getCommandInUpper(command);
 
 	// REVISAR ORDEN Y COMO DIVIDIR PARA Q MAPA HAGA PRIMERO EL RESTO
 	// Handle commands for unregistered users
@@ -236,18 +236,18 @@ void	Server::msgManagement(string &command, int fd) {
 			sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), splited[0]), fd);
 		}
 		return ;
-		}*/
+	}*/
 	
 	// Handle commands for registered users
-	std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
+	/*std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) {
 		// Execute the command
 		(this->*(it->second))(command, fd);
 	} else {
+		getClient(fd)->setNickname("TMP"); // BORRAR
 		// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
 		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), splited[0]), fd);
-	}
-		
+	}*/
 }
 
 bool Server::isRegistered(int fd) {
