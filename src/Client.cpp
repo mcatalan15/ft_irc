@@ -96,3 +96,7 @@ void	Client::clearSpecMsg() {
 	else
 		this->_msg.clear();
 }
+
+void	Client::cleanBuff() {
+	this->_msg.clear();
+}

@@ -106,10 +106,6 @@ void	Server::client_exist(int fd) {
 		removeClient(fd);
 		removeFd(fd);
 	} else {
-		// Print received message
-//	std::cout << "Client (" << getClient(fd) << "): " << buffer << std::endl;
-		// Echo the message back to the client
-		send(fd, buffer, bytes_read, 0);
 		/*
 			!!!!!!!!!!!!!!!!!!!!!!!!
 			AQUI VA LA MANDANGA
@@ -118,8 +114,8 @@ void	Server::client_exist(int fd) {
 		Client->setMsg(buffer);
 		Client->clearSpecMsg();
 		msgManagement(fd);
-		if (getClient(fd))
-			getClient(fd)->clearSpecMsg();
+		if (getClient(fd)) // to delete the buffer once is used
+			Client->cleanBuff();
 	}
 }
 
@@ -217,8 +213,8 @@ void	Server::msgManagement( int fd) {
 	std::vector<string> cmd = splitMsg(command);
 	for (size_t i = 0; i < cmd.size(); i++) 
 		std::cout << "Command[" << i << "] <" << cmd[i] << "> ";
-/*	std::cout << std::endl;
-	string cmd = command.substr(0, i);
+	std::cout << std::endl;
+	/*string cmd = command.substr(0, i);
 	string msg = command.substr(i + 1, command.size() - i + 1);
 	std::cout << "Esto es el cmd con substr <" << cmd << ">" << std::endl;
 	std::cout << "Esto es el msg con substr <" << msg << ">" << std::endl;*/
@@ -226,7 +222,8 @@ void	Server::msgManagement( int fd) {
 	
 
 	// Use getCommandInUpper to extract and normalize the command
-//	string upperCmd = getCommandInUpper(command);
+	string upperCmd = getCommandInUpper(cmd[0]);
+	std::cout << "upperCMD <" << upperCmd << ">" << std::endl;
 
 	// REVISAR ORDEN Y COMO DIVIDIR PARA Q MAPA HAGA PRIMERO EL RESTO
 	// Handle commands for unregistered users
