@@ -210,6 +210,7 @@ std::map<std::string, void (Server::*)(std::string&, int)> Server::createCmdMap(
 
 void	Server::msgManagement( int fd) {
 	string command = getClient(fd)->getMsg();
+	std::cout << "msgManagement <" << command << ">" << std::endl;
 	if (command.empty())
 		return ;
 	

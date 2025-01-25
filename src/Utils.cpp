@@ -5,19 +5,25 @@
 #include <sstream>
 #include <string>
 
-std::vector<string>	splitMsg(string str) {
-	std::vector<string>	command;
-	std::istringstream	stm(str);
-	string				line;
-	
-	while(std::getline(stm, line)) {
-		size_t pos = line.find_first_of("\r\n");
-		if (pos != string::npos)
-			line = line.substr(0, pos);
-		command.push_back(line);
-	}
-	return command;
+std::vector<string> splitMsg(string &str) {
+    std::vector<std::string> result;
+    size_t firstSpace = str.find_first_of(" \t");
+    
+    // Extract the first word
+    result.push_back(str.substr(0, firstSpace));
+    
+    // Extract the remainder, trimming leading spaces
+    if (firstSpace != std::string::npos) {
+        std::string remainder = str.substr(firstSpace + 1);
+        remainder.erase(0, remainder.find_first_not_of(" \t"));
+        result.push_back(remainder);
+    } else {
+        result.push_back(""); // Add an empty string if there's no remainder
+    }
+    
+    return result;
 }
+
 
 string	getCommandInUpper(const string &cmd) {
 	size_t start = cmd.find_first_not_of(" \t\v"); // Avoid initial empty spaces

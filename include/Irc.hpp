@@ -45,7 +45,7 @@ using std::string;
 #define WHITE "\033[0m"
 
 //Utils functions
-std::vector<string>	splitMsg(string str);
+std::vector<string>	splitMsg(string &str);
 string				getCommandInUpper(const string &cmd);
 std::vector<string>	splitCommand(string &cmd);
 
