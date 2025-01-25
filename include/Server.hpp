@@ -43,6 +43,9 @@ class Server {
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
 		
+		//isUsed commands
+		bool		nickIsUsed(string cmd);
+		bool		userIsUsed(string cmd);
 		//Commands
 		void		passCmd(string &cmd, int fd);
 		void		nickCmd(string &cmd, int fd);

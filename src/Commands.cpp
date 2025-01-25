@@ -12,27 +12,59 @@ void	Server::passCmd(string &cmd, int fd){
 	}
 }
 
+bool	Server::nickIsUsed(string cmd) {
+	
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		std::cout << "cmd: " << cmd << "  client: " << _clients[i].getNickname() << std::endl;
+		if (_clients[i].getNickname() == cmd) {
+			std::cout << "Exists" << std::endl;
+			return false;
+		}
+	}
+	return true;
+}
+
 void	Server::nickCmd(string &cmd, int fd){
 	std::cout << "NICK cmd" << std::endl;
-	if (getClient(fd)->getState()!= NICK)
-			return ;
-	else {
-		getClient(fd)->setState(LOGIN);
-		getClient(fd)->setNickname(cmd);
-		std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
+	if (getClient(fd)->getState() == NICK || getClient(fd)->getState() == REGISTERED) {
+		if (!nickIsUsed(cmd))
+			sendMsg("Nickname used\n", fd); // cambiar al error q toca
+		else {
+				getClient(fd)->setState(LOGIN);
+				getClient(fd)->setNickname(cmd);
+				std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
+		}
 	}
+			return ;
+}
+
+bool	Server::userIsUsed(string cmd) {
+	
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		std::cout << "cmd: <" << cmd << ">  user: <" << _clients[i].getUsername() << ">" << std::endl;
+		if (_clients[i].getUsername() == cmd) {
+			std::cout << "Exists" << std::endl;
+			return false;
+		}
+	}
+	return true;
 }
 
 void	Server::userCmd(string &cmd, int fd){
 	std::cout << "USER cmd" << std::endl;
-	if (getClient(fd)->getState()!= LOGIN)
-			return ;
-	else {
-		getClient(fd)->setUsername(cmd);
-		getClient(fd)->setState(REGISTERED);
-		std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
+	if (getClient(fd)->getState() == LOGIN || getClient(fd)->getState() == REGISTERED) {
+		if (!userIsUsed(cmd))
+			sendMsg("Username used\n", fd);
+		else {
+			getClient(fd)->setUsername(cmd);
+			getClient(fd)->setState(REGISTERED);
+			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
+			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
+		}
 	}
-	std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
+	return ;
 }
 
 void	Server::quitCmd(string &cmd, int fd){

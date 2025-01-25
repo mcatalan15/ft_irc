@@ -80,13 +80,13 @@ std::vector<string>	splitCommand(string &cmd);
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
-password
-:localhost 464 marc :Password incorrect
-nickname
-:localhost 433 marc mcs :Nickname is already in use
-user
-USER * * :marc catalan sanchez
-:localhost 461 marc USER :Not enough parameters
+//password
+//:localhost 464 marc :Password incorrect
+//nickname
+//:localhost 433 marc mcs :Nickname is already in use
+//user
+//USER * * :marc catalan sanchez
+//:localhost 461 marc USER :Not enough parameters
 
 
 #endif

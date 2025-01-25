@@ -213,22 +213,17 @@ void	Server::msgManagement( int fd) {
 		return ;
 	
 	std::vector<string> cmd = splitMsg(command);
-	for (size_t i = 0; i < cmd.size(); i++) 
-		std::cout << "Command[" << i << "] <" << cmd[i] << "> ";
-	std::cout << std::endl;
 	// Use getCommandInUpper to extract and normalize the command
 	string upperCmd = getCommandInUpper(cmd[0]);
-	std::cout << "upperCMD <" << upperCmd << ">" << std::endl;
 	
 	//FAKE AUTH
 	//getClient(fd)->setPass
-	getClient(fd)->setNickname("mcatalan");
-	getClient(fd)->setUsername("marc catalan");
 	// Handle commands for registered users
 	//if (isRegistered(fd)) {
 		// Handle commands for registered users
 		std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
 		if (it != cmdMap.end()) { // Execute the command
+			std::cout << "Sale del while!!!!!!!!!!!!!!!!1" << std::endl;
 			(this->*(it->second))(cmd[1], fd);
 		} else {
 			//CUIDADO PETA!!!!!
