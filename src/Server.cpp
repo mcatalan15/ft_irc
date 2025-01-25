@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include <cstddef>
+#include <cstring>
 #include <map>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -92,12 +93,12 @@ void Server::new_client(int &numfd) {
 // If client exists
 void	Server::client_exist(int fd) {
 	char buffer[512];
-	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0);
+	std::memset(buffer, 0, sizeof(buffer)); // clean buffer to verify there's nothing from the old buff
+	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0); //function to read buff
 	Client *Client = getClient(fd);
 	std::vector<string>	command;
 
-	if (bytes_read <= 0) {
-		// Client disconnected or error occurred
+	if (bytes_read <= 0) { // Client disconnected or error occurred
 		std::cout << "Client disconnected, fd: " << fd << std::endl;
 		close(fd);
 
@@ -111,10 +112,11 @@ void	Server::client_exist(int fd) {
 			AQUI VA LA MANDANGA
 			!!!!!!!!!!!!!!!!!!!!!!!!!
 		*/
+		std::cout << "////////////////////////////////////////" << std::endl;
 		Client->setMsg(buffer);
 		Client->clearSpecMsg();
 		msgManagement(fd);
-		if (getClient(fd)) // to delete the buffer once is used
+		if (getClient(fd)) // to delete the _msg once is used
 			Client->cleanBuff();
 	}
 }
@@ -214,13 +216,6 @@ void	Server::msgManagement( int fd) {
 	for (size_t i = 0; i < cmd.size(); i++) 
 		std::cout << "Command[" << i << "] <" << cmd[i] << "> ";
 	std::cout << std::endl;
-	/*string cmd = command.substr(0, i);
-	string msg = command.substr(i + 1, command.size() - i + 1);
-	std::cout << "Esto es el cmd con substr <" << cmd << ">" << std::endl;
-	std::cout << "Esto es el msg con substr <" << msg << ">" << std::endl;*/
-	//Normalize the input by removing leading spaces
-	
-
 	// Use getCommandInUpper to extract and normalize the command
 	string upperCmd = getCommandInUpper(cmd[0]);
 	std::cout << "upperCMD <" << upperCmd << ">" << std::endl;
@@ -231,21 +226,21 @@ void	Server::msgManagement( int fd) {
 		if (cmdMap.find(upperCmd) == cmdMap.end() || upperCmd == "PASS" || upperCmd == "NICK" || upperCmd == "USER") {
 			sendMsg(ERR_NOTREGISTERED(string("*")), fd);
 		} else {
-			sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), splited[0]), fd);
+			sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), cmd[0]), fd);
 		}
 		return ;
-	}*/
+		}*/
 	
 	// Handle commands for registered users
-	/*std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
+	std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) {
 		// Execute the command
-		(this->*(it->second))(command, fd);
+		(this->*(it->second))(cmd[1], fd);
 	} else {
-		getClient(fd)->setNickname("TMP"); // BORRAR
+		//CUIDADO PETA!!!!!
 		// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
-		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), splited[0]), fd);
-	}*/
+		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[0]), fd);
+	}
 }
 
 bool Server::isRegistered(int fd) {

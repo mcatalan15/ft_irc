@@ -1,8 +1,9 @@
 #include "../include/Server.hpp"
 
 void	Server::passCmd(string &cmd, int fd){
-	std::cout << "PASS cmd" << std::endl;
-	(void)cmd;
+	std::cout << "-------------------PASS cmd---------------------" << std::endl;
+	std::cout << "_msg of the client <" << getClient(fd)->getMsg() << ">" << std::endl;
+	std::cout << "cmd passed: " << cmd << std::endl;
 	(void)fd;
 }
 
