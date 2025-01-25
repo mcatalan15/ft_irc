@@ -1,22 +1,38 @@
 #include "../include/Server.hpp"
 
 void	Server::passCmd(string &cmd, int fd){
-	std::cout << "-------------------PASS cmd---------------------" << std::endl;
-	std::cout << "_msg of the client <" << getClient(fd)->getMsg() << ">" << std::endl;
-	std::cout << "cmd passed: " << cmd << std::endl;
-	(void)fd;
+	if (getClient(fd)->getState()!= HANDSHAKE)
+		return ;
+	else {
+		if (cmd == getPassword()) {
+			getClient(fd)->setState(NICK);
+			std::cout << "Correct password!" << std::endl;
+		}
+		//PASSword incorrect message
+	}
 }
 
 void	Server::nickCmd(string &cmd, int fd){
 	std::cout << "NICK cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	if (getClient(fd)->getState()!= NICK)
+			return ;
+	else {
+		getClient(fd)->setState(LOGIN);
+		getClient(fd)->setNickname(cmd);
+		std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
+	}
 }
 
 void	Server::userCmd(string &cmd, int fd){
 	std::cout << "USER cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	if (getClient(fd)->getState()!= LOGIN)
+			return ;
+	else {
+		getClient(fd)->setUsername(cmd);
+		getClient(fd)->setState(REGISTERED);
+		std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
+	}
+	std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
 }
 
 void	Server::quitCmd(string &cmd, int fd){

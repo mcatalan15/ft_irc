@@ -8,6 +8,7 @@
 // We can move it to Irc.hpp maybe ?
 enum State {
 	HANDSHAKE,  // Initial conection state
+	NICK,
 	LOGIN,      // The client has sent NICK and USER, but is mnot yet registred
 	REGISTERED  // The client is fully registered and ready to interact
 };

@@ -219,28 +219,38 @@ void	Server::msgManagement( int fd) {
 	// Use getCommandInUpper to extract and normalize the command
 	string upperCmd = getCommandInUpper(cmd[0]);
 	std::cout << "upperCMD <" << upperCmd << ">" << std::endl;
-
-	// REVISAR ORDEN Y COMO DIVIDIR PARA Q MAPA HAGA PRIMERO EL RESTO
-	// Handle commands for unregistered users
-	/*if (!isRegistered(fd)) {
-		if (cmdMap.find(upperCmd) == cmdMap.end() || upperCmd == "PASS" || upperCmd == "NICK" || upperCmd == "USER") {
-			sendMsg(ERR_NOTREGISTERED(string("*")), fd);
-		} else {
-			sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), cmd[0]), fd);
-		}
-		return ;
-		}*/
 	
+	//FAKE AUTH
+	//getClient(fd)->setPass
+	getClient(fd)->setNickname("mcatalan");
+	getClient(fd)->setUsername("marc catalan");
 	// Handle commands for registered users
-	std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
-	if (it != cmdMap.end()) {
-		// Execute the command
-		(this->*(it->second))(cmd[1], fd);
+	//if (isRegistered(fd)) {
+		// Handle commands for registered users
+		std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
+		if (it != cmdMap.end()) { // Execute the command
+			(this->*(it->second))(cmd[1], fd);
+		} else {
+			//CUIDADO PETA!!!!!
+			// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
+			sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[0]), fd);
+		}
+	//}
+	/*else {
+		if (getClient(fd)->getState() == HANDSHAKE)
+			passCmd(cmd[1], fd);
+		else if (getClient(fd)->getState() == NICK)
+			nickCmd(cmd[1], fd);
+		else if (getClient(fd)->getState() == LOGIN)
+			
+		}*/
+	//CAMBIAR !!!
+	/*if (cmdMap.find(upperCmd) == cmdMap.end() || upperCmd == "PASS" || upperCmd == "NICK" || upperCmd == "USER") {
+		sendMsg(ERR_NOTREGISTERED(string("*")), fd);
 	} else {
-		//CUIDADO PETA!!!!!
-		// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
-		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[0]), fd);
+		sendMsg(ERR_CMDNOTFOUND(getClient(fd)->getNickname(), cmd[0]), fd);
 	}
+	return ;*/
 }
 
 bool Server::isRegistered(int fd) {
