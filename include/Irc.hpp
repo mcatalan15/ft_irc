@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Irc.hpp                                            :+:      :+:    :+:   */
+/*   irc.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcatalan <mcatalan@student.42barcelona.    +#+  +:+       +#+        */
+/*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/01/11 23:40:59 by jpaul-kr         ###   ########.fr       */
+/*   Updated: 2025/01/25 15:51:06 by mcatalan@st      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,5 +80,13 @@ std::vector<string>	splitCommand(string &cmd);
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
+password
+:localhost 464 marc :Password incorrect
+nickname
+:localhost 433 marc mcs :Nickname is already in use
+user
+USER * * :marc catalan sanchez
+:localhost 461 marc USER :Not enough parameters
+
 
 #endif
