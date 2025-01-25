@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <sstream>
 #include <string>
+#include <vector>
 
 std::vector<string> splitMsg(string &str) {
     std::vector<std::string> result;
@@ -59,4 +60,25 @@ std::vector<string>	splitCommand(string &cmd) {
 		tmp.clear();
 	}
 	return splited;
+}
+
+std::vector<string> splitUserCmd(string& str)
+{
+	size_t				i;
+	size_t				init = 0;
+	std::vector<string>	vec;
+	
+	for (i = 0; str[i] != ':' && i < str.size(); i++)
+	{	
+		if (str[i] != ' ') // && str[i + 1] == ' ')
+		{
+			std::cout << "entra" << std::endl;
+			init = i;
+			while (str[i] != ' ' && str[i])
+				i++;
+			vec.push_back(str.substr(init, i - init));
+		}
+	}
+	vec.push_back(str.substr(i, -1));
+	return vec;
 }

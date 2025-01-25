@@ -74,7 +74,7 @@ using std::string;
 std::vector<string>	splitMsg(string &str);
 string				getCommandInUpper(const string &cmd);
 std::vector<string>	splitCommand(string &cmd);
-
+std::vector<string>	splitUserCmd(string &cmd);
 // Defines
 #define CRLF "\r\n"
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
