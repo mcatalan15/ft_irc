@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include <iostream>
 
 void	Server::passCmd(string &cmd, int fd){
 	if (getClient(fd)->getState()!= HANDSHAKE)
@@ -13,9 +14,7 @@ void	Server::passCmd(string &cmd, int fd){
 }
 
 bool	Server::nickIsUsed(string cmd) {
-	
-	for (size_t i = 0; i < _clients.size(); i++)
-	{
+	for (size_t i = 0; i < _clients.size(); i++) {
 		std::cout << "cmd: " << cmd << "  client: " << _clients[i].getNickname() << std::endl;
 		if (_clients[i].getNickname() == cmd) {
 			std::cout << "Exists" << std::endl;
@@ -36,7 +35,7 @@ void	Server::nickCmd(string &cmd, int fd){
 				std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
 		}
 	}
-			return ;
+	return ;
 }
 
 bool	Server::userIsUsed(string cmd) {
@@ -55,6 +54,7 @@ bool	Server::userIsUsed(string cmd) {
 void	Server::userCmd(string &cmd, int fd){
 	std::cout << "USER cmd" << std::endl;
 	if (getClient(fd)->getState() == LOGIN) {
+		std::cout << "entra if general" << std::endl;
 		if (!userIsUsed(cmd))
 			sendMsg("Username used\n", fd);
 		else {

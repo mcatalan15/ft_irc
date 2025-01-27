@@ -103,6 +103,4 @@ void	Client::cleanBuff() {
 	this->_msg.clear();
 }
 
-void	Client::appendToMsg(const string &msg) {
-	_msg += msg;
-}
+void	Client::appendToMsg(const string &msg) { _msg += msg; }
