@@ -49,6 +49,8 @@ State Client::getState() const { return (_state); }
 
 string Client::getMsg() const { return (_msg); }
 
+string &Client::getMsgRef() { return (_msg); }
+
 // To build the prefix in IRC format: ":nickname!username@hostname"
 string Client::getPrefix() const {
     string prefix = ":" + getNickname();
@@ -99,4 +101,8 @@ void	Client::clearSpecMsg() {
 
 void	Client::cleanBuff() {
 	this->_msg.clear();
+}
+
+void	Client::appendToMsg(const string &msg) {
+	_msg += msg;
 }

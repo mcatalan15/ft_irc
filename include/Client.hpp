@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include "Irc.hpp"
+#include <string>
 //#include "MessageHandler.hpp"
 
 // Definition of possible client state
@@ -50,6 +51,7 @@ class Client
 		string			getRealname() const;
 		string			getHostname() const;
 		string			getMsg() const; //tengo que implementarlo
+		string			&getMsgRef();
 		string			getPrefix() const;
 		bool			getIsOper() const;
 		State			getState() const;
@@ -68,6 +70,7 @@ class Client
 		void reply(string msg);    //Need to implement*/
 		void	clearSpecMsg();
 		void	cleanBuff();
+		void	appendToMsg(const string &msg);
 };
 
 #endif

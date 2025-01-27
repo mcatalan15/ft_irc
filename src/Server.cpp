@@ -107,17 +107,30 @@ void	Server::client_exist(int fd) {
 		removeClient(fd);
 		removeFd(fd);
 	} else {
-		/*
+		// Append received data to the client's existing buffer
+		string received_data(buffer, bytes_read);
+		Client->appendToMsg(received_data);
+
+		// Process the buffer while it contains complete messages ending with "\r\n"
+		string &msg_buffer = Client->getMsgRef();
+		size_t pos;
+		while ((pos = msg_buffer.find("\r\n")) != string::npos) {
+			// Extract a single complete message
+			string complete_msg = msg_buffer.substr(0, pos);
+			msg_buffer.erase(0, pos + 2);
+			/*
 			!!!!!!!!!!!!!!!!!!!!!!!!
 			AQUI VA LA MANDANGA
 			!!!!!!!!!!!!!!!!!!!!!!!!!
-		*/
-		std::cout << "////////////////////////////////////////" << std::endl;
-		Client->setMsg(buffer);
-		Client->clearSpecMsg();
-		msgManagement(fd);
-		if (getClient(fd)) // to delete the _msg once is used
-			Client->cleanBuff();
+			*/
+			std::cout << "////////////////////////////////////////" << std::endl;
+			std::cout << "msg_buffer: <" << complete_msg << ">" << std::endl;
+			Client->setMsg(buffer);
+			Client->clearSpecMsg();
+			msgManagement(fd);
+			if (getClient(fd)) // to delete the _msg once is used
+				Client->cleanBuff();
+		}
 	}
 }
 
