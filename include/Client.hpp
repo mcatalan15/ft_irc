@@ -68,7 +68,7 @@ class Client
 		//FUNCTIONS
 		void welcome();                 // Need to implement
 		void reply(string msg);    //Need to implement*/
-		void	clearSpecMsg();
+		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();
 		void	appendToMsg(const string &msg);
 };

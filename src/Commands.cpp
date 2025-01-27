@@ -39,9 +39,8 @@ void	Server::nickCmd(string &cmd, int fd){
 }
 
 bool	Server::userIsUsed(string cmd) {
-	
-	for (size_t i = 0; i < _clients.size(); i++)
-	{
+	// REALMENTE CUAL DEBERIA DE TODOS LOS NOMBRES DEBE MIRAR???
+	for (size_t i = 0; i < _clients.size(); i++) {
 		std::cout << "cmd: <" << cmd << ">  user: <" << _clients[i].getUsername() << ">" << std::endl;
 		if (_clients[i].getUsername() == cmd) {
 			std::cout << "Exists" << std::endl;
@@ -55,12 +54,12 @@ void	Server::userCmd(string &cmd, int fd){
 	std::cout << "USER cmd" << std::endl;
 	if (getClient(fd)->getState() == LOGIN) {
 		std::cout << "entra if general" << std::endl;
+		//std::vector<string> uSplited = splitUserCmd(cmd);
+		//for (size_t i = 0; i < uSplited.size(); i++)
+		//	std::cout << "cmd[" << i << "] <" << uSplited[i] << ">" << std::endl;
 		if (!userIsUsed(cmd))
 			sendMsg("Username used\n", fd);
 		else {
-			std::vector<string> uSplited = splitUserCmd(cmd);
-			for (size_t i = 0; i < uSplited.size(); i++)
-				std::cout << "cmd[" << i << "] <" << uSplited[i] << ">" << std::endl;
 			getClient(fd)->setUsername(cmd);
 			getClient(fd)->setState(REGISTERED);
 			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;

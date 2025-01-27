@@ -89,15 +89,15 @@ void Client::welcome()
     // NEED TO IMPLEMENT WELCOME MESSAGE
     std::cout << getNickname() << " is registered and ready to start !" << std::endl;
 }
-
+/* NOT used NOW
 void	Client::clearSpecMsg() {
 	size_t	lp = this->_msg.find_last_of("\r\n");
-
+	
 	if (lp != this->_msg.size())
 		this->_msg.erase(lp, this->_msg.size());
 	else
 		this->_msg.clear();
-}
+}*/
 
 void	Client::cleanBuff() {
 	this->_msg.clear();

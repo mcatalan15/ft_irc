@@ -6,25 +6,38 @@
 #include <string>
 #include <vector>
 
-std::vector<string> splitMsg(string &str) {
-    std::vector<std::string> result;
-    size_t firstSpace = str.find_first_of(" \t");
-    
-    // Extract the first word
-    result.push_back(str.substr(0, firstSpace));
-    
-    // Extract the remainder, trimming leading spaces
-    if (firstSpace != std::string::npos) {
-        std::string remainder = str.substr(firstSpace + 1);
-        remainder.erase(0, remainder.find_first_not_of(" \t"));
-        result.push_back(remainder);
-    } else {
-        result.push_back(""); // Add an empty string if there's no remainder
-    }
-    
+// CHECK NEW SPLITMSG. CREATES EXTRA VECTOR IN : CASE
+std::vector<std::string> splitMsg(std::string &str) {
+	std::vector<std::string> result;
+	std::string currentWord;
+	bool foundColon = false;
+
+	for (std::string::size_type i = 0; i < str.size(); ++i) {
+		char c = str[i];
+		if (foundColon) {
+			// After finding ':', add the rest of the string as a single command
+			currentWord += c;
+		} else if (c == ':') {
+			// Start treating everything after ':' as a single command
+			foundColon = true;
+			result.push_back(currentWord);
+			//currentWord = c; // Include ':' in the current word
+		} else if (c == ' ' || c == '\t') {
+			// Split words on spaces or tabs
+			if (!currentWord.empty()) {
+				result.push_back(currentWord);
+				currentWord.clear();
+			}
+		} else {
+			// Accumulate characters into the current word
+			currentWord += c;
+		}
+	}
+	// Add the last word if it's non-empty
+	if (!currentWord.empty())
+        result.push_back(currentWord);
     return result;
 }
-
 
 string	getCommandInUpper(const string &cmd) {
 	size_t start = cmd.find_first_not_of(" \t\v"); // Avoid initial empty spaces
