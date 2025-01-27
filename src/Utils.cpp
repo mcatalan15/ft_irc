@@ -20,8 +20,8 @@ std::vector<std::string> splitMsg(std::string &str) {
 		} else if (c == ':') {
 			// Start treating everything after ':' as a single command
 			foundColon = true;
-			result.push_back(currentWord);
-			//currentWord = c; // Include ':' in the current word
+			if (!currentWord.empty())
+				result.push_back(currentWord);
 		} else if (c == ' ' || c == '\t') {
 			// Split words on spaces or tabs
 			if (!currentWord.empty()) {
