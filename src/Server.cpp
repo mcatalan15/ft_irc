@@ -196,10 +196,11 @@ void	Server::removeFd(int fd) {
 }
 
 // Define the map outside the function
-const std::map<std::string, void (Server::*)(std::string&, int)> Server::cmdMap = Server::createCmdMap();
+const std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::cmdMap = Server::createCmdMap();
 
-std::map<std::string, void (Server::*)(std::string&, int)> Server::createCmdMap() {
-	std::map<std::string, void (Server::*)(std::string&, int)> map;
+std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::createCmdMap() {
+	std::map<std::string, void (Server::*)(std::vector<string>&, int)> map;
+	map["CAP"] = &Server::capCmd;
 	map["PASS"] = &Server::passCmd;
 	map["NICK"] = &Server::nickCmd;
 	map["USER"] = &Server::userCmd;
@@ -227,15 +228,15 @@ void	Server::msgManagement( int fd) {
 	
 	std::vector<string> cmd = splitMsg(command);
 	// Use getCommandInUpper to extract and normalize the command
-	string upperCmd = getCommandInUpper(cmd[0]);
+	string upperCmd = getCommandInUpper(cmd[0]); //toupper
 	
 	for (size_t i = 0; i < cmd.size(); i++)
 		std::cout << "cmd[" << i << "] <" << cmd[i] << ">" << std::endl;
 	
-	std::map<string, void (Server::*)(string&, int)>::const_iterator it = cmdMap.find(upperCmd);
+	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) { // Execute the command
 		std::cout << "Sale del while!!!!!!!!!!!!!!!!1" << std::endl;
-		(this->*(it->second))(cmd[1], fd);
+		(this->*(it->second))(cmd, fd);
 	} else {
 			//CUIDADO PETA!!!!!
 			// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
