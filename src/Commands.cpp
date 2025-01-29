@@ -5,7 +5,7 @@
 
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	std::cout << "CAP cmd" << std::endl;
-	sendMsg("CAP * LS :0", fd);
+	sendMsg("CAP * LS :0\r\n", fd);
 	std::cout << "message send" << std::endl;
 	(void)cmd;
 }
@@ -145,7 +145,8 @@ void	Server::adminCmd(std::vector<string>& cmd, int fd){
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	std::cout << "INFO cmd" << std::endl;
 	(void)cmd;
-	(void)fd;
+	sendMsg("RPL_INFO(371)", fd);
+	sendMsg("RPL_ENDOFINFO(374)\r\n", fd);
 }
 
 void	Server::pongCmd(std::vector<string>& cmd, int fd){
