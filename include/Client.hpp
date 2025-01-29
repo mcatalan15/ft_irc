@@ -2,7 +2,6 @@
 #define CLIENT_HPP
 
 #include "Irc.hpp"
-#include <string>
 //#include "MessageHandler.hpp"
 
 // Definition of possible client state

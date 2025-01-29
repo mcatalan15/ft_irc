@@ -1,6 +1,7 @@
 #include "../include/Server.hpp"
 #include <cstddef>
 #include <cstring>
+#include <iostream>
 #include <map>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -97,7 +98,8 @@ void	Server::client_exist(int fd) {
 	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0); //function to read buff
 	Client *Client = getClient(fd);
 	std::vector<string>	command;
-
+	Client->setHostname(addHostname());
+	std::cout << "hostname <" << Client->getHostname() << ">" << std::endl;
 	if (bytes_read <= 0) { // Client disconnected or error occurred
 		std::cout << "Client disconnected, fd: " << fd << std::endl;
 		close(fd);
@@ -229,9 +231,6 @@ void	Server::msgManagement( int fd) {
 	std::vector<string> cmd = splitMsg(command);
 	// Use getCommandInUpper to extract and normalize the command
 	string upperCmd = getCommandInUpper(cmd[0]); //toupper
-	
-	for (size_t i = 0; i < cmd.size(); i++)
-		std::cout << "cmd[" << i << "] <" << cmd[i] << ">" << std::endl;
 	
 	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) { // Execute the command

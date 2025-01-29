@@ -35,8 +35,8 @@ std::vector<std::string> splitMsg(std::string &str) {
 	}
 	// Add the last word if it's non-empty
 	if (!currentWord.empty())
-        result.push_back(currentWord);
-    return result;
+		result.push_back(currentWord);
+	return result;
 }
 
 string	getCommandInUpper(const string &cmd) {
@@ -94,4 +94,17 @@ std::vector<string> splitUserCmd(string& str)
 	}
 	vec.push_back(str.substr(i, -1));
 	return vec;
+}
+
+void	printVecStr(std::vector<string> cmd) {
+	for (size_t i = 0; i < cmd.size(); i++)
+		std::cout << "cmd[" << i << "] <" << cmd[i] << ">" << std::endl;
+}
+
+string	addHostname() {
+	char	hostname[256];
+	
+	if (gethostname(hostname, sizeof(hostname)) == 0)
+		return string(hostname);
+	return NULL;
 }

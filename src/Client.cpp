@@ -4,9 +4,10 @@
 // Default constructor
 Client::Client() : _fd(-1), _isOper(false), _state(HANDSHAKE) {}
 
+
 // Constructor
 Client::Client(int client_fd) :_fd(client_fd), _isOper(false), _state(HANDSHAKE) {
-    _nickname.clear();
+	_nickname.clear();
     _username.clear();
     _realname.clear();
     _hostname.clear();
@@ -104,3 +105,5 @@ void	Client::cleanBuff() {
 }
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
+
+

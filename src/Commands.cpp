@@ -5,8 +5,9 @@
 
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	std::cout << "CAP cmd" << std::endl;
+	sendMsg("CAP * LS :0", fd);
+	std::cout << "message send" << std::endl;
 	(void)cmd;
-	(void)fd;
 }
 
 void	Server::passCmd(std::vector<string>& cmd, int fd){
@@ -18,6 +19,7 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 			std::cout << "Correct password!" << std::endl;
 		}
 		//PASSword incorrect message
+//		sendMsg("password incorrect msg", fd);
 	}
 }
 
@@ -60,7 +62,9 @@ bool	Server::userIsUsed(string cmd) {
 
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	std::cout << "USER cmd" << std::endl;
-	if (getClient(fd)->getState() == LOGIN) {
+	printVecStr(cmd);
+	std::cout << "User len <" << cmd.size() << ">" << std::endl;
+	if (getClient(fd)->getState() == LOGIN && cmd.size() == 5) {
 		std::cout << "entra if general" << std::endl;
 		//std::vector<string> uSplited = splitUserCmd(cmd);
 		//for (size_t i = 0; i < uSplited.size(); i++)
@@ -70,6 +74,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 		else {
 			getClient(fd)->setUsername(cmd[1]);
 			getClient(fd)->setState(REGISTERED);
+			getClient(fd)->setRealname(cmd[3]);
 			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
 			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
 		}
