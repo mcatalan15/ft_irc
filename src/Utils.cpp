@@ -64,6 +64,7 @@ string	getCommandInUpper(const string &cmd) {
 	return command;
 }
 
+// Split buffer when there is some commands in the same buffer
 std::vector<string>	splitCommand(string &cmd) {
 	std::vector<string>	splited;
 	std::istringstream	stm(cmd);
@@ -77,6 +78,7 @@ std::vector<string>	splitCommand(string &cmd) {
 	return splited;
 }
 
+// Split the command in the vector with the correct division
 std::vector<string> splitUserCmd(string& str)
 {
 	size_t				i;
@@ -98,11 +100,13 @@ std::vector<string> splitUserCmd(string& str)
 	return vec;
 }
 
+// Print the any vector of strings
 void	printVecStr(std::vector<string> cmd) {
 	for (size_t i = 0; i < cmd.size(); i++)
 		std::cout << "cmd[" << i << "] <" << cmd[i] << ">" << std::endl;
 }
 
+// Use gethostname to get the hostname of the machine
 string	addHostname() {
 	char	hostname[256];
 	
