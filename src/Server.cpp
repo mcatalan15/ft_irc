@@ -234,7 +234,7 @@ void	Server::msgManagement( int fd) {
 	
 	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) { // Execute the command
-		std::cout << "Sale del while!!!!!!!!!!!!!!!!1" << std::endl;
+		std::cout << "Sale del mapa!!!!!!!!!!!!!!!!1" << std::endl;
 		(this->*(it->second))(cmd, fd);
 	} else {
 			//CUIDADO PETA!!!!!

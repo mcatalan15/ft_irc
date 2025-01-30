@@ -4,7 +4,6 @@
 // Default constructor
 Client::Client() : _fd(-1), _isOper(false), _state(HANDSHAKE) {}
 
-
 // Constructor
 Client::Client(int client_fd) :_fd(client_fd), _isOper(false), _state(HANDSHAKE) {
 	_nickname.clear();
@@ -78,11 +77,9 @@ void Client::setIsOper(bool isOper) { _isOper = isOper; }
 void Client::setMsg(const std::string& msg) { _msg = msg; }
 
 //FONCTIONS
-void Client::welcome()
-{
+void Client::welcome() {
     // NEED To IMPLEMENT
-    if (_state != LOGIN || getNickname().empty() || getUsername().empty())
-    {
+    if (_state != LOGIN || getNickname().empty() || getUsername().empty()) {
         std::cout << "Waiting for registration..." << std::endl;
         return;
     }
@@ -105,5 +102,4 @@ void	Client::cleanBuff() {
 }
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
-
 

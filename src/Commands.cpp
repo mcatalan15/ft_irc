@@ -5,7 +5,10 @@
 
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	std::cout << "CAP cmd" << std::endl;
-	sendMsg("CAP * LS :0\r\n", fd);
+	if (cmd[1] == "LS")
+		sendMsg("CAP * LS :0\r\n", fd);
+	if (cmd[1] == "END")
+		sendMsg("CAP END", fd);	
 	std::cout << "message send" << std::endl;
 	(void)cmd;
 }
