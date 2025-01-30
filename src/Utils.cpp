@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -68,9 +69,10 @@ std::vector<string>	splitCommand(string &cmd) {
 	std::istringstream	stm(cmd);
 	string				tmp;
 	
-	while (stm >> tmp) {
+	while (std::getline(stm, tmp, '\n')) {
+		if (tmp.find_last_of("\r\n"))
+			tmp.erase(tmp.size() - 1, tmp.size());
 		splited.push_back(tmp);
-		tmp.clear();
 	}
 	return splited;
 }

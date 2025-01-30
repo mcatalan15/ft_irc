@@ -8,7 +8,7 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
 	if (cmd[1] == "END")
-		sendMsg("CAP END", fd);	
+		sendMsg("CAP END\r\n", fd);	
 	std::cout << "message send" << std::endl;
 	(void)cmd;
 }
@@ -20,6 +20,7 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 		if (cmd[1] == getPassword()) {
 			getClient(fd)->setState(NICK);
 			std::cout << "Correct password!" << std::endl;
+			sendMsg("Correct password\r\n", fd);
 		}
 		//PASSword incorrect message
 //		sendMsg("password incorrect msg", fd);
@@ -46,6 +47,7 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 				getClient(fd)->setState(LOGIN);
 				getClient(fd)->setNickname(cmd[1]);
 				std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
+				sendMsg("correct nickname\r\n", fd);
 		}
 	}
 	return ;
@@ -80,6 +82,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 			getClient(fd)->setRealname(cmd[3]);
 			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
 			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
+			sendMsg("Correct used\r\n", fd);
 		}
 	}
 	return ;

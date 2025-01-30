@@ -115,24 +115,26 @@ void	Server::client_exist(int fd) {
 
 		// Process the buffer while it contains complete messages ending with "\r\n"
 		string &msg_buffer = Client->getMsgRef();
-		size_t pos;
-		while ((pos = msg_buffer.find("\r\n")) != string::npos) {
+		std::vector<string> cmd = splitCommand(msg_buffer);
+		printVecStr(cmd);
+		for (size_t i = 0; i < cmd.size(); i++) {
+			Client->setMsg(cmd[i]);
+			msgManagement(fd);
+			if (getClient(fd)) // to delete the _msg once is used
+				Client->cleanBuff();
+		}
 			// Extract a single complete message
-			string complete_msg = msg_buffer.substr(0, pos);
-			msg_buffer.erase(0, pos + 2);
 			/*
 			!!!!!!!!!!!!!!!!!!!!!!!!
 			AQUI VA LA MANDANGA
 			!!!!!!!!!!!!!!!!!!!!!!!!!
 			*/
-			std::cout << "////////////////////////////////////////" << std::endl;
-			std::cout << "msg_buffer: <" << complete_msg << ">" << std::endl;
-			Client->setMsg(complete_msg);
+		std::cout << "sin codigo <"<< msg_buffer << ">" << std::endl;
+		std::cout << "////////////////////////////////////////" << std::endl;
+//		while () {
+			//lanzar comandos individual con + CRLF
+			//	}
 			//Client->clearSpecMsg();
-			msgManagement(fd);
-			if (getClient(fd)) // to delete the _msg once is used
-				Client->cleanBuff();
-		}
 	}
 }
 
