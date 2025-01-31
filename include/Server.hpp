@@ -32,7 +32,6 @@ class Server {
 		void			removeFd(int fd);
 		void			msgManagement(int fd);
 		bool			isRegistered(int fd);
-		void			sendMsg(string msg, int fd);
 
 		//Fds management
 		void			closeFds();

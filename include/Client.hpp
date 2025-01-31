@@ -65,7 +65,7 @@ class Client
 		void setIsOper(bool isOper);
 
 		//FUNCTIONS
-		void welcome();                 // Need to implement
+		void welcome(Client &Client, int fd);                 // Need to implement
 		void reply(string msg);    //Need to implement*/
 		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();

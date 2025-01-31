@@ -77,15 +77,28 @@ void Client::setIsOper(bool isOper) { _isOper = isOper; }
 void Client::setMsg(const std::string& msg) { _msg = msg; }
 
 //FONCTIONS
-void Client::welcome() {
+void Client::welcome(Client &Client, int fd) {
+	string userId = USER_ID(Client.getNickname(), Client.getUsername());
+	sendMsg("hola\r\n", fd);
+	sendMsg(RPL_WELCOME(Client.getNickname(), userId), fd);
+	sendMsg(RPL_YOURHOST(Client.getUsername(), SERVER_NAME, SERVER_VERSION), fd);
+	//sendMsg(RPL_CREATED(Client.getUsername(), _timer), fd); FALTA TIMER!!!!!
+	sendMsg(RPL_MYINFO(Client.getUsername(), SERVER_NAME, SERVER_VERSION, USER_MODES, CHANNEL_MODES, CHANNEL_MODES_WITH_PARAM), fd);
+	string supportedTokens = "NICKLEN=9";
+	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
+	sendMsg(RPL_MOTDSTART(Client.getUsername(), SERVER_NAME), fd);
+	sendMsg(RPL_MOTD(Client.getUsername(), "EMPIEZAAAAAAAAAAAAAAAA!!!!!!!!!"), fd);
+	// MAS MOTD
+	sendMsg(RPL_ENDOFMOTD(Client.getUsername()), fd);
+
     // NEED To IMPLEMENT
-    if (_state != LOGIN || getNickname().empty() || getUsername().empty()) {
-        std::cout << "Waiting for registration..." << std::endl;
-        return;
-    }
-    setState(REGISTERED);
+    //if (_state != LOGIN || getNickname().empty() || getUsername().empty()) {
+    //    std::cout << "Waiting for registration..." << std::endl;
+    //    return;
+    //}
+    //setState(REGISTERED);
     // NEED TO IMPLEMENT WELCOME MESSAGE
-    std::cout << getNickname() << " is registered and ready to start !" << std::endl;
+    //std::cout << getNickname() << " is registered and ready to start !" << std::endl;
 }
 /* NOT used NOW
 void	Client::clearSpecMsg() {
@@ -102,4 +115,3 @@ void	Client::cleanBuff() {
 }
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
-

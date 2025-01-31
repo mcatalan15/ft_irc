@@ -82,7 +82,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 			getClient(fd)->setRealname(cmd[3]);
 			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
 			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
-			sendMsg("Correct used\r\n", fd);
+			getClient(fd)->welcome(*getClient(fd), fd);
 		}
 	}
 	return ;

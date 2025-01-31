@@ -112,5 +112,9 @@ string	addHostname() {
 	
 	if (gethostname(hostname, sizeof(hostname)) == 0)
 		return string(hostname);
-	return NULL;
+	return string(); //Debiria el hostname ser localhost????
+}
+
+void	sendMsg(string msg, int fd) {
+	send(fd, msg.c_str(), msg.size(), 0);
 }

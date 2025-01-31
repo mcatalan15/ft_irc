@@ -94,7 +94,6 @@ void Server::new_client(int &numfd) {
 // If client exists
 void	Server::client_exist(int fd) {
 	char buffer[512];
-	std::memset(buffer, 0, sizeof(buffer)); // clean buffer to verify there's nothing from the old buff
 	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0); //function to read buff
 	Client *Client = getClient(fd);
 	std::vector<string>	command;
@@ -112,6 +111,7 @@ void	Server::client_exist(int fd) {
 		// Append received data to the client's existing buffer
 		string received_data(buffer, bytes_read);
 		Client->appendToMsg(received_data);
+		std::cout << "<" << Client->getMsg() << std::endl;
 
 		// Process the buffer while it contains complete messages ending with "\r\n"
 		string &msg_buffer = Client->getMsgRef();
@@ -252,6 +252,13 @@ bool Server::isRegistered(int fd) {
 	return false;
 }
 
-void Server::sendMsg(string msg, int fd) {
+/*void	Server::sendMsg(string msg, int fd) {
 	send(fd, msg.c_str(), msg.size(), 0);
-}
+}*/
+/*
+void	Server::welcomeMsg(int fd) {
+	string userId = USER_ID(getClient(fd)->getNickname(), getClient(fd)->getUsername);
+	//string nickname = getClient(fd)->getNickname();
+	//string hostname =getClient(fd)->getHostname();
+	sendMsg(RPL_WELCOME(getClient(fd)->getNickname(), userId), fd);
+}*/

@@ -77,12 +77,33 @@ std::vector<string>	splitCommand(string &cmd);
 std::vector<string>	splitUserCmd(string &cmd);
 void				printVecStr(std::vector<string> cmd);
 string	addHostname();
+void	sendMsg(string msg, int fd); 
 
 // Defines
 #define CRLF "\r\n"
+#define SERVER_NAME "FT_IRC"
+#define SERVER_VERSION "1.0"
+#define USER_MODES		"" // que mierdas es esto
+#define CHANNEL_MODES	"itkol" // y esto otro?
+#define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
+
+#define USER_ID(nick, client) (":" + (nick) + "!" + (client) + "@localhost")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
+
+//WELCOME msg (RPL_WELCOME)
+#define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
+#define RPL_YOURHOST(client, servername, version) (":localhost 002 " + (client) + " :Your host is " + (servername) + ", running version " + (version) + CRLF)
+#define RPL_CREATED(client, datatime) (":localhost 003 " + (client) + " :This server was created " + (datatime) + CRLF)
+#define RPL_MYINFO(client, servername, version, availableUserModes, availableChannelModes, channelModesWithParam)\
+	(":Localhost 004 " + client + " " + servername + " " + version + " " + availableUserModes + " " + availableChannelModes + " " + channelModesWithParam"" + CRLF)
+#define RPL_ISSUPPORT(client, supportedTokens) (":localhost 005 " + client + " " + supportedTokens + " :are supported by this server" + CRLF)
+
+//MOTD msg
+#define RPL_MOTDSTART(client, servername)(":localhost 375 " + client + " :- " + servername + " Messsage of the day -" + CRLF)
+#define RPL_MOTD(client, line)(":localhost 372 " + client + " :" + line + CRLF)
+#define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
 //password
 //:localhost 464 marc :Password incorrect
 //nickname
