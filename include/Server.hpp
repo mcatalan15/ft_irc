@@ -35,6 +35,7 @@ class Server {
 
 		//Fds management
 		void			closeFds();
+		void			remove_fd(int fd); // Remove save pollFds
 		
 		
 		//Getters
