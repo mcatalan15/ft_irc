@@ -79,7 +79,6 @@ void Client::setMsg(const std::string& msg) { _msg = msg; }
 //FONCTIONS
 void Client::welcome(Client &Client, int fd) {
 	string userId = USER_ID(Client.getNickname(), Client.getUsername());
-	sendMsg("hola\r\n", fd);
 	sendMsg(RPL_WELCOME(Client.getNickname(), userId), fd);
 	sendMsg(RPL_YOURHOST(Client.getUsername(), SERVER_NAME, SERVER_VERSION), fd);
 	//sendMsg(RPL_CREATED(Client.getUsername(), _timer), fd); FALTA TIMER!!!!!
@@ -87,8 +86,16 @@ void Client::welcome(Client &Client, int fd) {
 	string supportedTokens = "NICKLEN=9";
 	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
 	sendMsg(RPL_MOTDSTART(Client.getUsername(), SERVER_NAME), fd);
-	sendMsg(RPL_MOTD(Client.getUsername(), "EMPIEZAAAAAAAAAAAAAAAA!!!!!!!!!"), fd);
-	// MAS MOTD
+	sendMsg(RPL_MOTD(Client.getUsername(),  
+		" ______  _______    ______  \n"  
+		"|      \\|       \\  /      \\ \n"  
+		" \\$$$$$$| $$$$$$$\\|  $$$$$$\\\n"  
+		"  | $$  | $$__| $$| $$   \\$$\n"  
+		"  | $$  | $$    $$| $$      \n"  
+		"  | $$  | $$$$$$$\\| $$   __ \n"  
+		" _| $$_ | $$  | $$| $$__/  \\\n"  
+		"|   $$ \\| $$  | $$ \\$$    $$\n"  
+		" \\$$$$$$ \\$$   \\$$  \\$$$$$$  \n"), fd);
 	sendMsg(RPL_ENDOFMOTD(Client.getUsername()), fd);
 
     // NEED To IMPLEMENT

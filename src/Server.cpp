@@ -16,6 +16,7 @@ bool	Server::_signal = false;
 Server::Server(int port, string password) {
 	struct pollfd   s_poll;
 
+	memset(&_address, 0, sizeof(_address)); //Avoid unitialized memory errors
 	_address.sin6_family = AF_INET6; // sets IP path to ipv6
 	_address.sin6_addr = in6addr_any; // accepts any IP
 	_address.sin6_port = htons(port); // gets port number in bytes (abre puerto input)
@@ -139,12 +140,14 @@ void	Server::client_exist(int fd) {
 }
 
 void	Server::client_process() {
-	int numfd = 1; //empieza en 1 pq server es 0
+	int numfd = 1; //empieza en 1 pq server socket es 0
 	while (!(this->_signal)) {
 		int numEvents = poll(&_pollFds[0], numfd, -1); //
-		if (numEvents < 0 && _signal == false)
+		if (numEvents < 0 && _signal == false) {
 			std::cerr << "polling failed" << std::endl;
-
+			continue; //Skip the loop in case of error
+		}
+		// Iterate through the fds
 		for (int i = 0; i < numfd; i++) { //si hay eventos entra (si hay clientes conectados)
 			if (_pollFds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
 				if (_pollFds[i].fd == _serverFd) //mira si el evento es alguien nuevo?
@@ -251,14 +254,3 @@ bool Server::isRegistered(int fd) {
 		return true;
 	return false;
 }
-
-/*void	Server::sendMsg(string msg, int fd) {
-	send(fd, msg.c_str(), msg.size(), 0);
-}*/
-/*
-void	Server::welcomeMsg(int fd) {
-	string userId = USER_ID(getClient(fd)->getNickname(), getClient(fd)->getUsername);
-	//string nickname = getClient(fd)->getNickname();
-	//string hostname =getClient(fd)->getHostname();
-	sendMsg(RPL_WELCOME(getClient(fd)->getNickname(), userId), fd);
-}*/
