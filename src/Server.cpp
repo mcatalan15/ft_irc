@@ -34,7 +34,7 @@ Server::Server(int port, string password) {
 		std::cerr << "error: failed to set option (O_NONBLOCK) on socket" << std::endl;
 	if (bind(_serverFd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
 		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
-	if (listen(_serverFd, 5) < 0) // deja abierto el puerto
+	if (listen(_serverFd, MAX_CONNECTIONS) < 0) // deja abierto el puerto
 		std::cerr << "error: server not listening" << std::endl;
 
 	s_poll.fd = _serverFd;
@@ -76,8 +76,9 @@ void Server::new_client(int &numfd) {
 	socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
 	int client_fd = accept(_serverFd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
 	if (client_fd < 0) {
-		std::cerr << "accept() failed" << std::endl;
-		return;
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return; // Not a real error, just no clients to accept
+		std::cerr << "accept() failed: " << strerror(errno) << std::endl;
 	}
 	std::cout << "clientfd: " << client_fd << std::endl;
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1) {
@@ -88,7 +89,7 @@ void Server::new_client(int &numfd) {
 	
 	Client	newClient(client_fd);
 	
-	struct pollfd		newpoll;
+	struct pollfd		newpoll = {};
 	newpoll.fd = client_fd; // Adds the new client fd to the list of monitored fd's.
 	newpoll.events = POLLIN; // Marks the fd
 	newpoll.revents = 0; // Initialize revents 0

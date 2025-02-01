@@ -80,6 +80,7 @@ string	addHostname();
 void	sendMsg(string msg, int fd); 
 
 // Defines
+#define MAX_CONNECTIONS 5
 #define CRLF "\r\n"
 #define SERVER_NAME "FT_IRC"
 #define SERVER_VERSION "1.0"
