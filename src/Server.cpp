@@ -214,12 +214,12 @@ void Server::closeFds() {
 }
 
 void	Server::remove_fd(int fd) {
-	//find_if search for an element in a range 
-	std::vector<pollfd>::iterator it = std::find_if(_pollFds.begin(), _pollFds.end(), [fd](const pollfd& pfd) {
-		return pfd.fd == fd;
-	});
-	if (it != _pollFds.end())
-		_pollFds.erase(it);
+	for (std::vector<struct pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
+        if (it->fd == fd) {
+            _pollFds.erase(it);
+            break; // Exit the loop once the fd is removed
+        }
+    }
 }
 
 void	Server::removeClient(int fd) {
