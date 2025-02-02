@@ -165,12 +165,12 @@ void	Server::client_process() {
 			continue; //Skip the loop in case of error
 		}
 		// Iterate through the fds USING vector IT in case _pollFds change inside the for to be updated
-		for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) { //si hay eventos entra (si hay clientes conectados)
-			if (it->revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
-				if (it->fd == _serverFd) //mira si el evento es alguien nuevo?
+		for (size_t i = 0; i < _pollFds.size(); i++) { //si hay eventos entra (si hay clientes conectados)
+			if (_pollFds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
+				if (_pollFds[i].fd == _serverFd) //mira si el evento es alguien nuevo?
 					new_client(numfd);
 				else 
-					client_exist(it->fd);
+					client_exist(_pollFds[i].fd);
 			}
 		}
 		/*	In case error persist we need to add the _pollFds used inside new_client || client_exist
