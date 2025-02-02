@@ -108,8 +108,8 @@ void	sendMsg(string msg, int fd);
 #define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
 
 //INFO cmd
-//#define RPL_INFO(client, string)(":localhost 371 " + client + " :" + string + CRLF)
-//#define RPL_ENDOFINFO(client)(":localhost 374 " + client + " :End of INFO list" + CRLF)
+#define RPL_INFO(client, string)(":localhost 371 " + (client) + " :" + (string) + CRLF)
+#define RPL_ENDOFINFO(client)(":localhost 374 " + (client) + " :End of INFO list" + CRLF)
 
 //password
 //:localhost 464 marc :Password incorrect

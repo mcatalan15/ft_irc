@@ -34,8 +34,8 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 			std::cout << "Correct password!" << std::endl;
 			sendMsg("Correct password\r\n", fd);
 		}
-		//PASSword incorrect message
-		sendMsg("password incorrect msg", fd);
+		else
+			sendMsg("password incorrect msg", fd);
 	}
 }
 
@@ -54,7 +54,9 @@ bool	Server::nickIsUsed(string cmd) {
 void	Server::nickCmd(std::vector<string>& cmd, int fd){
 	std::cout << "NICK cmd" << std::endl;
 	if (getClient(fd)->getState() == NICK || getClient(fd)->getState() == REGISTERED) {
-		if (!nickIsUsed(cmd[1]))
+		if (cmd[1].size() > 9)
+			sendMsg("Nickname too long (>9)\n", fd); // cambiar al error q toca
+		else if (!nickIsUsed(cmd[1]))
 			sendMsg("Nickname used\n", fd); // cambiar al error q toca
 		else {
 				getClient(fd)->setState(LOGIN);
@@ -191,8 +193,26 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	std::cout << "INFO cmd" << std::endl;
 	(void)cmd;
 	(void)fd;
-	//sendMsg(RPL_INFO(getClient(fd), ""), fd);
-	//sendMsg(RPL_ENDOFINFO(getClient(fd), fd);
+	
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to ExampleIRC Server      ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by InspIRCd 3.0         ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Admin: AdminNick  (admin@example.com)  ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Uptime: 12 days, 4 hours, 32 minutes    ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Users Online: 128                       ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Channels: 45                            ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Rules:                                 ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  1. Be respectful.                      ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  2. No spam or flooding.                ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  3. No excessive trolling.               ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit: https://www.example.com         ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
+	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
 }
 
 // PONG COMMAND
@@ -205,6 +225,7 @@ void	Server::pongCmd(std::vector<string>& cmd, int fd){
 // PING COMMAND
 void	Server::pingCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PING cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	string tmp = cmd[1].append(CRLF);
+	string pong = "PONG ";
+	sendMsg(pong.append(tmp), fd);
 }
