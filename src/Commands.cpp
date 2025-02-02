@@ -14,6 +14,16 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 }
 
 void	Server::passCmd(std::vector<string>& cmd, int fd){
+	if (cmd.size() < 2 || cmd[1].empty()) {
+		sendMsg("Password not provided", fd);
+		return ;
+	}
+	// Soluciona el error??
+	Client *client = getClient(fd);
+	if (!client) {
+		sendMsg("Server Error: Client not found", fd);
+		return ;
+	}
 	if (getClient(fd)->getState()!= HANDSHAKE)
 		return ;
 	else {
