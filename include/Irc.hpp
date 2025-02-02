@@ -13,6 +13,7 @@
 #ifndef IRC_HPP
 #define IRC_HPP
 
+
 // System includes
 #include <string>
 #include <map>
@@ -98,13 +99,18 @@ void	sendMsg(string msg, int fd);
 #define RPL_YOURHOST(client, servername, version) (":localhost 002 " + (client) + " :Your host is " + (servername) + ", running version " + (version) + CRLF)
 #define RPL_CREATED(client, datatime) (":localhost 003 " + (client) + " :This server was created " + (datatime) + CRLF)
 #define RPL_MYINFO(client, servername, version, availableUserModes, availableChannelModes, channelModesWithParam)\
-	(":Localhost 004 " + client + " " + servername + " " + version + " " + availableUserModes + " " + availableChannelModes + " " + channelModesWithParam"" + CRLF)
+	(":localhost 004 " + client + " " + servername + " " + version + " " + availableUserModes + " " + availableChannelModes + " " + channelModesWithParam"" + CRLF)
 #define RPL_ISSUPPORT(client, supportedTokens) (":localhost 005 " + client + " " + supportedTokens + " :are supported by this server" + CRLF)
 
 //MOTD msg
 #define RPL_MOTDSTART(client, servername)(":localhost 375 " + client + " :- " + servername + " Messsage of the day -" + CRLF)
 #define RPL_MOTD(client, line)(":localhost 372 " + client + " :" + line + CRLF)
 #define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
+
+//INFO cmd
+//#define RPL_INFO(client, string)(":localhost 371 " + client + " :" + string + CRLF)
+//#define RPL_ENDOFINFO(client)(":localhost 374 " + client + " :End of INFO list" + CRLF)
+
 //password
 //:localhost 464 marc :Password incorrect
 //nickname

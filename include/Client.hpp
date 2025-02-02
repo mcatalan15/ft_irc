@@ -43,7 +43,7 @@ class Client
 		
 		//void			newClient(int &numfd);
 		//GETTERS
-		struct sockaddr	getAddr(); // PARA QUE LO NECESITAMOS ?
+		struct sockaddr_in6	getAddr(); // PARA QUE LO NECESITAMOS ?
 		int				getFd();
 		string			getNickname() const;
 		string			getUsername() const;

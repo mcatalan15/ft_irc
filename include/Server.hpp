@@ -30,12 +30,15 @@ class Server {
 		void			new_client(int &numfd);
 		void			removeClient(int fd);
 		void			removeFd(int fd);
-		void			msgManagement(int fd);
 		bool			isRegistered(int fd);
 
 		//Fds management
 		void			closeFds();
 		void			remove_fd(int fd); // Remove save pollFds
+		
+		//Msg management
+		void			msgManagement(int fd);
+		bool			msgEnded(int fd);
 		
 		
 		//Getters

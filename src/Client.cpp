@@ -86,16 +86,15 @@ void Client::welcome(Client &Client, int fd) {
 	string supportedTokens = "NICKLEN=9";
 	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
 	sendMsg(RPL_MOTDSTART(Client.getUsername(), SERVER_NAME), fd);
-	sendMsg(RPL_MOTD(Client.getUsername(),  
-		" ______  _______    ______  \n"  
-		"|      \\|       \\  /      \\ \n"  
-		" \\$$$$$$| $$$$$$$\\|  $$$$$$\\\n"  
-		"  | $$  | $$__| $$| $$   \\$$\n"  
-		"  | $$  | $$    $$| $$      \n"  
-		"  | $$  | $$$$$$$\\| $$   __ \n"  
-		" _| $$_ | $$  | $$| $$__/  \\\n"  
-		"|   $$ \\| $$  | $$ \\$$    $$\n"  
-		" \\$$$$$$ \\$$   \\$$  \\$$$$$$  \n"), fd);
+	sendMsg(RPL_MOTD(Client.getUsername()," ______  _______    ______"),fd);  
+	sendMsg(RPL_MOTD(Client.getUsername(),"|      \\|       \\  /      \\"), fd);  
+	sendMsg(RPL_MOTD(Client.getUsername()," \\$$$$$$| $$$$$$$\\|  $$$$$$\\"), fd); 
+	sendMsg(RPL_MOTD(Client.getUsername(),"  | $$  | $$__| $$| $$   \\$$"),fd);
+	sendMsg(RPL_MOTD(Client.getUsername(),"  | $$  | $$    $$| $$      "), fd);
+	sendMsg(RPL_MOTD(Client.getUsername(),"  | $$  | $$$$$$$\\| $$   __ "), fd);
+	sendMsg(RPL_MOTD(Client.getUsername()," _| $$_ | $$  | $$| $$__/  \\"),fd);
+	sendMsg(RPL_MOTD(Client.getUsername(),"|   $$ \\| $$  | $$ \\$$    $$"), fd);
+	sendMsg(RPL_MOTD(Client.getUsername()," \\$$$$$$ \\$$   \\$$  \\$$$$$$  "), fd);
 	sendMsg(RPL_ENDOFMOTD(Client.getUsername()), fd);
 
     // NEED To IMPLEMENT
