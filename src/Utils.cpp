@@ -71,9 +71,10 @@ std::vector<string>	splitCommand(string &cmd) {
 	string				tmp;
 	
 	while (std::getline(stm, tmp, '\n')) {
-		if (tmp.find_last_of("\r\n"))
-			tmp.erase(tmp.size() - 1, tmp.size());
-		splited.push_back(tmp);
+		if (!tmp.empty() && tmp[tmp.size() - 1]=='\r')
+			tmp.erase(tmp.size() - 1);
+		if (!tmp.empty())
+			splited.push_back(tmp);
 	}
 	return splited;
 }

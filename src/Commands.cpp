@@ -39,7 +39,7 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 
 bool	Server::nickIsUsed(string cmd) {
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "cmd: " << cmd[1] << "  client: " << _clients[i].getNickname() << std::endl;
+		std::cout << "cmdssss: " << cmd << "  client: " << _clients[i].getNickname() << std::endl;
 		if (_clients[i].getNickname() == cmd) {
 			std::cout << "Exists" << std::endl;
 			return false;

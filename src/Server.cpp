@@ -125,11 +125,12 @@ void	Server::client_exist(int fd) {
 		buffer[bytes_read] = '\0';
 		string received_data(buffer, bytes_read);
 		Client->appendToMsg(received_data);
-		std::cout << "<" << Client->getMsg() << std::endl;
+		std::cout << "<" << Client->getMsg() << ">" << std::endl;
 
 		// Process the buffer while it contains complete messages ending with "\r\n"
 		string &msg_buffer = Client->getMsgRef();
 		std::vector<string> cmd = splitCommand(msg_buffer);
+		std::cout << "SlitCommand" << std::endl;
 		printVecStr(cmd);
 		for (size_t i = 0; i < cmd.size(); i++) {
 			Client->setMsg(cmd[i]);
@@ -137,14 +138,13 @@ void	Server::client_exist(int fd) {
 			if (getClient(fd)) // to delete the _msg once is used
 				Client->cleanBuff();
 		}
+		std::cout << "////////////////////////////////////////" << std::endl;
 			// Extract a single complete message
 			/*
 			!!!!!!!!!!!!!!!!!!!!!!!!
 			AQUI VA LA MANDANGA
 			!!!!!!!!!!!!!!!!!!!!!!!!!
 			*/
-		std::cout << "sin codigo <"<< msg_buffer << ">" << std::endl;
-		std::cout << "////////////////////////////////////////" << std::endl;
 //		while () {
 			//lanzar comandos individual con + CRLF
 			//	}
