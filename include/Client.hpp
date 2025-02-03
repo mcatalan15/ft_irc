@@ -8,6 +8,7 @@
 // We can move it to Irc.hpp maybe ?
 enum State {
 	HANDSHAKE,  // Initial conection state
+	NICK,
 	LOGIN,      // The client has sent NICK and USER, but is mnot yet registred
 	REGISTERED  // The client is fully registered and ready to interact
 };
@@ -27,7 +28,7 @@ class Client
 		//std::vector<Channel>	_channels;		// Not sure we need that
 		//std::vector<Client>	_clients;		// List of all clients
 
-		string				_password;		// HACE FALTA ?*/
+		//string				_password;		// HACE FALTA ?*/
 		struct sockaddr_in6		address;		// DE QUE SIRVE ??
 		//struct pollfd			*fds;
 		bool					_registered;
@@ -42,13 +43,14 @@ class Client
 		
 		//void			newClient(int &numfd);
 		//GETTERS
-		struct sockaddr	getAddr(); // PARA QUE LO NECESITAMOS ?
+		struct sockaddr_in6	getAddr(); // PARA QUE LO NECESITAMOS ?
 		int				getFd();
 		string			getNickname() const;
 		string			getUsername() const;
 		string			getRealname() const;
 		string			getHostname() const;
 		string			getMsg() const; //tengo que implementarlo
+		string			&getMsgRef();
 		string			getPrefix() const;
 		bool			getIsOper() const;
 		State			getState() const;
@@ -63,8 +65,11 @@ class Client
 		void setIsOper(bool isOper);
 
 		//FUNCTIONS
-		void welcome();                 // Need to implement
+		void welcome(Client &Client, int fd);                 // Need to implement
 		void reply(string msg);    //Need to implement*/
+		//void	clearSpecMsg();		//Not used NOW
+		void	cleanBuff();
+		void	appendToMsg(const string &msg);
 };
 
 #endif
