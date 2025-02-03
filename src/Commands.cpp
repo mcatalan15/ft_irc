@@ -16,18 +16,18 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 
 // PASSWORD COMMAND
 void	Server::passCmd(std::vector<string>& cmd, int fd){
-	if (cmd.size() < 2 || cmd[1].empty()) {
-		sendMsg("Password not provided", fd);
-		return ;
-	}
-	// Soluciona el error??
 	Client *client = getClient(fd);
-	if (!client) {
-		sendMsg("Server Error: Client not found", fd);
+	
+	if (cmd.size() < 2 || cmd[1].empty())
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
+	if (!client)
+		return (sendMsg("Server Error: Client not found", fd));
+	if (client->getState() != HANDSHAKE)
+	{
+		if (client->getState() == REGISTERED)
+			sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
 		return ;
 	}
-	if (getClient(fd)->getState()!= HANDSHAKE)
-		return ;
 	else {
 		if (cmd[1] == getPassword()) {
 			getClient(fd)->setState(NICK);
@@ -35,7 +35,7 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 			sendMsg("Correct password\r\n", fd);
 		}
 		else
-			sendMsg("password incorrect msg", fd);
+			sendMsg(ERR_PASSWDMISMATCH(client->getNickname()), fd);
 	}
 }
 
@@ -53,15 +53,18 @@ bool	Server::nickIsUsed(string cmd) {
 
 void	Server::nickCmd(std::vector<string>& cmd, int fd){
 	std::cout << "NICK cmd" << std::endl;
-	if (getClient(fd)->getState() == NICK || getClient(fd)->getState() == REGISTERED) {
-		if (cmd[1].size() > 9)
-			sendMsg("Nickname too long (>9)\n", fd); // cambiar al error q toca
+	Client *client = getClient(fd);
+	if (cmd.size() < 2 || cmd[1].empty())
+		return (sendMsg(ERR_NONICKNAMEGIVEN(), fd));
+	if (client->getState() == NICK || client->getState() == REGISTERED) {
+		if (!nickChecker(cmd[1]))
+			sendMsg(ERR_ERRONEUSNICKNAME(cmd[1]), fd); // cambiar al error q toca
 		else if (!nickIsUsed(cmd[1]))
-			sendMsg("Nickname used\n", fd); // cambiar al error q toca
+			sendMsg(ERR_NICKNAMEINUSE(cmd[1]), fd); // cambiar al error q toca
 		else {
-				getClient(fd)->setState(LOGIN);
-				getClient(fd)->setNickname(cmd[1]);
-				std::cout << "Nickname: " << getClient(fd)->getNickname() << std::endl;
+				client->setState(LOGIN);
+				client->setNickname(cmd[1]);
+				std::cout << "Nickname: " << client->getNickname() << std::endl;
 				sendMsg("correct nickname\r\n", fd);
 		}
 	}
@@ -82,20 +85,26 @@ bool	Server::userIsUsed(string cmd) {
 }
 
 void	Server::userCmd(std::vector<string>& cmd, int fd){
+	Client*	client = getClient(fd);
+	
 	std::cout << "USER cmd" << std::endl;
 	printVecStr(cmd);
 	std::cout << "User len <" << cmd.size() << ">" << std::endl;
-	if (getClient(fd)->getState() == LOGIN && cmd.size() == 5) {
+	if (cmd.size() < 2 || cmd[1].empty())
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[1]), fd));
+	if (client->getState() == LOGIN && cmd.size() == 5) {
 		std::cout << "entra if general" << std::endl;
+		if (cmd[1].size() > 18)
+			cmd[1] = cmd[1].substr(0, 18);
 		if (!userIsUsed(cmd[1]))
-			sendMsg("Username used\n", fd);
+			sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);
 		else {
-			getClient(fd)->setUsername(cmd[1]);
-			getClient(fd)->setRealname(cmd[3]);
-			getClient(fd)->setState(REGISTERED);
-			std::cout << "Username: " << getClient(fd)->getUsername() << std::endl;
+			client->setUsername(cmd[1]);
+			client->setRealname(cmd[3]);
+			client->setState(REGISTERED);
+			std::cout << "Username: " << client->getUsername() << std::endl;
 			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
-			getClient(fd)->welcome(*getClient(fd), fd);
+			client->welcome(*getClient(fd), fd);
 		}
 	}
 	return ;
@@ -210,7 +219,7 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit: https://www.example.com         ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit: https://www.youtube.com/watch?v=dQw4w9WgXcQhttps          ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
 	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
 }

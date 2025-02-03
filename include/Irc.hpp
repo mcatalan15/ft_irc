@@ -79,8 +79,12 @@ std::vector<string>	splitUserCmd(string &cmd);
 void				printVecStr(std::vector<string> cmd);
 string	addHostname();
 void	sendMsg(string msg, int fd); 
+bool	nickChecker(string cmd);
 
 // Defines
+#define NICK_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-"
+#define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
+#define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
 #define MAX_CONNECTIONS 5
 #define CRLF "\r\n"
 #define SERVER_NAME "FT_IRC"
@@ -111,7 +115,22 @@ void	sendMsg(string msg, int fd);
 #define RPL_INFO(client, string)(":localhost 371 " + (client) + " :" + (string) + CRLF)
 #define RPL_ENDOFINFO(client)(":localhost 374 " + (client) + " :End of INFO list" + CRLF)
 
-//password
+//PASS cmd
+#define ERR_PASSWDMISMATCH(client)(":localhost 464 " + (client) + " : Password incorrect" + CRLF)
+
+//NICK cmd
+#define ERR_NONICKNAMEGIVEN()(string(":localhost 431 * :No nickname given") + CRLF)
+#define ERR_ERRONEUSNICKNAME(nick)(":localhost 432 * " + (nick) + " :Erroneus nickname" + CRLF)
+#define ERR_NICKNAMEINUSE(nick)(":localhost 433 * " + (nick) + " :Nickname is already in use")
+
+//USER cmd
+#define ERR_ERRONEUSUSERNAME(user)(":localhost 432 * " + (user) + " :Erroneus nickname" + CRLF)
+#define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use")
+
+// GENERAL ERR
+#define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " : Not enought parameters" + CRLF)
+#define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)
+
 //:localhost 464 marc :Password incorrect
 //nickname
 //:localhost 433 marc mcs :Nickname is already in use

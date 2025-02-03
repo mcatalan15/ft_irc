@@ -119,3 +119,11 @@ string	addHostname() {
 void	sendMsg(string msg, int fd) {
 	send(fd, msg.c_str(), msg.size(), 0);
 }
+
+bool nickChecker(string cmd) {
+	if (cmd.size() > 9 || !std::isalpha(cmd[0]))
+		return false;
+	if (cmd.find_first_of(NICK_CHARSET) == string::npos)
+		return false;
+	return true;
+}

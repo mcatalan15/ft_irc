@@ -83,7 +83,7 @@ void Client::welcome(Client &Client, int fd) {
 	sendMsg(RPL_YOURHOST(Client.getUsername(), SERVER_NAME, SERVER_VERSION), fd);
 	//sendMsg(RPL_CREATED(Client.getUsername(), _timer), fd); FALTA TIMER!!!!!
 	sendMsg(RPL_MYINFO(Client.getUsername(), SERVER_NAME, SERVER_VERSION, USER_MODES, CHANNEL_MODES, CHANNEL_MODES_WITH_PARAM), fd);
-	string supportedTokens = "NICKLEN=9";
+	string supportedTokens = "NICKLEN=9 && USERLEN=18";
 	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
 	sendMsg(RPL_MOTDSTART(Client.getUsername(), SERVER_NAME), fd);
 	sendMsg(RPL_MOTD(Client.getUsername()," ______  _______    ______"),fd);  
