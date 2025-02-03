@@ -125,7 +125,7 @@ bool	nickChecker(string cmd);
 
 //USER cmd
 #define ERR_ERRONEUSUSERNAME(user)(":localhost 432 * " + (user) + " :Erroneus nickname" + CRLF)
-#define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use")
+#define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use" + CRLF)
 
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " : Not enought parameters" + CRLF)

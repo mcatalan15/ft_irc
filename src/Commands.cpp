@@ -97,7 +97,8 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 		if (cmd[1].size() > 18)
 			cmd[1] = cmd[1].substr(0, 18);
 		if (!userIsUsed(cmd[1]))
-			sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);
+			sendMsg("Username is used\r\n", fd);
+			//sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);??????????????
 		else {
 			client->setUsername(cmd[1]);
 			client->setRealname(cmd[3]);
@@ -107,6 +108,8 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 			client->welcome(*getClient(fd), fd);
 		}
 	}
+	else
+		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
 	return ;
 }
 
