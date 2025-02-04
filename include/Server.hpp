@@ -3,8 +3,10 @@
 
 #include "Irc.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 class Client;
+class Channel;
 
 class Server {
 	private:
@@ -16,6 +18,7 @@ class Server {
 		std::vector<struct pollfd>	_pollFds; //buffer. Structura para manejar mas de 1 fd(cliente)
 		struct sockaddr_in6			_address;
 		string						_password;
+		std::vector<Channel>		_channels;
 		// For map (switch case)
 		static std::map<std::string, void (Server::*)(std::vector<string>&, int)> createCmdMap();
 	    static const std::map<std::string, void (Server::*)(std::vector<string>&, int)> cmdMap;

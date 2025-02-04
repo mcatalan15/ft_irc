@@ -12,7 +12,9 @@
 
 NAME = ircserv
 SRC_DIR = ./src/
-SRC = $(wildcard $(SRC_DIR)*.cpp)
+CHANNEL_DIR = ./src/Channel/
+SRC = $(wildcard $(SRC_DIR)*.cpp) $(wildcard $(CHANNEL_DIR)*.cpp)
+
 PATH_OBJ = ./src/obj/
 PATH_DEPS = ./src/obj/
 OBJ = $(addprefix $(PATH_OBJ), $(notdir $(SRC:.cpp=.o)))
@@ -28,6 +30,10 @@ NC = "\033[37m"
 all: $(NAME)
 
 $(PATH_OBJ)%.o: $(SRC_DIR)%.cpp
+	@mkdir -p $(PATH_OBJ)
+	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
+
+$(PATH_OBJ)%.o: $(CHANNEL_DIR)%.cpp
 	@mkdir -p $(PATH_OBJ)
 	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 

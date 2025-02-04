@@ -16,17 +16,19 @@ void Channel::addInvitation(Client *client)
 
 void Channel::removeInvitation(Client *client)
 {
-    auto it = getInvitedClients().find(client);
+	(void)client;
+   /* auto it = getInvitedClients().find(client);
     if (it == getInvitedClients().end());
         throw std::runtime_error("Client is not in the invitation list.");
     // Maybe we need to implement a different message error
-    _invitedClients.erase(client);
+    _invitedClients.erase(client);*/
 }
 
 bool Channel::isInvited(Client *client) const
 {
-    auto it = getInvitedClients().find(client);
+	(void)client;
+    /*auto it = getInvitedClients().find(client);
     if (it == getOperators().end())
-        return (false);
+        return (false);*/
     return (true);
 }

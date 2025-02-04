@@ -121,7 +121,7 @@ bool	nickChecker(string cmd);
 //NICK cmd
 #define ERR_NONICKNAMEGIVEN()(string(":localhost 431 * :No nickname given") + CRLF)
 #define ERR_ERRONEUSNICKNAME(nick)(":localhost 432 * " + (nick) + " :Erroneus nickname" + CRLF)
-#define ERR_NICKNAMEINUSE(nick)(":localhost 433 * " + (nick) + " :Nickname is already in use")
+#define ERR_NICKNAMEINUSE(nick)(":localhost 433 * " + (nick) + " :Nickname is already in use" + CRLF)
 
 //USER cmd
 #define ERR_ERRONEUSUSERNAME(user)(":localhost 432 * " + (user) + " :Erroneus nickname" + CRLF)

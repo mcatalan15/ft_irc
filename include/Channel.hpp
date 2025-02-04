@@ -52,7 +52,8 @@ class Channel
     private:
         std::string             _name;          // name of the channel
         std::vector<Client*>    _clients;        // list of clients in the channel
-        int                     _userLimit;     // max num of clients in the channel
+        size_t                     _userLimit;     // max num of clients in the channel
+        //string					_operator;
         std::set<Client*>       _operators;     // set of operators in the channel
         std::set<Client*>       _invitedClients; // set of clients invited to the channel
         std::string             _password;       // password required to join the channel

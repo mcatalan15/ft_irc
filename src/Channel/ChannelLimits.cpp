@@ -8,6 +8,7 @@ int Channel::getUserLimit() const
 int Channel::setUserLimit(int userLimit)
 {
     _userLimit = userLimit;
+    return userLimit;
 }
 
 bool Channel::isFull() const

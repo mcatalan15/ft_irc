@@ -16,17 +16,20 @@ void Channel::addOperator(Client *client)
 
 void Channel::removeOperator(Client *client)
 {
+	(void)client; /*
     auto it = getOperators().find(client);
     if (it == getOperators().end());
         throw std::runtime_error("Client is not in the invitation list.");
     // Maybe we need to implement a different message error
     _operators.erase(client);
+    */
 }
 
 bool Channel::isOperator(Client *client) const
 {
-    auto it = getOperators().find(client);
+	(void)client; /*
+  auto it = getOperators().find(client);
     if (it == getOperators().end())
-        return (false);
+        return (false); */
     return (true);
 }

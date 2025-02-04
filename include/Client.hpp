@@ -17,13 +17,13 @@ class Client
 {
 	private:
 		int						_fd;
+		bool					_isOper;
 		string					_IPv6;
 		string					_nickname;
 		string					_username;
 		string					_realname;
 		string					_hostname;		// maybe we need to print
 		string					_msg;			// To manage messages
-		bool					_isOper;		// Is the client an IRC operator ?
 		State					_state;			// Connection state
 		//std::vector<Channel>	_channels;		// Not sure we need that
 		//std::vector<Client>	_clients;		// List of all clients

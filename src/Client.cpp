@@ -96,15 +96,6 @@ void Client::welcome(Client &Client, int fd) {
 	sendMsg(RPL_MOTD(Client.getUsername(),"|   $$ \\| $$  | $$ \\$$    $$"), fd);
 	sendMsg(RPL_MOTD(Client.getUsername()," \\$$$$$$ \\$$   \\$$  \\$$$$$$  "), fd);
 	sendMsg(RPL_ENDOFMOTD(Client.getUsername()), fd);
-
-    // NEED To IMPLEMENT
-    //if (_state != LOGIN || getNickname().empty() || getUsername().empty()) {
-    //    std::cout << "Waiting for registration..." << std::endl;
-    //    return;
-    //}
-    //setState(REGISTERED);
-    // NEED TO IMPLEMENT WELCOME MESSAGE
-    //std::cout << getNickname() << " is registered and ready to start !" << std::endl;
 }
 /* NOT used NOW
 void	Client::clearSpecMsg() {
