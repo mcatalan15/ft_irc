@@ -8,11 +8,13 @@
 #include "Client.hpp"
 
 /* */
+class Client;
 
 class Channel
 {
     public:
         Channel(const std::string& name);
+        Channel(const Channel& cpy);
         ~Channel();
 
         /*------------ CHANNEL INFO ---------------*/
@@ -51,10 +53,10 @@ class Channel
 
     private:
         std::string             _name;          // name of the channel
+        string					_topic;
         std::vector<Client*>    _clients;        // list of clients in the channel
-        size_t                     _userLimit;     // max num of clients in the channel
-        //string					_operator;
-        std::set<Client*>       _operators;     // set of operators in the channel
+        size_t                  _userLimit;     // max num of clients in the channel
+        std::set<Client*>       _operators;    // set of operators in the channel
         std::set<Client*>       _invitedClients; // set of clients invited to the channel
         std::string             _password;       // password required to join the channel
 };

@@ -2,10 +2,10 @@
 #include <cstddef>
 
 // Default constructor
-Client::Client() : _fd(-1), _isOper(false), _state(HANDSHAKE) {}
+Client::Client() : _fd(-1), _state(HANDSHAKE) {}
 
 // Constructor
-Client::Client(int client_fd) :_fd(client_fd), _isOper(false), _state(HANDSHAKE) {
+Client::Client(int client_fd) :_fd(client_fd), _state(HANDSHAKE) {
 	_nickname.clear();
     _username.clear();
     _realname.clear();
@@ -26,7 +26,6 @@ Client &Client::operator=(Client const &src) {
 		_username = src._username;
 		_realname = src._realname;
 		_hostname = src._hostname;
-		_isOper = src._isOper;
 		_state = src._state;
 	}
 	return (*this);
@@ -43,7 +42,7 @@ string Client::getRealname() const { return (_realname); }
 
 string Client::getHostname() const { return (_hostname); }
 
-bool Client::getIsOper() const { return (_isOper); }
+//bool Client::getIsOper() const { return (_isOper); }
 
 State Client::getState() const { return (_state); }
 
@@ -72,7 +71,7 @@ void Client::setHostname(const std::string& hostname) { _hostname = hostname; }
 
 void Client::setState(State newState) { _state = newState; }
 
-void Client::setIsOper(bool isOper) { _isOper = isOper; }
+//void Client::setIsOper(bool isOper) { _isOper = isOper; }
 
 void Client::setMsg(const std::string& msg) { _msg = msg; }
 
@@ -85,6 +84,7 @@ void Client::welcome(Client &Client, int fd) {
 	sendMsg(RPL_MYINFO(Client.getUsername(), SERVER_NAME, SERVER_VERSION, USER_MODES, CHANNEL_MODES, CHANNEL_MODES_WITH_PARAM), fd);
 	string supportedTokens = "NICKLEN=9 && USERLEN=18";
 	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
+	sendMsg(RPL_ISSUPPORT(Client.getUsername(), "CHANLIMIT=5"), fd);
 	sendMsg(RPL_MOTDSTART(Client.getUsername(), SERVER_NAME), fd);
 	sendMsg(RPL_MOTD(Client.getUsername()," ______  _______    ______"),fd);  
 	sendMsg(RPL_MOTD(Client.getUsername(),"|      \\|       \\  /      \\"), fd);  
@@ -112,3 +112,8 @@ void	Client::cleanBuff() {
 }
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
+
+void	Client::addChannel(Channel* channel)
+{
+	_channels.push_back(channel);	
+}

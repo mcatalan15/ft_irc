@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include "Irc.hpp"
+#include "Channel.hpp"
 //#include "MessageHandler.hpp"
 
 // Definition of possible client state
@@ -13,11 +14,13 @@ enum State {
 	REGISTERED  // The client is fully registered and ready to interact
 };
 
+class Channel;
+
 class Client
 {
 	private:
 		int						_fd;
-		bool					_isOper;
+		//bool					_isOper;
 		string					_IPv6;
 		string					_nickname;
 		string					_username;
@@ -25,7 +28,7 @@ class Client
 		string					_hostname;		// maybe we need to print
 		string					_msg;			// To manage messages
 		State					_state;			// Connection state
-		//std::vector<Channel>	_channels;		// Not sure we need that
+		std::vector<Channel*>	_channels;		// Not sure we need that
 		//std::vector<Client>	_clients;		// List of all clients
 
 		//string				_password;		// HACE FALTA ?*/
@@ -69,6 +72,7 @@ class Client
 		void reply(string msg);    //Need to implement*/
 		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();
+		void	addChannel(Channel* channel);
 		void	appendToMsg(const string &msg);
 };
 

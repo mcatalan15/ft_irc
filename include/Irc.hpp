@@ -86,6 +86,7 @@ bool	nickChecker(string cmd);
 #define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
 #define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
 #define MAX_CONNECTIONS 5
+#define MAX_CHANNELS 5
 #define CRLF "\r\n"
 #define SERVER_NAME "FT_IRC"
 #define SERVER_VERSION "1.0"
@@ -126,6 +127,9 @@ bool	nickChecker(string cmd);
 //USER cmd
 #define ERR_ERRONEUSUSERNAME(user)(":localhost 432 * " + (user) + " :Erroneus nickname" + CRLF)
 #define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use" + CRLF)
+
+// JOIN CMD RPL
+#define RPL_TOPIC(client, channel, topic)(":localhost 332 ")
 
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " : Not enought parameters" + CRLF)

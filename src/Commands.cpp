@@ -144,13 +144,44 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd){
 	(void)fd;
 }
 
-// JOIN COMMAND
-void	Server::joinCmd(std::vector<string>& cmd, int fd){
-	std::cout << "JOIN cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-}
+// ------------------------------------------------------------------------
 
+/*void	Server::successJoin(int fd) {
+	//get channel
+	sendMsg();
+	}*/
+// JOIN COMMAND
+void	Server::joinCmd(std::vector<string>& cmd, int fd)
+{
+	Channel*	found = NULL;
+	std::cout << "JOIN cmd" << std::endl;
+	if (cmd.size() < 2)
+		return (sendMsg("no channel names provided\n", fd));
+	if (cmd[1][0] != '#')
+		return (sendMsg("channel needs to start with '#'\n", fd));
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i]->getName() == cmd[1])
+			found = _channels[i];
+	}
+	Client*		client = getClient(fd);
+	if (!found)
+	{
+		Channel*	newchannel = new Channel(cmd[1]);
+		
+		newchannel->addClient(client);
+		newchannel->addOperator(client);
+		_channels.push_back(newchannel);
+		client->addChannel(newchannel);
+		sendMsg("channel " + cmd[1] + " created!\n", fd);
+	}
+	else
+	{
+		found->addClient(client);
+		sendMsg("you joined " + cmd[1] + " channel!\n", fd);
+	}
+}
+//--------------------------------------------------------------------------------------------
 // PART COMMAND
 void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PART cmd" << std::endl;
