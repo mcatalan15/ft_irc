@@ -9,7 +9,7 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
 	//if (cmd[1] == "END")
-		//sendMsg("CAP END\r\n", fd);	
+		//sendMsg("CAP END\r\n", fd);
 	std::cout << "message send" << std::endl;
 	(void)cmd;
 }
@@ -17,7 +17,7 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 // PASSWORD COMMAND
 void	Server::passCmd(std::vector<string>& cmd, int fd){
 	Client *client = getClient(fd);
-	
+
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
 	if (!client)
@@ -86,7 +86,7 @@ bool	Server::userIsUsed(string cmd) {
 
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	Client*	client = getClient(fd);
-	
+
 	std::cout << "USER cmd" << std::endl;
 	printVecStr(cmd);
 	std::cout << "User len <" << cmd.size() << ">" << std::endl;
@@ -205,7 +205,7 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	std::cout << "INFO cmd" << std::endl;
 	(void)cmd;
 	(void)fd;
-	
+
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to ExampleIRC Server      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by InspIRCd 3.0         ║"), fd);
@@ -237,7 +237,10 @@ void	Server::pongCmd(std::vector<string>& cmd, int fd){
 // PING COMMAND
 void	Server::pingCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PING cmd" << std::endl;
-	string tmp = cmd[1].append(CRLF);
+	string tmp = "\0";
 	string pong = "PONG ";
+
+	if (cmd.size() > 1)
+		tmp = cmd[1].append(CRLF);
 	sendMsg(pong.append(tmp), fd);
 }

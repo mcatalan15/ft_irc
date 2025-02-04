@@ -8,12 +8,13 @@
 #include <vector>
 
 // CHECK NEW SPLITMSG. CREATES EXTRA VECTOR IN : CASE
-std::vector<std::string> splitMsg(std::string &str) {
-	std::vector<std::string> result;
-	std::string currentWord;
+std::vector<std::string> splitMsg(std::string &str)
+{
+	std::vector<string> result;
+	string currentWord;
 	bool foundColon = false;
 
-	for (std::string::size_type i = 0; i < str.size(); ++i) {
+	for (string::size_type i = 0; i < str.size(); ++i) {
 		char c = str[i];
 		if (foundColon) {
 			// After finding ':', add the rest of the string as a single command
@@ -44,7 +45,7 @@ string	getCommandInUpper(const string &cmd) {
 	size_t start = cmd.find_first_not_of(" \t\v"); // Avoid initial empty spaces
 	if (start == string::npos)
 		return "";
-		
+
 	size_t end = cmd.find_first_of(" \t\v", start); // Find the end of the first word
 	std::string command = cmd.substr(start, end - start);
 
@@ -69,7 +70,7 @@ std::vector<string>	splitCommand(string &cmd) {
 	std::vector<string>	splited;
 	std::istringstream	stm(cmd);
 	string				tmp;
-	
+
 	while (std::getline(stm, tmp, '\n')) {
 		if (!tmp.empty() && tmp[tmp.size() - 1]=='\r')
 			tmp.erase(tmp.size() - 1);
@@ -85,9 +86,9 @@ std::vector<string> splitUserCmd(string& str)
 	size_t				i;
 	size_t				init = 0;
 	std::vector<string>	vec;
-	
+
 	for (i = 0; str[i] != ':' && i < str.size(); i++)
-	{	
+	{
 		if (str[i] != ' ') // && str[i + 1] == ' ')
 		{
 			std::cout << "entra" << std::endl;
@@ -110,7 +111,7 @@ void	printVecStr(std::vector<string> cmd) {
 // Use gethostname to get the hostname of the machine
 string	addHostname() {
 	char	hostname[256];
-	
+
 	if (gethostname(hostname, sizeof(hostname)) == 0)
 		return string(hostname);
 	return string(); //Debiria el hostname ser localhost????
