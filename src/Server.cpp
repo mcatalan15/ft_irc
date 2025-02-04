@@ -1,109 +1,289 @@
-#include "../include/Irc.hpp"
-#include <fcntl.h>
+#include "../include/Server.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <iostream>
+#include <map>
 #include <sys/poll.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <vector>
+
+bool	Server::_signal = false;
 
 /*
-    Prints a messege in the server as disconnected 
+	Constructor
+	This constructor
 */
-void cleanexit(int signal) {
-	(void) signal;
-	std::cout << "\b\b\r   Server disconnected - See you soon!\n\n";
-	std::cout << "\033[?25h";
-	std::system("stty echo");
-	exit(0);
-}
-
-/**/
 Server::Server(int port, string password) {
-    struct pollfd   s_poll;
-    
-	_fd = socket(AF_INET6, SOCK_STREAM, 0); //creates listening FD for the server
-	if (_fd < 0)
-		std::cerr << "error: socket connection" << std::endl;
-	_password = password; //contrasena del input
-	_opt = 1; //opciones que se le puede dar al server en setsocketopt
+	struct pollfd   s_poll;
 
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
-		std::cerr << "error: setstockopt error" << std::endl;
-	
+	memset(&_address, 0, sizeof(_address)); //Avoid unitialized memory errors
 	_address.sin6_family = AF_INET6; // sets IP path to ipv6
 	_address.sin6_addr = in6addr_any; // accepts any IP
 	_address.sin6_port = htons(port); // gets port number in bytes (abre puerto input)
 
-	signal(SIGINT,cleanexit);
-	
-	if (bind(_fd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
+	_password = password; //contrasena del input
+	_opt = 1; //opciones que se le puede dar al server en setsocketopt
+
+	if ((_serverFd = socket(AF_INET6, SOCK_STREAM, 0)) < 0) //creates listening FD for the server
+		std::cerr << "error: socket connection" << std::endl;
+	if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
+		std::cerr << "error: setstockopt error" << std::endl;
+	if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) == -1)
+		std::cerr << "error: failed to set option (O_NONBLOCK) on socket" << std::endl;
+	if (bind(_serverFd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
 		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
-	if (listen(_fd, 5) < 0) // deja abierto el puerto
+	if (listen(_serverFd, MAX_CONNECTIONS) < 0) // deja abierto el puerto
 		std::cerr << "error: server not listening" << std::endl;
 
-	fcntl(_fd, F_SETFL, O_NONBLOCK);
-	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
-	s_poll.fd = _fd;
+	s_poll.fd = _serverFd;
 	s_poll.events = POLLIN; //cada input al terminal
-	_fds.push_back(s_poll);
+	s_poll.revents = 0;
+	_pollFds.push_back(s_poll);
+	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
 }
 
-Server::~Server() 
-{
- /*   for (int i = 0; i < _fds.size(); i++)
-    {
-        
-    }*/
-}
 /*
-    New client
-    This function  is used when the fd[0] (the server) is detected with an event (a new client whants to connect).
-    Creates
+	Destructor
+	This destructor iterates through all the fds(clients) connected/opened and close the fd in order to finalize the connection
+	with the server
+*/
+Server::~Server() {
+	for (size_t i = 0; i < _pollFds.size(); i++)
+		close(_pollFds[i].fd);
+	close(_serverFd);
+}
+
+/*
+	Signal Handler
+	This function is used when a signal is detected. Sets the privat variable _signal to true, this way the infinite loop
+	is stoped and with that the ircserv.
+*/
+void Server::signalHandler(int signum) {
+	(void)signum;
+	std::cout << "Signal received, shutting down..." << std::endl;
+	_signal = true;
+}
+
+/*
+	New client
+	This function  is used when the fd[0] (the server) is detected with an event (a new client whants to connect).
+	Creates
 */
 void Server::new_client(int &numfd) {    
-    //Client  newClient(_fd);
-    struct sockaddr_in client_addr; // Struct needed to save the client address.
-    socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
-    int client_fd = accept(_fd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
-                
-    //_fds[i].fd = newClient.getFd();
-    _fds[numfd].fd = client_fd; // Adds the new client fd to the list of monitored fd's.
-    _fds[numfd].events = POLLIN; // Marks the fd
-    numfd++;
+	struct sockaddr_in	client_addr; // Struct needed to save the client address.
+	socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
+	int client_fd = accept(_serverFd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
+	if (client_fd < 0) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return; // Not a real error, just no clients to accept
+		std::cerr << "accept() failed: " << strerror(errno) << std::endl;
+	}
+	std::cout << "clientfd: " << client_fd << std::endl;
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1) {
+		std::cerr << "fcntl failed" << std::endl;
+		close(client_fd);
+		return ;
+	}
+	
+	Client	newClient(client_fd);
+	
+	struct pollfd		newpoll = {};
+	newpoll.fd = client_fd; // Adds the new client fd to the list of monitored fd's.
+	newpoll.events = POLLIN; // Marks the fd
+	newpoll.revents = 0; // Initialize revents 0
+	
+	// Ensure the _pollFds has enought space to acommodate the new Fd
+	if (static_cast<std::vector<pollfd>::size_type>(numfd) >= _pollFds.size())
+		_pollFds.push_back(newpoll); //Add new poll() to the vector
+	else
+		_pollFds[numfd] = newpoll; // Replace an existance entry (if any)
+	_clients.push_back(newClient); // Add client to the Client vector
+	numfd++; // Increment the number of Fds
+	std::cout << GREEN << "Client <" << client_fd << "> Connected" << WHITE << std::endl;
 }
 
 // If client exists
-void    Server::client_exist(int &numfd, int i) {
-    char buffer[512] = {};
-    int bytes_read = recv(_fds[i].fd, buffer, 512, 0);
-    
-    if (bytes_read <= 0) {
-    // Client disconnected or error occurred
-    std::cout << "Client disconnected, fd: " << _fds[i].fd << std::endl;
-    close(_fds[i].fd);
- 
-    // Remove the client from the monitored list
-    _fds[i] = _fds[numfd - 1]; // Replace with the last active descriptor
-    numfd--;
-    } else {
-    // Print received message
-    std::cout << "Client (" << i << "): " << buffer << std::endl;
-    // Echo the message back to the client
-    send(_fds[i].fd, buffer, bytes_read, 0);
-    }
+void	Server::client_exist(int fd) {
+	char buffer[1024];
+	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0); //function to read buff
+	Client *Client = getClient(fd);
+	std::vector<string>	command;
+	Client->setHostname(addHostname());
+	std::cout << "hostname <" << Client->getHostname() << ">" << std::endl;
+	if (bytes_read <= 0) { // Client disconnected or error occurred
+		std::cerr << "Client disconnected or read error, fd: " << fd << std::endl;
+		close(fd);
+		// Remove the client from the monitored list
+		// removeClientChannel(fd);
+		removeClient(fd);
+		removeFd(fd);
+	} else {
+		// Append received data to the client's existing buffer
+		string received_data(buffer, bytes_read);
+		Client->appendToMsg(received_data);
+		std::cout << "<" << Client->getMsg() << ">" << std::endl;
+		if (msgEnded(fd)) {
+			// Process the buffer while it contains complete messages ending with "\r\n"
+			string &msg_buffer = Client->getMsgRef();
+			std::vector<string> cmd = splitCommand(msg_buffer);
+			std::cout << "SlitCommand" << std::endl;
+			printVecStr(cmd);
+			for (size_t i = 0; i < cmd.size(); i++) {
+				Client->setMsg(cmd[i]);
+				msgManagement(fd);
+				if (getClient(fd)) // to delete the _msg once is used
+					Client->cleanBuff();
+			}
+		}
+		std::cout << "////////////////////////////////////////" << std::endl;
+	}
+}
+
+bool	Server::msgEnded(int fd) {
+	if (getClient(fd)->getMsg().find("\r\n") != string::npos)
+		return true;
+	return false;
 }
 
 void	Server::client_process() {
-    int numfd = 1; //empieza en 1 pq server es 0
-    while (true) {
-        int numEvents = poll(&_fds[0], numfd, -1); //
-        if (numEvents < 0)
-            std::cerr << "polling failed" << std::endl;
-        
-        for (int i = 0; i < numfd; i++) { //si hay eventos entra (si hay clientes conectados)
-            if (_fds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
-                if (_fds[i].fd == _fd) //mira si el evento es alguien nuevo?
-                    new_client(numfd);
-                else 
-                    client_exist(numfd, i);
-            }
+	int numfd = 1; //empieza en 1 pq server socket es 0
+	while (!(this->_signal)) {
+		//Adjustment numfd to the real size of _pollFds
+		numfd = std::min(numfd, static_cast<int>(_pollFds.size())); //std::min returns the min val of 2 values
+		
+		//Wait for events on Fds
+		int numEvents = poll(&_pollFds[0], numfd, -1); //
+		if (numEvents < 0 && _signal == false) {
+			std::cerr << "polling failed" << std::endl;
+			continue; //Skip the loop in case of error
+		}
+		// Iterate through the fds USING vector IT in case _pollFds change inside the for to be updated
+		for (size_t i = 0; i < _pollFds.size(); i++) { //si hay eventos entra (si hay clientes conectados)
+			if (_pollFds[i].revents & POLLIN) { //mira si el evento (cliente) es de input (POLLIN) 
+				if (_pollFds[i].fd == _serverFd) //mira si el evento es alguien nuevo?
+					new_client(numfd);
+				else 
+					client_exist(_pollFds[i].fd);
+			}
+		}
+		/*	In case error persist we need to add the _pollFds used inside new_client || client_exist
+			save in a temporal list and change it outside the for loop
+		*/
+	}
+	closeFds(); //Close all fds when finished
+}
+
+// Getters
+string	Server::getPassword() { return this->_password; }
+
+Client *Server::getClient(int fd) {
+	for (size_t i = 0; i < this->_clients.size(); i++) {
+		if (this->_clients[i].getFd() == fd)
+			return &this->_clients[i];
+	}
+	return NULL;
+}
+
+void Server::closeFds() {
+	//Temporary vector
+	std::vector<int>to_remove;
+	
+	// Close all clients Fds except the server socket
+	for (size_t i = 1; i < _pollFds.size(); i++) {
+		std::cout << "Client <" << _pollFds[i].fd << "> Disconnected" << std::endl;
+		string message = "Server has disconnected\n";
+		send(_pollFds[i].fd, message.c_str(), message.size(), 0);
+		close(_pollFds[i].fd);
+		to_remove.push_back(_pollFds[i].fd);
+	}
+	// Remove clients closed in _pollFds
+	for (std::vector<int>::size_type i = 0; i < to_remove.size(); ++i)
+		remove_fd(to_remove[i]); // Safe removal function for fds
+	//Close server Fd if valid
+	if (_serverFd != -1) {
+		std::cout << "Server <" << _serverFd << "> Disconnected" << std::endl;
+		close(_serverFd);
+		_serverFd = -1; // Mark server as closed in case any error
+	}
+}
+
+void	Server::remove_fd(int fd) {
+	for (std::vector<struct pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
+        if (it->fd == fd) {
+            _pollFds.erase(it);
+            break; // Exit the loop once the fd is removed
         }
     }
+}
+
+void	Server::removeClient(int fd) {
+	for (size_t i = 0; i < _clients.size(); i++) {
+		if (_clients[i].getFd() == fd) {
+			_clients.erase(_clients.begin() + i);
+			break;
+		}
+	}
+}
+
+void	Server::removeFd(int fd) {
+	for (size_t i = 0; i < _pollFds.size(); i++) {
+		if (_pollFds[i].fd == fd) {
+			_pollFds.erase(_pollFds.begin() + i);
+			break;
+		}
+	}
+}
+
+// Define the map outside the function
+const std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::cmdMap = Server::createCmdMap();
+
+std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::createCmdMap() {
+	std::map<std::string, void (Server::*)(std::vector<string>&, int)> map;
+	map["CAP"] = &Server::capCmd;
+	map["PASS"] = &Server::passCmd;
+	map["NICK"] = &Server::nickCmd;
+	map["USER"] = &Server::userCmd;
+	map["QUIT"] = &Server::quitCmd;
+	map["MODE"] = &Server::modeCmd;
+	map["JOIN"] = &Server::joinCmd;
+	map["PART"] = &Server::partCmd;
+	map["TOPIC"] = &Server::topicCmd;
+	map["KICK"] = &Server::kickCmd;
+	map["PRIVMSG"] = &Server::privmsgCmd;
+	map["INVITE"] = &Server::inviteCmd;
+	map["WHOIS"] = &Server::whoisCmd;
+	map["ADMIN"] = &Server::adminCmd;
+	map["INFO"] = &Server::infoCmd;
+	map["PONG"] = &Server::pongCmd;
+	map["PING"] = &Server::pingCmd;
+	return map;
+}
+
+void	Server::msgManagement( int fd) {
+	string command = getClient(fd)->getMsg();
+	std::cout << "msgManagement <" << command << ">" << std::endl;
+	if (command.empty())
+		return ;
+	
+	std::vector<string> cmd = splitMsg(command);
+	// Use getCommandInUpper to extract and normalize the command
+	string upperCmd = getCommandInUpper(cmd[0]); //toupper
+	
+	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
+	if (it != cmdMap.end()) // Execute the command
+		(this->*(it->second))(cmd, fd);
+	else {
+			//CUIDADO PETA!!!!!
+			// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
+		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[0]), fd);
+	}
+}
+
+bool Server::isRegistered(int fd) {
+	//
+	if (getClient(fd)->getState() == REGISTERED)
+		return true;
+	return false;
 }
