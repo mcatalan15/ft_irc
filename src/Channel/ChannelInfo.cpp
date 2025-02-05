@@ -6,3 +6,8 @@ const string Channel:: getName() const { return (_name); }
 string Channel::getPassword() const { return (_password); }
 
 void	Channel::setPassword(const string& password) { _password = password; }
+
+bool	Channel::hasPassword() const
+{
+	return (_password.empty() ? false : true);
+}

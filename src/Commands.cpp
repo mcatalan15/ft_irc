@@ -220,8 +220,8 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd)
 		else
 		{
 			// mierdas de mode y password
-			if (found->getPassword() != channelsPass[i])
-				std::cout << "Contrasena incorrecta" << std::endl;
+			if ((i >= channelsPass.size() && found->hasPassword()) || found->getPassword() != channelsPass[i])
+				std::cout << "Contrasenya incorrecta" << std::endl;
 			found->addClient(client);
 			sendMsg("you joined " + channelsNames[i] + " channel!\n", fd);
 		}
