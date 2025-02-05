@@ -50,8 +50,8 @@ Server::Server(int port, string password) {
 	with the server
 */
 Server::~Server() {
-	for (size_t i = 0; i < _channels.size(); i++)
-		delete _channels[i];
+	/*for (size_t i = 0; i < _channels.size(); i++)
+		delete _channels[i];*/
 	for (size_t i = 0; i < _pollFds.size(); i++)
 		close(_pollFds[i].fd);
 	close(_serverFd);

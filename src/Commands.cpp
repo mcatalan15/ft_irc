@@ -153,26 +153,33 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd){
 // JOIN COMMAND
 void	Server::joinCmd(std::vector<string>& cmd, int fd)
 {
-	Channel*	found = NULL;
 	std::cout << "JOIN cmd" << std::endl;
+	// Checkers
 	if (cmd.size() < 2)
 		return (sendMsg("no channel names provided\n", fd));
 	if (cmd[1][0] != '#')
 		return (sendMsg("channel needs to start with '#'\n", fd));
+
+	// Check if channel exist
+	Channel*	found = NULL;
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		if (_channels[i]->getName() == cmd[1])
-			found = _channels[i];
+		if (_channels[i].getName() == cmd[1]) {
+			found = &_channels[i];
+			break ;
+		}
 	}
 	Client*		client = getClient(fd);
+	// If channel dont exist
 	if (!found)
 	{
-		Channel*	newchannel = new Channel(cmd[1]);
-		
-		newchannel->addClient(client);
-		newchannel->addOperator(client);
+		_channels.push_back(cmd[1]); //Stores object
+		Channel& newchannel =_channels.back();
+
+		newchannel.addClient(client);
+		newchannel.addOperator(client);
 		_channels.push_back(newchannel);
-		client->addChannel(newchannel);
+		client->addChannel(&newchannel);
 		sendMsg("channel " + cmd[1] + " created!\n", fd);
 	}
 	else
