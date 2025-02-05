@@ -151,41 +151,80 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd){
 	sendMsg();
 	}*/
 // JOIN COMMAND
+
+std::vector<string>	joinDivisor(string cmd) {
+
+	size_t	i;
+	size_t	init = 0;
+	std::vector<string>	vec;
+	int		num_ch = 0;
+	for (i = 0; i < cmd.size(); i++) {
+		if (cmd[i] == ',')
+		{
+			vec.push_back(cmd.substr(init, i - init));
+			//std::cout << "cmd[" << num_ch << "]: " << str << std::endl;
+			init = i + 1;
+			num_ch++;
+		}
+	}
+	vec.push_back(cmd.substr(init, -1));
+	//std::cout << "cmd[" << num_ch << "]: " << str << std::endl;
+	return vec;
+}
 void	Server::joinCmd(std::vector<string>& cmd, int fd)
 {
 	std::cout << "JOIN cmd" << std::endl;
+	Client*		client = getClient(fd);
 	// Checkers
 	if (cmd.size() < 2)
-		return (sendMsg("no channel names provided\n", fd));
-	if (cmd[1][0] != '#')
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
+	if (cmd[1][0] != '#') // CAMBIAR!!!! SOO aplica al 1r
 		return (sendMsg("channel needs to start with '#'\n", fd));
+	
+	std::cout << "CANALES!!!" << std::endl;
+	std::vector<string> channelsNames = joinDivisor(cmd[1]);
+	printVecStr(channelsNames);
+	std::vector<string> channelsPass;
+	if (cmd.size() > 2) {
+		std::cout << std::endl << "KEYYSSS!!!!" <<std::endl;
+		channelsPass = joinDivisor(cmd[2]);
+		printVecStr(channelsPass);
+	}
 
 	// Check if channel exist
-	Channel*	found = NULL;
-	for (size_t i = 0; i < _channels.size(); i++)
+	for (size_t i = 0; i < channelsNames.size(); i++)
 	{
-		if (_channels[i].getName() == cmd[1]) {
-			found = &_channels[i];
-			break ;
+		Channel*	found = NULL;
+		for (size_t j = 0; j < _channels.size(); j++)
+		{
+			if (_channels[j].getName() == channelsNames[i]) {
+				found = &_channels[j];
+				break ;
+			}
 		}
-	}
-	Client*		client = getClient(fd);
-	// If channel dont exist
-	if (!found)
-	{
-		_channels.push_back(cmd[1]); //Stores object
-		Channel& newchannel =_channels.back();
-
-		newchannel.addClient(client);
-		newchannel.addOperator(client);
-		_channels.push_back(newchannel);
-		client->addChannel(&newchannel);
-		sendMsg("channel " + cmd[1] + " created!\n", fd);
-	}
-	else
-	{
-		found->addClient(client);
-		sendMsg("you joined " + cmd[1] + " channel!\n", fd);
+		// If channel dont exist
+		if (!found)
+		{
+			//_channels.push_back(channelsNames[i]); //Stores object
+			Channel newchannel(channelsNames[i]);
+	
+			if (cmd.size() > 2 && i < channelsPass.size())
+				newchannel.setPassword(channelsPass[i]);
+			newchannel.addClient(client);
+			newchannel.addOperator(client);
+			_channels.push_back(newchannel);
+			client->addChannel(&newchannel);
+			
+			sendMsg("channel " + channelsNames[i] + " created!\n", fd);
+		}
+		else
+		{
+			// mierdas de mode y password
+			if (found->getPassword() != channelsPass[i])
+				std::cout << "Contrasena incorrecta" << std::endl;
+			found->addClient(client);
+			sendMsg("you joined " + channelsNames[i] + " channel!\n", fd);
+		}
 	}
 }
 //--------------------------------------------------------------------------------------------
