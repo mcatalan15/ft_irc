@@ -7,20 +7,24 @@
 
 #include "Client.hpp"
 
-/* */
-typdef struct s_modes
-{
-	bool	i;
-	bool	t;
-	bool	k;
-	bool	o;
-	bool	l;
-}t_modes;
+/* 
+MODES
++/- i -> invite only (default: off = -i)
++/- t -> topic restricted (default: off = -t)
++/- k -> password set (default: off = -k) if pass is set Change to +k  
++/- l -> user limit (default: off = -l)
+*/
 class Client;
 
 class Channel
 {
-    public:
+	public:
+    	enum Mode {
+		    INVITE_ONLY = (1 << 0), 	//0001 (+i/-i) -> 1
+		    TOPIC_RESTRICTED = (1 << 1),//0010 (+t/-t) -> 2
+		    PASSWORD_SET = (1 << 2),	//0100 (+k/-k) -> 4
+		    USER_LIMIT = (1 << 3)		//1000 (+l/-l) -> 8
+	    };
         Channel(const std::string& name);
         Channel(const Channel& cpy);
         ~Channel();
@@ -67,7 +71,7 @@ class Channel
         std::set<Client*>       _operators;    // set of operators in the channel
         std::set<Client*>       _invitedClients; // set of clients invited to the channel
         std::string             _password; // password required to join the channel
-        t_modes					_mode;
+       // t_modes					_mode;
 };
 
 #endif
