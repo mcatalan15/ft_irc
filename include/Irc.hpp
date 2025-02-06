@@ -130,8 +130,8 @@ bool	nickChecker(string cmd);
 
 // JOIN CMD RPL
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
-#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + " " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + " " + CRLF)
-#define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
+#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + " " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
+//#define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 #define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
 #define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + ":Cannot join channel (+k)" + CRLF)
 #define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474 " (client) + " " + (channel) + ":Cannot join channel (+b)"+ CRLF)

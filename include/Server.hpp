@@ -43,6 +43,10 @@ class Server {
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
 		
+		//Channel Management
+		Channel*		channelsMng(string& channelName, int fd);
+		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
+		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd);
 		
 		//Getters
 		string		getPassword();
@@ -54,23 +58,23 @@ class Server {
 		bool		userIsUsed(string cmd);
 
 		//Commands
-		void		passCmd(std::vector<string>& cmd, int fd);
-		void		nickCmd(std::vector<string>& cmd, int fd);
-		void		userCmd(std::vector<string>& cmd, int fd);
-		void		quitCmd(std::vector<string>& cmd, int fd);
-		void		modeCmd(std::vector<string>& cmd, int fd);
-		void		joinCmd(std::vector<string>& cmd, int fd);
-		void		partCmd(std::vector<string>& cmd, int fd);
-		void		topicCmd(std::vector<string>& cmd, int fd);
-		void		kickCmd(std::vector<string>& cmd, int fd);
-		void		privmsgCmd(std::vector<string>& cmd, int fd);
-		void		inviteCmd(std::vector<string>& cmd, int fd);
-		void		whoisCmd(std::vector<string>& cmd, int fd);
-		void		adminCmd(std::vector<string>& cmd, int fd);
-		void		infoCmd(std::vector<string>& cmd, int fd);
-		void		pongCmd(std::vector<string>& cmd, int fd);
-		void		pingCmd(std::vector<string>& cmd, int fd);
-		void		capCmd(std::vector<string>& cmd, int fd);
+		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		nickCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		userCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		quitCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		modeCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		joinCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		partCmd(std::vector<string>& cmd, int fd);	//ESTA?
+		void		topicCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		kickCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		privmsgCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		inviteCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		whoisCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		adminCmd(std::vector<string>& cmd, int fd);//ESTA?
+		void		infoCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		pongCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		pingCmd(std::vector<string>& cmd, int fd); //ESTA?
+		void		capCmd(std::vector<string>& cmd, int fd);  //ESTA?
 };
 
 #endif

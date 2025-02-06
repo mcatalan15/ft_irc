@@ -8,7 +8,14 @@
 #include "Client.hpp"
 
 /* */
-
+typdef struct s_modes
+{
+	bool	i;
+	bool	t;
+	bool	k;
+	bool	o;
+	bool	l;
+}t_modes;
 class Client;
 
 class Channel
@@ -59,7 +66,8 @@ class Channel
         size_t                  _userLimit;     // max num of clients in the channel
         std::set<Client*>       _operators;    // set of operators in the channel
         std::set<Client*>       _invitedClients; // set of clients invited to the channel
-        std::string             _password;       // password required to join the channel
+        std::string             _password; // password required to join the channel
+        t_modes					_mode;
 };
 
 #endif

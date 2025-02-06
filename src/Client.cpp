@@ -113,7 +113,4 @@ void	Client::cleanBuff() {
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
 
-void	Client::addChannel(Channel* channel)
-{
-	_channels.push_back(channel);	
-}
+void	Client::addChannel(Channel* channel) { _channels.push_back(channel); }
