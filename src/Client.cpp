@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include <cstddef>
+#include <iostream>
 
 // Default constructor
 Client::Client() : _fd(-1), _state(HANDSHAKE) {}
@@ -76,11 +77,11 @@ void Client::setState(State newState) { _state = newState; }
 void Client::setMsg(const std::string& msg) { _msg = msg; }
 
 //FONCTIONS
-void Client::welcome(Client &Client, int fd) {
+void Client::welcome(Server& Server, Client &Client, int fd) {
 	string userId = USER_ID(Client.getNickname(), Client.getUsername());
 	sendMsg(RPL_WELCOME(Client.getNickname(), userId), fd);
 	sendMsg(RPL_YOURHOST(Client.getUsername(), SERVER_NAME, SERVER_VERSION), fd);
-	//sendMsg(RPL_CREATED(Client.getUsername(), _timer), fd); FALTA TIMER!!!!!
+	sendMsg(RPL_CREATED(Client.getUsername(), Server.getCreationTime()), fd);
 	sendMsg(RPL_MYINFO(Client.getUsername(), SERVER_NAME, SERVER_VERSION, USER_MODES, CHANNEL_MODES, CHANNEL_MODES_WITH_PARAM), fd);
 	string supportedTokens = "NICKLEN=9 && USERLEN=18";
 	sendMsg(RPL_ISSUPPORT(Client.getUsername(), supportedTokens), fd);
@@ -114,3 +115,16 @@ void	Client::cleanBuff() {
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
 
 void	Client::addChannel(Channel* channel) { _channels.push_back(channel); }
+
+const std::vector<Channel*> &Client::getChannels() const
+{
+    return (_channels);
+}
+
+bool Client::clientMaxChannel() const
+{
+	std::cout << _channels.size() << " SIZE CLIENTMAXCHANNEL" << std::endl;
+    if(_channels.size() >= MAX_CHANNELS)
+        return (true);
+    return (false);
+}

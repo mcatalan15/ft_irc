@@ -4,6 +4,7 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include <string>
 
 class Client;
 class Channel;
@@ -19,6 +20,7 @@ class Server {
 		struct sockaddr_in6			_address;
 		string						_password;
 		std::vector<Channel>		_channels; //Sin puntero guardamos directamente object (no new)
+		string						_creationTime;
 		// For map (switch case)
 		static std::map<std::string, void (Server::*)(std::vector<string>&, int)> createCmdMap();
 	    static const std::map<std::string, void (Server::*)(std::vector<string>&, int)> cmdMap;
@@ -47,11 +49,23 @@ class Server {
 		Channel*		channelsMng(string& channelName, int fd);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
 		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd);
+		Channel*		findChannel(string channelName);
+		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
 		
 		//Getters
-		string		getPassword();
+		string			getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
+		
+		// Time
+		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
+		string			getCreationTime() { return _creationTime; };
+		
+		//MODE
+		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
+		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
+		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
+		bool    		isFlagMode(Channel* channel, std::vector<string>& cmd, int num);
 		
 		//isUsed commands
 		bool		nickIsUsed(string cmd);

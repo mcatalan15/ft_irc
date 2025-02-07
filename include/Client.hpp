@@ -16,6 +16,8 @@ enum State {
 
 class Channel;
 
+class Server;
+
 class Client
 {
 	private:
@@ -57,7 +59,9 @@ class Client
 		string			getPrefix() const;
 		bool			getIsOper() const;
 		State			getState() const;
-
+		const std::vector<Channel*> &getChannels() const;
+		bool            clientMaxChannel() const;
+		
 		//SETTERS
 		void setNickname(const string& nickname);
 		void setUsername(const string& username);
@@ -68,7 +72,7 @@ class Client
 		void setIsOper(bool isOper);
 
 		//FUNCTIONS
-		void welcome(Client &Client, int fd);                 // Need to implement
+		void welcome(Server& Server, Client &Client, int fd);          // Need to implement
 		void reply(string msg);    //Need to implement*/
 		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();

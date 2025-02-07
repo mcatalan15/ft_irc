@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -127,4 +128,31 @@ bool nickChecker(string cmd) {
 	if (cmd.find_first_of(NICK_CHARSET) == string::npos)
 		return false;
 	return true;
+}
+
+string	getCurrentDataTime() {
+	time_t now = time(0);
+	struct tm *t = localtime(&now);
+
+	char buf[20];
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", t);
+	return string(buf);
+}
+
+std::vector<string>	joinDivisor(string cmd) {
+
+	size_t	i;
+	size_t	init = 0;
+	std::vector<string>	vec;
+	int		num_ch = 0;
+	for (i = 0; i < cmd.size(); i++) {
+		if (cmd[i] == ',')
+		{
+			vec.push_back(cmd.substr(init, i - init));
+			init = i + 1;
+			num_ch++;
+		}
+	}
+	vec.push_back(cmd.substr(init, -1));
+	return vec;
 }
