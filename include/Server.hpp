@@ -48,7 +48,7 @@ class Server {
 		//Channel Management
 		Channel*		channelsMng(string& channelName, int fd);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
-		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd);
+		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag);
 		Channel*		findChannel(string channelName);
 		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
 		Client*			findNickname(string nick, Channel* channel);

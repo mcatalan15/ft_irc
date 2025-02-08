@@ -21,6 +21,7 @@ enum Mode {
 	PASSWORD_SET = (1 << 2),	//0100 (+k/-k) -> 4
 	USER_LIMIT = (1 << 3)		//1000 (+l/-l) -> 8
 };
+
 class Client;
 
 class Channel

@@ -270,17 +270,19 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 			}
 		}
 		if (cmd[2][i] == 'k') {
-			if (cmd.size() >= (j + 1)) { 
-				if (flag) {
+			if (flag) {
+				if (cmd.size() >= (j + 1)) { 
 					channel->setPassword(cmd[j]);
 					channel->setMode(PASSWORD_SET);
 				}
-				else {
-					channel->setPassword("");
-					channel->unsetMode(PASSWORD_SET);
-				}
+				else
+					sendMsg("no enviaste contrasenya bro", fd);
+					//channel->setPassword("");
+					//}
 				j++;
 			}
+			else
+				channel->unsetMode(PASSWORD_SET);
 		}
 		if (cmd[2][i] == 'l') {
 			if (flag) {

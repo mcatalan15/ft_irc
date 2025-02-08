@@ -33,10 +33,15 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 }
 
 void	Server::createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd) {
-	std::cout << "Create new channel" << std::endl;
-	std::cout << "Entra" << std::endl;
+//	std::cout << "Create new channel" << std::endl;
+//	std::cout << "Entra" << std::endl;
 	Channel newchannel(channelName);
-	if (i < pass) {
+	if (_channels.size() >= MAX_CHANNELS) //User joins max channels
+			return (sendMsg(ERR_TOOMANYCHANNELSCREATED(getClient(fd)->getNickname(), channelName), fd));
+	if (getClient(fd)->clientMaxChannel()) //User joins max channels
+		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));	
+	if (i < pass)
+	{
 		std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
 		newchannel.setPassword(channelPass);
 		newchannel.setMode(PASSWORD_SET);
@@ -47,6 +52,8 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	newchannel.addOperator(getClient(fd));
 	_channels.push_back(newchannel);
 	getClient(fd)->addChannel(&newchannel);
+//	std::cout << "channels server addr: " << &_channels[0] << std::endl;
+//	std::cout << "channels client addr: " << &newchannel << std::endl;
 	sendMsg("channel " + channelName + " created!\n", fd);
 }
 
@@ -78,14 +85,21 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 	return true;
 }
 
-void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd) {
+void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag) {
 	std::cout << "Existing channel" << std::endl;
-	// mierdas de mode y password
-	std::cout << found->isModeSet(PASSWORD_SET) << " <- Password_set" << std::endl;
-	if (found->isModeSet(PASSWORD_SET)) {
+	if (found->isModeSet(PASSWORD_SET)) 
+	{
+		std::cout << "Entra a tiene contrasenya\n";
 		std::cout << "i: " << i << std::endl;
-		if (channelPass == found->getPassword()) {
-			if (channelConnStatus(fd, found, channelPass, channelName)) {
+		if (flag == 1) {
+			string channelPass = "";
+			sendMsg("bro no pusiste key y se necesita XD", fd);
+			return ;
+		}
+		if (channelPass == found->getPassword()) 
+		{
+			if (channelConnStatus(fd, found, channelPass, channelName)) 
+			{
 				found->addClient(getClient(fd));
 				getClient(fd)->addChannel(found);
 				sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
@@ -95,8 +109,10 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		else
 			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
 	}
-	else {
-		if (channelConnStatus(fd, found, channelPass, channelName)) {
+	else
+	{
+		if (channelConnStatus(fd, found, channelPass, channelName)) 
+		{
 			found->addClient(getClient(fd));
 			getClient(fd)->addChannel(found);
 			sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
@@ -120,27 +136,31 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
 
 	std::cout << "CANALES!!!" << std::endl;
-	std::vector<string> channelsNames = joinDivisor(cmd[1]);
-	printVecStr(channelsNames);
+	std::vector<string> channelName = joinDivisor(cmd[1]);
+	printVecStr(channelName);
 
-	std::vector<string> channelsPass;
+	std::vector<string> channelPass;
 	int pass = 0;
 	if (cmd.size() > 2) {
 		std::cout << std::endl << "KEYYSSS!!!!" <<std::endl;
-		channelsPass = joinDivisor(cmd[2]);
-		printVecStr(channelsPass);
-		pass = channelsPass.size();
+		channelPass = joinDivisor(cmd[2]);
+		printVecStr(channelPass);
+		pass = channelPass.size();
 	}
 
 	// Check if channel exist
 	Channel* found = NULL;
-	for (size_t i = 0; i < channelsNames.size(); i++) {
-		if (validChannel(channelsNames[i], fd)) {
-			found = channelsMng(channelsNames[i], fd);
+	int flag = 0;
+	for (size_t i = 0; i < channelName.size(); i++) {
+		if (validChannel(channelName[i], fd)) {
+			found = channelsMng(channelName[i], fd);
 			if (!found)
-				createNewChannel(channelsNames[i], channelsPass[i], pass, i, fd);
-			else
-				existingChannel(found, channelsPass[i], channelsNames[i], i, fd);
+				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
+			else {
+				if (channelPass.empty())
+					flag = 1;
+				existingChannel(found, channelPass[i], channelName[i], i, fd, flag);
+			}
 		}
 	}
 }

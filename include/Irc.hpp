@@ -34,7 +34,6 @@
 #include <vector>		// -> vector
 #include <cstddef>		// -> size_t
 
-#define MAX_CLIENTS 25
 
 using std::string;
 
@@ -87,6 +86,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define NICK_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-"
 #define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
 #define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
+#define MAX_CLIENTS 25
 #define MAX_CONNECTIONS 5
 #define MAX_CHANNELS 5
 #define CRLF "\r\n"
@@ -135,6 +135,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + " " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 #define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 #define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
+#define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
 #define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + ":Cannot join channel (+k)" + CRLF)
 #define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474 " (client) + " " + (channel) + ":Cannot join channel (+b)"+ CRLF)
 #define	ERR_CHANNELISFULL(client, channel)(":localhost 471 " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
