@@ -51,6 +51,7 @@ class Server {
 		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd);
 		Channel*		findChannel(string channelName);
 		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
+		Client*			findNickname(string nick, Channel* channel);
 		
 		//Getters
 		string			getPassword();
@@ -61,11 +62,11 @@ class Server {
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
 		
-		//MODE
+		//MODEi
 		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
 		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
-		bool    		isFlagMode(Channel* channel, std::vector<string>& cmd, int num);
+		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num);
 		
 		//isUsed commands
 		bool		nickIsUsed(string cmd);

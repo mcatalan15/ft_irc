@@ -24,13 +24,12 @@ std::vector<string>	joinDivisor(string cmd) {
 
 Channel* Server::channelsMng(string& channelName, int fd) {
 	(void)fd;
-	Channel* found = NULL;
 	for (size_t j = 0; j < _channels.size(); j++)
 	{
 		if (_channels[j].getName() == channelName)
-			found = &_channels[j];
+			return &_channels[j];
 	}
-	return found;
+	return NULL;
 }
 
 void	Server::createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd) {
@@ -82,6 +81,7 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd) {
 	std::cout << "Existing channel" << std::endl;
 	// mierdas de mode y password
+	std::cout << found->isModeSet(PASSWORD_SET) << " <- Password_set" << std::endl;
 	if (found->isModeSet(PASSWORD_SET)) {
 		std::cout << "i: " << i << std::endl;
 		if (channelPass == found->getPassword()) {
@@ -95,8 +95,15 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		else
 			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
 	}
-	else
-		std::cout << "no tiee ppass" << std::endl;
+	else {
+		if (channelConnStatus(fd, found, channelPass, channelName)) {
+			found->addClient(getClient(fd));
+			getClient(fd)->addChannel(found);
+			sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
+			//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
+		}
+	}
+		std::cout << "no tiee pass" << std::endl;
 }
 
 bool validChannel(string& channelName, int fd) {

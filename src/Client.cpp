@@ -8,9 +8,9 @@ Client::Client() : _fd(-1), _state(HANDSHAKE) {}
 // Constructor
 Client::Client(int client_fd) :_fd(client_fd), _state(HANDSHAKE) {
 	_nickname.clear();
-    _username.clear();
-    _realname.clear();
-    _hostname.clear();
+	_username.clear();
+	_realname.clear();
+	_hostname.clear();
 }
 
 // Destructor
@@ -53,12 +53,12 @@ string &Client::getMsgRef() { return (_msg); }
 
 // To build the prefix in IRC format: ":nickname!username@hostname"
 string Client::getPrefix() const {
-    string prefix = ":" + getNickname();
-    if (!getUsername().empty())
-        prefix += "!" + getUsername();
-    if (!getHostname().empty())
-        prefix += "@" + getHostname();
-    return prefix;
+	string prefix = ":" + getNickname();
+	if (!getUsername().empty())
+		prefix += "!" + getUsername();
+	if (!getHostname().empty())
+		prefix += "@" + getHostname();
+	return prefix;
 }
 
 //SETTERS
@@ -118,13 +118,13 @@ void	Client::addChannel(Channel* channel) { _channels.push_back(channel); }
 
 const std::vector<Channel*> &Client::getChannels() const
 {
-    return (_channels);
+	return (_channels);
 }
 
 bool Client::clientMaxChannel() const
 {
 	std::cout << _channels.size() << " SIZE CLIENTMAXCHANNEL" << std::endl;
-    if(_channels.size() >= MAX_CHANNELS)
-        return (true);
-    return (false);
+	if(_channels.size() >= MAX_CHANNELS)
+		return (true);
+	return (false);
 }

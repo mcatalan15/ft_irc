@@ -77,10 +77,10 @@ string				getCommandInUpper(const string &cmd);
 std::vector<string>	splitCommand(string &cmd);
 std::vector<string>	splitUserCmd(string &cmd);
 void				printVecStr(std::vector<string> cmd);
-string	addHostname();
-void	sendMsg(string msg, int fd); 
-bool	nickChecker(string cmd);
-string	getCurrentDataTime();
+string				addHostname();
+void				sendMsg(string msg, int fd); 
+bool				nickChecker(string cmd);
+string				getCurrentDataTime();
 std::vector<string>	joinDivisor(string cmd);
 
 // Defines

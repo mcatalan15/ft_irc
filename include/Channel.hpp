@@ -44,6 +44,7 @@ class Channel
 		void addClient(Client* client);
 		void removeClient(Client* client);
 		bool hasClient(Client *client) const;
+		Client*	findNickname(string nick);
 
 		/*---------- CHANNEL OPERATORS ---------------*/
 		const std::set<Client*> &getOperators() const;
@@ -75,14 +76,14 @@ class Channel
 		string	getCreationTime() { return _creationTime; };
 
 		private:
-			std::string             _name;          // name of the channel
+			std::string				_name;          // name of the channel
 			string					_topic;
-			std::vector<Client*>    _clients;        // list of clients in the channel
-			size_t                  _userLimit;     // max num of clients in the channel
-			std::set<Client*>       _operators;    // set of operators in the channel
-			std::set<Client*>       _invitedClients; // set of clients invited to the channel
-			std::set<Client*>       _bannedClients; // set of clients banned 
-			std::string             _password; // password required to join the channel
+			std::vector<Client*>	_clients;        // list of clients in the channel
+			size_t					_userLimit;     // max num of clients in the channel
+			std::set<Client*>		_operators;    // set of operators in the channel
+			std::set<Client*>		_invitedClients; // set of clients invited to the channel
+			std::set<Client*>		_bannedClients; // set of clients banned 
+			std::string				_password; // password required to join the channel
 			unsigned int			_modes;
 			string					_creationTime;
 };

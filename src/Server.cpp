@@ -215,11 +215,11 @@ void Server::closeFds() {
 
 void	Server::remove_fd(int fd) {
 	for (std::vector<struct pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
-        if (it->fd == fd) {
-            _pollFds.erase(it);
-            break; // Exit the loop once the fd is removed
-        }
-    }
+		if (it->fd == fd) {
+			_pollFds.erase(it);
+			break; // Exit the loop once the fd is removed
+		}
+	}
 }
 
 void	Server::removeClient(int fd) {

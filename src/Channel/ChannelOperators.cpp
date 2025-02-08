@@ -5,31 +5,33 @@
 
 const std::set<Client*> &Channel::getOperators() const
 {
-    return (_operators);
+	return (_operators);
 }
 
 void Channel::addOperator(Client *client)
 {
-    _operators.insert(client);
-    // We can use the return value if the client is allready
-    // an operator. Should we ?
+	std::cout << client << " addOperator" << std::endl;
+	_operators.insert(client);
+	std::cout << "sddgadfgdfgafgadfhdghhlilgusdfgluifdlgi wruilg hlw" << std::endl;
+	// We can use the return value if the client is allready
+	// an operator. Should we ?
 }
 
 void Channel::removeOperator(Client *client)
 {
-    std::set<Client*>::iterator it = getOperators().find(client);
-    if (it == getOperators().end())
-        throw std::runtime_error("Client is not in the invitation list.");
-    // Maybe we need to implement a different message error
-    _operators.erase(client);
+	std::set<Client*>::iterator it = getOperators().find(client);
+	if (it == getOperators().end())
+		throw std::runtime_error("Client is not in the invitation list.");
+	// Maybe we need to implement a different message error
+	_operators.erase(client);
 }
 
 bool Channel::isOperator(Client *client) const
 {
-    std::set<Client*>::iterator it = getOperators().find(client);
-    if (it == getOperators().end())
-        return (false);
-    return (true);
+	std::set<Client*>::iterator it = getOperators().find(client);
+	if (it == getOperators().end())
+		return (false);
+	return (true);
 }
 
 bool	Channel::isModeSet(Mode mode) { 

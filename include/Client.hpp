@@ -60,7 +60,7 @@ class Client
 		bool			getIsOper() const;
 		State			getState() const;
 		const std::vector<Channel*> &getChannels() const;
-		bool            clientMaxChannel() const;
+		bool			clientMaxChannel() const;
 		
 		//SETTERS
 		void setNickname(const string& nickname);
