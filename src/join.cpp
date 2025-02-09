@@ -61,8 +61,9 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	newchannel.addOperator(getClient(fd));
 	_channels.push_back(newchannel);
 	getClient(fd)->addChannel(&newchannel);
-//	std::cout << "channels server addr: " << &_channels[0] << std::endl;
-//	std::cout << "channels client addr: " << &newchannel << std::endl;
+	std::cout << "name channel: " << newchannel.getName() << std::endl;
+	std::cout << "channels server addr: " << &_channels[0] << std::endl;
+	std::cout << "channels client addr: " << &newchannel << std::endl;
 	sendMsg("channel " + channelName + " created!\n", fd);
 //	joinMsg(mewchannel, fd);
 }

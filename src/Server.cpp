@@ -303,3 +303,16 @@ Channel*	Server::findChannel(string channelName)
 	return channel;
 }
 
+void	Server::sendMsgToChannel(string message, Channel* channel, int fd)
+{
+	if (!channel)
+		return ;
+	Client*			client = getClient(fd);
+	std::vector<Client*>	clientsVec = channel->getClients();
+
+	for (size_t i = 0; i < clientsVec.size(); i++)
+	{
+		std::cout << "entra en for\n";
+		sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, clientsVec[i]->getFd());
+	}
+}

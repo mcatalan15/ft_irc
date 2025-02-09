@@ -44,6 +44,7 @@ class Server {
 		//Msg management
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
+		void			sendMsgToChannel(string message, Channel* channel, int fd);
 		
 		//Channel Management
 		Channel*		channelsMng(string& channelName, int fd);

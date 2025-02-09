@@ -128,3 +128,19 @@ bool Client::clientMaxChannel() const
 		return (true);
 	return (false);
 }
+
+bool	Client::removeChannel(string channelname)
+{
+	std::vector<Channel*>::iterator		it;
+	//std::cout << _channels[0]->getName() << std::endl;
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if ((*it)->getName() == channelname)
+		{
+	std::cout << "it addr: " << *(_channels.begin()) << " channel addr: " << _channels[0] << std::endl;
+			_channels.erase(it);
+			return true;
+		}
+	}
+	return false;
+}

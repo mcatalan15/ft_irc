@@ -36,6 +36,7 @@ bool Channel::hasClient(Client *client) const
 		return (false);
 	return (true);
 }
+
 /*
 Client*	Channel::findNickname(string nick)
 {

@@ -77,6 +77,7 @@ class Client
 		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();
 		void	addChannel(Channel* channel);
+		bool	removeChannel(string channelname);
 		void	appendToMsg(const string &msg);
 };
 
