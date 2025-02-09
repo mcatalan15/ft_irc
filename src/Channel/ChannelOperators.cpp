@@ -12,7 +12,6 @@ void Channel::addOperator(Client *client)
 {
 	std::cout << client << " addOperator" << std::endl;
 	_operators.insert(client);
-	std::cout << "sddgadfgdfgafgadfhdghhlilgusdfgluifdlgi wruilg hlw" << std::endl;
 	// We can use the return value if the client is allready
 	// an operator. Should we ?
 }
@@ -28,13 +27,17 @@ void Channel::removeOperator(Client *client)
 
 bool Channel::isOperator(Client *client) const
 {
-	std::set<Client*>::iterator it = getOperators().find(client);
+	/*std::set<Client*>::iterator it= getOperators().find(client);
 	if (it == getOperators().end())
 		return (false);
-	return (true);
+	return (true);*/
+	/*std::vector<Client*> pedro = getOperators());
+	if (it == getOperators().end())
+		return (false);
+	return (true);*/
 }
 
-bool	Channel::isModeSet(Mode mode) { 
+bool	Channel::isModeSet(Mode mode) {
 	std::cout << "Checking mode: " << mode << ", current modes: " << this->_modes << std::endl;
 	return _modes & mode; }
 
@@ -42,4 +45,3 @@ bool	Channel::isModeSet(Mode mode) {
 void	Channel::setMode(Mode mode) { _modes |= mode; }
 
 void	Channel::unsetMode(Mode mode) { _modes &= ~mode; }
-
