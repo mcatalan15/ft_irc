@@ -32,6 +32,15 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 	return NULL;
 }
 
+/*void	Server::joinMsg(Channel *channel, int fd) {
+	std::vector<Client*> clients_fd = channnel->getClients();
+	
+	for(size_t i = 0; clients_fd.size(); i++) {
+		std::cout << "client[" << i << "] ->" << clients_fd[i] << std::endl
+	}
+	
+}*/
+
 void	Server::createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd) {
 //	std::cout << "Create new channel" << std::endl;
 //	std::cout << "Entra" << std::endl;
@@ -39,7 +48,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	if (_channels.size() >= MAX_CHANNELS) //User joins max channels
 			return (sendMsg(ERR_TOOMANYCHANNELSCREATED(getClient(fd)->getNickname(), channelName), fd));
 	if (getClient(fd)->clientMaxChannel()) //User joins max channels
-		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));	
+		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));
 	if (i < pass)
 	{
 		std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
@@ -55,6 +64,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 //	std::cout << "channels server addr: " << &_channels[0] << std::endl;
 //	std::cout << "channels client addr: " << &newchannel << std::endl;
 	sendMsg("channel " + channelName + " created!\n", fd);
+//	joinMsg(mewchannel, fd);
 }
 
 bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
@@ -87,7 +97,7 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 
 void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag) {
 	std::cout << "Existing channel" << std::endl;
-	if (found->isModeSet(PASSWORD_SET)) 
+	if (found->isModeSet(PASSWORD_SET))
 	{
 		std::cout << "Entra a tiene contrasenya\n";
 		std::cout << "i: " << i << std::endl;
@@ -96,9 +106,9 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 			sendMsg("bro no pusiste key y se necesita XD", fd);
 			return ;
 		}
-		if (channelPass == found->getPassword()) 
+		if (channelPass == found->getPassword())
 		{
-			if (channelConnStatus(fd, found, channelPass, channelName)) 
+			if (channelConnStatus(fd, found, channelPass, channelName))
 			{
 				found->addClient(getClient(fd));
 				getClient(fd)->addChannel(found);
@@ -111,7 +121,7 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 	}
 	else
 	{
-		if (channelConnStatus(fd, found, channelPass, channelName)) 
+		if (channelConnStatus(fd, found, channelPass, channelName))
 		{
 			found->addClient(getClient(fd));
 			getClient(fd)->addChannel(found);

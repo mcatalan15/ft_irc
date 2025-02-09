@@ -52,6 +52,7 @@ class Server {
 		Channel*		findChannel(string channelName);
 		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
 		Client*			findNickname(string nick, Channel* channel);
+		void			joinMsg(Channel *channel, int fd);
 		
 		//Getters
 		string			getPassword();

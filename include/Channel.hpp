@@ -27,16 +27,16 @@ class Client;
 class Channel
 {
 	public:
-		Channel(const std::string& name);
+		Channel(const string& name);
 		Channel(const Channel& cpy);
 		~Channel();
 
 		/*------------ CHANNEL INFO ---------------*/
-		const std::string getName() const;
+		const string getName() const;
 
 		// Password management
-		std::string getPassword() const;
-		void setPassword(const std::string& password);
+		string getPassword() const;
+		void setPassword(const string& password);
 		bool hasPassword() const;
 
 		/*---------- CHANNEL MANAGEMENT -----------*/
@@ -77,14 +77,14 @@ class Channel
 		string	getCreationTime() { return _creationTime; };
 
 		private:
-			std::string				_name;          // name of the channel
+			string				_name;          // name of the channel
 			string					_topic;
 			std::vector<Client*>	_clients;        // list of clients in the channel
 			size_t					_userLimit;     // max num of clients in the channel
 			std::set<Client*>		_operators;    // set of operators in the channel
 			std::set<Client*>		_invitedClients; // set of clients invited to the channel
 			std::set<Client*>		_bannedClients; // set of clients banned 
-			std::string				_password; // password required to join the channel
+			string				_password; // password required to join the channel
 			unsigned int			_modes;
 			string					_creationTime;
 };

@@ -103,7 +103,7 @@ std::vector<string>	joinDivisor(string cmd);
 
 //WELCOME msg (RPL_WELCOME)
 #define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
-#define RPL_YOURHOST(client, servername, version) (":localhost 002 " + (client) + " :Your host is " + (servername) + ", running version " + (version) + CRLF)
+#define RPL_YOURHOST(client, servername, version) (":localhost 002 " + (client) + " :Your host is " + (servername) + ", running version Release Candidate(RC)-" + (version) + CRLF)
 #define RPL_CREATED(client, datatime) (":localhost 003 " + (client) + " :This server was created " + (datatime) + CRLF)
 #define RPL_MYINFO(client, servername, version, availableUserModes, availableChannelModes, channelModesWithParam)\
 	(":localhost 004 " + client + " " + servername + " " + version + " " + availableUserModes + " " + availableChannelModes + " " + channelModesWithParam"" + CRLF)

@@ -139,7 +139,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 }
 // MODE COMMAND ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/* 
 bool	Server::isFlagMode(Channel* channel, std::vector<string>& cmd, int num)
 {
 	(void)channel;
@@ -317,7 +317,7 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 		return ;
 	// necesitamos checker si los modes son del mismo typo
 	modeManagement(channel, cmd, fd);
-}
+}*/
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
