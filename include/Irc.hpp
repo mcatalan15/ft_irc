@@ -96,7 +96,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define CHANNEL_MODES	"itkol" // y esto otro?
 #define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
 
-#define USER_ID(nick, client) (":" + (nick) + "!" + (client) + "@localhost")
+#define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
@@ -131,6 +131,8 @@ std::vector<string>	joinDivisor(string cmd);
 #define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use" + CRLF)
 
 // JOIN CMD RPL
+#define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
+#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353" + (nick) + " = " + (channel) + " " + (msg) + CRLF)
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
 #define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + " " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 #define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
@@ -141,8 +143,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define	ERR_CHANNELISFULL(client, channel)(":localhost 471 " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
 #define ERR_INVITEONLYCHAN(client, channel)(":localhost 473 " +(client) + " " + (channel) + " :Cannot join channel (+i)" + CRLF)
 #define ERR_BADCHANMASK(channel)(":localhost  " + (channel) + " :Bad Channel Mask" + CRLF)
-//#define RPL_NAMREPLY 353
-//#define RPL_ENDOFNAMES 366
+#define RPL_ENDOFNAMES(client, channel) (":localhost 366" + " :End of /NAMES list" + CRLF)
 
 // MODE MD
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)

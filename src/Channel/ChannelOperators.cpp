@@ -10,9 +10,8 @@ const std::set<Client*> &Channel::getOperators() const
 
 void Channel::addOperator(Client *client)
 {
-	std::cout << client << " addOperator" << std::endl;
 	_operators.insert(client);
-	std::cout << "sddgadfgdfgafgadfhdghhlilgusdfgluifdlgi wruilg hlw" << std::endl;
+
 	// We can use the return value if the client is allready
 	// an operator. Should we ?
 }

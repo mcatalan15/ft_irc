@@ -5,10 +5,6 @@
 
 const std::vector<Client*> &Channel::getClients() const
 {
-	/*for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
-    {
-        std::cout <<  "Client nickname: " << (*it)->getNickname() << " Client address: " << *it << std::endl; // Dereference the iterator to get the pointer to the Client
-    }*/
 	return (_clients);
 }
 
