@@ -327,7 +327,7 @@ void	Server::sendMsgToChannel(string message, Channel* channel, int fd)
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
 		//std::cout << "entra en for\n";
-		//std::cout << "clientsVec 1: " << clientsVec[i] << std::endl;
+		std::cout << "clientsVec " << i << ": " << clientsVec[i] << std::endl;
 		//std::cout << "clientsVec 1: " << clientsVec[i]->getNickname() << std::cout;
 		sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, clientsVec[i]->getFd());
 	}

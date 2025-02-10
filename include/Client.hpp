@@ -31,6 +31,7 @@ class Client
 		string					_msg;			// To manage messages
 		State					_state;			// Connection state
 		std::vector<Channel*>	_channels;		// Not sure we need that
+		std::vector<string>		_channelnames;
 		//std::vector<Client>	_clients;		// List of all clients
 
 		//string				_password;		// HACE FALTA ?*/

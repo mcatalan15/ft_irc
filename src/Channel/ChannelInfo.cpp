@@ -2,7 +2,6 @@
 
 const string Channel:: getName() const 
 {
-	std::cout << _name << std::endl;
 	return (_name); 
 }
 

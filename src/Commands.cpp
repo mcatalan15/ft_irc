@@ -437,24 +437,29 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 	Client*		client = getClient(fd);
 	Channel*	channel;
 	string		message;
+	std::vector<string>	channelsVec;
 
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
-
-	channel = findChannel(cmd[1]);
-	std::cout << "channelname: " << channel->getName() << std::endl;
-	std::cout << "hihihihi" << std::endl;
-	if (!channel)
-		return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
-	if (!client->removeChannel(cmd[1]))
-		return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[0]), fd));
-	if (cmd.size() < 3)
-		cmd.push_back("");
-	message = "PART " + cmd[1] + " " + cmd[2];
-	sendMsgToChannel(message, channel, fd);
-	channel->removeClient(client);
-	if (channel->getClients().size() <= 0)
-		removeChannel(channel->getName());
+	
+	channelsVec = joinDivisor(cmd[1]);
+	for (size_t i = 0; i < channelsVec.size(); i++)
+	{
+		channel = findChannel(channelsVec[i]);
+		std::cout << "channelname: " << channel->getName() << std::endl;
+		//std::cout << "hihihihi" << std::endl;
+		if (!channel)
+			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
+		if (!client->removeChannel(channelsVec[i]))
+			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[0]), fd));
+		if (cmd.size() < 3)
+			cmd.push_back("");
+		message = "PART " + channelsVec[i] + " " + cmd[2];
+		sendMsgToChannel(message, channel, fd);
+		channel->removeClient(client);
+		if (channel->getClients().size() <= 0)
+			removeChannel(channel->getName());
+	}
 }
 
 //TOPIC COMMAND
