@@ -104,7 +104,7 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		std::cout << "i: " << i << std::endl;
 		if (flag == 1) {
 			string channelPass = "";
-			sendMsg("bro no pusiste key y se necesita XD", fd);
+			sendMsg("bro no pusiste key y se necesita XD\n", fd);
 			return ;
 		}
 		if (channelPass == found->getPassword())

@@ -453,6 +453,8 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 	message = "PART " + cmd[1] + " " + cmd[2];
 	sendMsgToChannel(message, channel, fd);
 	channel->removeClient(client);
+	if (channel->getClients().size() <= 0)
+		removeChannel(channel->getName());
 }
 
 //TOPIC COMMAND

@@ -240,6 +240,20 @@ void	Server::removeFd(int fd) {
 	}
 }
 
+void	Server::removeChannel(string channelname)
+{
+	std::vector<Channel>::iterator	it;
+
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		if ((*it).getName() == channelname)
+		{
+			_channels.erase(it);
+			break ;
+		}
+	}
+}
+
 // Define the map outside the function
 const std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::cmdMap = Server::createCmdMap();
 
@@ -312,7 +326,9 @@ void	Server::sendMsgToChannel(string message, Channel* channel, int fd)
 
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
-		std::cout << "entra en for\n";
+		//std::cout << "entra en for\n";
+		//std::cout << "clientsVec 1: " << clientsVec[i] << std::endl;
+		//std::cout << "clientsVec 1: " << clientsVec[i]->getNickname() << std::cout;
 		sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, clientsVec[i]->getFd());
 	}
 }
