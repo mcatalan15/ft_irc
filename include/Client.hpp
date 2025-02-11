@@ -3,6 +3,7 @@
 
 #include "Irc.hpp"
 #include "Channel.hpp"
+#include <string>
 //#include "MessageHandler.hpp"
 
 // Definition of possible client state
@@ -30,7 +31,7 @@ class Client
 		string					_hostname;		// maybe we need to print
 		string					_msg;			// To manage messages
 		State					_state;			// Connection state
-		std::vector<Channel*>	_channels;		// Not sure we need that
+		std::vector<string>		_channels;
 		//std::vector<Client>	_clients;		// List of all clients
 
 		//string				_password;		// HACE FALTA ?*/
@@ -59,7 +60,7 @@ class Client
 		string			getPrefix() const;
 		bool			getIsOper() const;
 		State			getState() const;
-		const std::vector<Channel*> &getChannels() const;
+		const std::vector<string> &getChannels() const;
 		bool			clientMaxChannel() const;
 		
 		//SETTERS
@@ -76,7 +77,8 @@ class Client
 		void reply(string msg);    //Need to implement*/
 		//void	clearSpecMsg();		//Not used NOW
 		void	cleanBuff();
-		void	addChannel(Channel* channel);
+		void	addChannel(string channelname);
+		bool	removeChannel(string channelname);
 		void	appendToMsg(const string &msg);
 };
 

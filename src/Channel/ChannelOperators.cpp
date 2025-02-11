@@ -1,45 +1,65 @@
 #include "../../include/Channel.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 
-const std::set<Client*> &Channel::getOperators() const
-{
+// Return the username of the operators
+const std::vector<string> &Channel::getOperators() const {
 	return (_operators);
 }
 
-void Channel::addOperator(Client *client)
-{
-	std::cout << client << " addOperator" << std::endl;
-	_operators.insert(client);
-	std::cout << "sddgadfgdfgafgadfhdghhlilgusdfgluifdlgi wruilg hlw" << std::endl;
+// Add the operators to _operators
+void Channel::addOperator(string clientname) {
+	std::cout << clientname << " addOperator" << std::endl;
+	std::vector<string>::iterator it;
+	for (it = _operators.begin(); it != _operators.end(); ++it){
+		if (*it == clientname) {
+			std::cout << "Client [" << clientname << "] already operator" << std::endl;
+			return ;
+		}
+	}
+	_operators.push_back(clientname);
+	std::cout << "Client [" << clientname << "] now is operator" << std::endl;
 	// We can use the return value if the client is allready
 	// an operator. Should we ?
 }
 
-void Channel::removeOperator(Client *client)
-{
-	std::set<Client*>::iterator it = getOperators().find(client);
-	if (it == getOperators().end())
-		throw std::runtime_error("Client is not in the invitation list.");
+// Remove operators from _operatos
+void Channel::removeOperator(string clientname) {
+	std::vector<string>::iterator it;
+	for (it = _operators.begin(); it != _operators.end(); ++it) {
+		if (*it == clientname) {
+			_operators.erase(it);
+			std::cout << "Client [" << clientname << "] not an operator anymore" << std::endl;
+		}
+	}
+	std::cout << "Client [" << clientname << "] not an operator" << std::endl;
 	// Maybe we need to implement a different message error
-	_operators.erase(client);
 }
 
-bool Channel::isOperator(Client *client) const
-{
-	std::set<Client*>::iterator it = getOperators().find(client);
-	if (it == getOperators().end())
-		return (false);
-	return (true);
+// Checks if the clientname is ins _operators
+bool Channel::isOperator(string clientname) const {
+	std::vector<string>::iterator it;
+
+	for (it == _operators.begin(); it != _operators.end(); ++it) {
+		if (*it == clientname) {
+			std::cout << "Client [" << clientname << "] is operator" << std::endl;
+			return true;
+		}
+	}
+	std::cout << "Client [" << clientname << "] not an operator" << std::endl;
+	return false;
 }
 
+// Checks if the mode given is 1(set) or 0(unset)
 bool	Channel::isModeSet(Mode mode) { 
 	std::cout << "Checking mode: " << mode << ", current modes: " << this->_modes << std::endl;
 	return _modes & mode; }
 
-
+// Set the mode given changing the 0 to 1
 void	Channel::setMode(Mode mode) { _modes |= mode; }
 
+// Unsets the mode given changing the 1 to 0
 void	Channel::unsetMode(Mode mode) { _modes &= ~mode; }
 
