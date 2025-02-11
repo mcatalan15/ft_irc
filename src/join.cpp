@@ -3,26 +3,6 @@
 #include <iterator>
 #include <ostream>
 #include <string>
-/*
-std::vector<string>	joinDivisor(string cmd) {
-
-	size_t	i;
-	size_t	init = 0;
-	std::vector<string>	vec;
-	int		num_ch = 0;
-	for (i = 0; i < cmd.size(); i++) {
-		if (cmd[i] == ',')
-		{
-			vec.push_back(cmd.substr(init, i - init));
-			init = i + 1;
-			num_ch++;
-		}
-	}
-	vec.push_back(cmd.substr(init, -1));
-	return vec;
-	}*/
-
-//bool	Server::channelIsFull(Channel* channel, int fd)
 
 Channel* Server::channelsMng(string& channelName, int fd) {
 	(void)fd;
@@ -36,15 +16,18 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 
 void	Server::joinMsg(Channel *channel, int fd) {
 	std::vector<string> usersList = channel->getClients();
-	sendMsg(RPL_CONNECT(getClient(fd)->getNickname(), getClient(fd)->getUsername(), channel->getName()), fd);
+	//sendMsg(RPL_CONNECT(getClient(fd)->getNickname(), getClient(fd)->getUsername(), channel->getName()), fd);
 	string msg = "";
 	for (size_t i = 0; i < usersList.size(); i++) {
 		msg.append(" ");
 		if (channel->isOperator(usersList[i]))
 			msg.append("@");
-		msg.append(getUser(usersList[i])->getNickname()); // cambiar a nick (es user)
+		msg.append(getUser(usersList[i])->getNickname());
 	}
 	std::cout << msg << std::endl;
+	string msg2 = "JOIN :";
+	msg2.append(channel->getName());
+	sendMsgToChannel(msg2 , channel, fd);
 	sendMsg(RPL_NAMREPLY(getClient(fd)->getNickname(), channel->getName(), msg), fd); //RPL_NAMREPLY 353
 	sendMsg(RPL_ENDOFNAMES(getClient(fd)->getNickname(), channel->getName()), fd); //RPL_ENDOFNAMES 366
 	sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channel->getName(), "EMTPY TO-DO TOPIC"), fd);
@@ -59,8 +42,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 			return (sendMsg(ERR_TOOMANYCHANNELSCREATED(getClient(fd)->getNickname(), channelName), fd));
 	if (getClient(fd)->clientMaxChannel()) //User joins max channels
 		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));
-	if (i < pass)
-	{
+	if (i < pass) {
 		std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
 		newchannel.setPassword(channelPass);
 		newchannel.setMode(PASSWORD_SET);
@@ -71,16 +53,13 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	newchannel.addOperator(username);
 	_channels.push_back(newchannel);
 	getClient(fd)->addChannel(channelName);
-	//std::cout << "name channel: " << newchannel.getName() << std::endl;
-	//std::cout << "channels server addr: " << &_channels[0] << std::endl;
-	//std::cout << "channels client addr: " << getClient(fd)->getChannels()[0] << std::endl;
-	sendMsg("channel " + channelName + " created!\n", fd);
 	joinMsg(&newchannel, fd);
 }
 
 bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
 	(void)channelPass;
 	if (found->isBanned(getClient(fd)->getUsername())) { //User is banned from channel
+		sendMsg(ERR_BANNEDFROMCHAN(getClient(fd)->getNickname(), channelName), fd);
 		std::cout << "IS baned" <<std::endl;
 		return false;
 	}
@@ -107,8 +86,7 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 
 void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag) {
 	std::cout << "Existing channel" << std::endl;
-	if (found->isModeSet(PASSWORD_SET))
-	{
+	if (found->isModeSet(PASSWORD_SET)) {
 		std::cout << "Entra a tiene contrasenya\n";
 		std::cout << "i: " << i << std::endl;
 		if (flag == 1) {
@@ -116,28 +94,20 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 			sendMsg("bro no pusiste key y se necesita XD\n", fd);
 			return ;
 		}
-		if (channelPass == found->getPassword())
-		{
-			if (channelConnStatus(fd, found, channelPass, channelName))
-			{
+		if (channelPass == found->getPassword()) {
+			if (channelConnStatus(fd, found, channelPass, channelName)) {
 				found->addClient(getClient(fd)->getUsername());
 				getClient(fd)->addChannel(found->getName());
-				//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
-				//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
 				joinMsg(found, fd);
 			}
 		}
 		else
 			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
 	}
-	else
-	{
-		if (channelConnStatus(fd, found, channelPass, channelName))
-		{
+	else {
+		if (channelConnStatus(fd, found, channelPass, channelName)) {
 			found->addClient(getClient(fd)->getUsername());
 			getClient(fd)->addChannel(found->getName());
-			//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
-			//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
 			joinMsg(found, fd);
 		}
 	}
@@ -153,18 +123,15 @@ bool validChannel(string& channelName, int fd) {
 
 void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 	std::cout << "JOIN cmd" << std::endl;
-	Client*		client = getClient(fd);
 	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
+		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
 
-	std::cout << "CANALES!!!" << std::endl;
 	std::vector<string> channelName = joinDivisor(cmd[1]);
 	printVecStr(channelName);
 
 	std::vector<string> channelPass;
 	int pass = 0;
 	if (cmd.size() > 2) {
-		std::cout << std::endl << "KEYYSSS!!!!" <<std::endl;
 		channelPass = joinDivisor(cmd[2]);
 		printVecStr(channelPass);
 		pass = channelPass.size();

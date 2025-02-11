@@ -9,8 +9,6 @@ void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	std::cout << "CAP cmd" << std::endl;
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
-	//if (cmd[1] == "END")
-		//sendMsg("CAP END\r\n", fd);
 	std::cout << "message send" << std::endl;
 	(void)cmd;
 }
@@ -121,15 +119,13 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 	empty.clear();
 	getClient(fd)->setMsg(empty);
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-		if (it->getFd() == fd)
-		{
+		if (it->getFd() == fd) {
 			_clients.erase(it);
 			break;
 		}
 	}
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
-		if (it->fd == fd)
-		{
+		if (it->fd == fd) {
 			_pollFds.erase(it);
 			break;
 		}
@@ -319,117 +315,8 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 	modeManagement(channel, cmd, fd);
 }*/
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*void	Server::successJoin(int fd) {
-	//get channel
-	sendMsg();
-	}*/
 // JOIN COMMAND
 
-/*std::vector<string>	joinDivisor(string cmd) {
-
-	size_t	i;
-	size_t	init = 0;
-	std::vector<string>	vec;
-	int		num_ch = 0;
-	for (i = 0; i < cmd.size(); i++) {
-		if (cmd[i] == ',')
-		{
-			vec.push_back(cmd.substr(init, i - init));
-			//std::cout << "cmd[" << num_ch << "]: " << cmd[i] << std::endl;
-			init = i + 1;
-			num_ch++;
-		}
-	}
-	vec.push_back(cmd.substr(init, -1));
-	//std::cout << "cmd[" << num_ch << "]: " <<  << std::endl;
-	return vec;
-}*/
-/*
-void	Server::channelsMng(string& channelName, string& channelPass, std::vector<string>& cmd, int i, int fd) {
-	Client*		client = getClient(fd);
-	Channel*	found = NULL;
-	std::cout << "empieza" << _channels.size() << "Channel: " << channelName.size() << std::endl;
-	for (size_t j = 0; j < _channels.size(); j++)
-	{
-		if (channelName[0] != '#') {
-			return(sendMsg("channel needs to start with '#'\n", fd));
-		}
-		if (_channels[j].getName() == channelName) {
-			found = &_channels[j];
-			break ;
-		}
-	}
-	// If channel doesnt exist
-	if (!found)
-	{
-		//_channels.push_back(channelsNames[i]); //Stores object
-		Channel newchannel(channelName);
-
-		if (cmd.size() > 2 && i < channelPass.size()) {
-			std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
-			newchannel.setPassword(channelPass);
-		}
-		else {
-			std::cout << "channel: " << channelName << "  NO password" << std::endl;
-		}
-		newchannel.addClient(client);
-		newchannel.addOperator(client);
-		_channels.push_back(newchannel);
-		client->addChannel(&newchannel);
-		
-		sendMsg("channel " + channelName + " created!\n", fd);
-	}
-	else //Existe el channel
-	{
-		// mierdas de mode y password
-		std::cout << "LA size: " << cmd.size() << std::endl;
-		if (found->hasPassword()) {
-			if (channelPass == found->getPassword())
-				std::cout << "Contrasenya correcte" <<"cdm[" << channelName << "] channelpass [" << channelPass<< "]" << std::endl;
-			else
-				std::cout << "Contrasenya incorecte" << "cdm[" << channelName << "] channelpass [" << channelPass << "]" << std::endl;
-		}
-			//std::cout << "Size channelPass" << channelsPass.size() << std::endl;
-			//if ((i < channelsPass.size() && found->hasPassword()) || found->getPassword() != channelsPass[i])
-			//	std::cout << "Contrasenya incorrecta" << std::endl;
-			//found->addClient(client);
-			//sendMsg("you joined " + channelsNames[i] + " channel!\n", fd);
-	}
-	std::cout << "acaba  " << _channels.size() << std::endl;
-}
-
-void	Server::joinCmd(std::vector<string>& cmd, int fd)
-{
-	std::cout << "JOIN cmd" << std::endl;
-	Client*		client = getClient(fd);
-	// Checkers
-	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
-	
-	std::cout << "CANALES!!!" << std::endl;
-	std::vector<string> channelsNames = joinDivisor(cmd[1]);
-	printVecStr(channelsNames);
-	std::vector<string> channelsPass;
-	if (cmd.size() > 2) {
-		std::cout << std::endl << "KEYYSSS!!!!" <<std::endl;
-		channelsPass = joinDivisor(cmd[2]);
-		printVecStr(channelsPass);
-	}
-
-	// Check if channel exist
-	
-	for (size_t i = 0; i < channelsNames.size(); i++)
-		if (cmd.size() > 2) {
-			if (i < channelsPass.size())
-				channelsMng(channelsNames[i], channelsPass[i], cmd, i, fd);
-			else
-				std::cout << "no tiene password" << std::endl;
-		} else
-			std::cout << " no hay contrasenyas" << std::endl;
-}*/
-//--------------------------------------------------------------------------------------------
 // PART COMMAND
 void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PART cmd" << std::endl;
@@ -446,8 +333,6 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		channel = findChannel(channelsVec[i]);
-		//std::cout << "channelname: " << channel->getName() << std::endl;
-		//std::cout << "hihihihi" << std::endl;
 		if (!channel)
 			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
 		if (!client->removeChannel(channelsVec[i]))
