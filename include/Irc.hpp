@@ -132,9 +132,9 @@ std::vector<string>	joinDivisor(string cmd);
 
 // JOIN CMD RPL
 #define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
-#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353" + (nick) + " = " + (channel) + " " + (msg) + CRLF)
+#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + " " + (msg) + CRLF)
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
-#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + " " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
+#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 #define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 #define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
 #define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
@@ -143,7 +143,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define	ERR_CHANNELISFULL(client, channel)(":localhost 471 " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
 #define ERR_INVITEONLYCHAN(client, channel)(":localhost 473 " +(client) + " " + (channel) + " :Cannot join channel (+i)" + CRLF)
 #define ERR_BADCHANMASK(channel)(":localhost  " + (channel) + " :Bad Channel Mask" + CRLF)
-#define RPL_ENDOFNAMES(client, channel) (":localhost 366" + " :End of /NAMES list" + CRLF)
+#define RPL_ENDOFNAMES(client, channel) (":localhost 366 " + (client) + " " + (channel) + " :End of /NAMES list" + CRLF)
 
 // MODE MD
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
