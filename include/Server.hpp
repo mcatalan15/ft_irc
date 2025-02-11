@@ -44,7 +44,8 @@ class Server {
 		//Msg management
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
-
+		void			sendMsgToChannel(string message, Channel* channel, int fd);
+		
 		//Channel Management
 		Channel*		channelsMng(string& channelName, int fd);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
@@ -53,11 +54,14 @@ class Server {
 		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
 		Client*			findNickname(string nick, Channel* channel);
 		void			joinMsg(Channel *channel, int fd);
+		void			removeChannel(string channelname);
 
+		
 		//Getters
 		string			getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
+		Client*			getUser(string clientname);
 
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };

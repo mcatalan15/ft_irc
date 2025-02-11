@@ -1,6 +1,8 @@
 #include "../include/Server.hpp"
 #include <iostream>
+#include <iterator>
 #include <ostream>
+#include <string>
 /*
 std::vector<string>	joinDivisor(string cmd) {
 
@@ -32,19 +34,27 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 	return NULL;
 }
 
-/*void	Server::joinMsg(Channel *channel, int fd) {
-	std::vector<Client*> clients_fd = channnel->getClients();
-	
-	for(size_t i = 0; clients_fd.size(); i++) {
-		std::cout << "client[" << i << "] ->" << clients_fd[i] << std::endl
+void	Server::joinMsg(Channel *channel, int fd) {
+	std::vector<string> usersList = channel->getClients();
+	sendMsg(RPL_CONNECT(getClient(fd)->getNickname(), getClient(fd)->getUsername(), channel->getName()), fd);
+	string msg = "";
+	for (size_t i = 0; i < usersList.size(); i++) {
+		msg.append(" ");
+		if (channel->isOperator(usersList[i]))
+			msg.append("@");
+		msg.append(getUser(usersList[i])->getNickname()); // cambiar a nick (es user)
 	}
-	
-}*/
+	std::cout << msg << std::endl;
+	sendMsg(RPL_NAMREPLY(getClient(fd)->getNickname(), channel->getName(), msg), fd); //RPL_NAMREPLY 353
+	sendMsg(RPL_ENDOFNAMES(getClient(fd)->getNickname(), channel->getName()), fd); //RPL_ENDOFNAMES 366
+	sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channel->getName(), "EMTPY TO-DO TOPIC"), fd);
+	sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channel->getName(), getClient(fd)->getNickname(), channel->getCreationTime()), fd);
+}
 
 void	Server::createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd) {
-//	std::cout << "Create new channel" << std::endl;
-//	std::cout << "Entra" << std::endl;
 	Channel newchannel(channelName);
+	string	username = getClient(fd)->getUsername();
+
 	if (_channels.size() >= MAX_CHANNELS) //User joins max channels
 			return (sendMsg(ERR_TOOMANYCHANNELSCREATED(getClient(fd)->getNickname(), channelName), fd));
 	if (getClient(fd)->clientMaxChannel()) //User joins max channels
@@ -57,19 +67,20 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	}
 	else
 		std::cout << "channel: " << channelName << "  NO password" << std::endl;
-	newchannel.addClient(getClient(fd));
-	newchannel.addOperator(getClient(fd));
+	newchannel.addClient(username);
+	newchannel.addOperator(username);
 	_channels.push_back(newchannel);
-	getClient(fd)->addChannel(&newchannel);
-//	std::cout << "channels server addr: " << &_channels[0] << std::endl;
-//	std::cout << "channels client addr: " << &newchannel << std::endl;
+	getClient(fd)->addChannel(channelName);
+	//std::cout << "name channel: " << newchannel.getName() << std::endl;
+	//std::cout << "channels server addr: " << &_channels[0] << std::endl;
+	//std::cout << "channels client addr: " << getClient(fd)->getChannels()[0] << std::endl;
 	sendMsg("channel " + channelName + " created!\n", fd);
-//	joinMsg(mewchannel, fd);
+	joinMsg(&newchannel, fd);
 }
 
 bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
 	(void)channelPass;
-	if (found->isBanned(getClient(fd))) { //User is banned from channel
+	if (found->isBanned(getClient(fd)->getUsername())) { //User is banned from channel
 		std::cout << "IS baned" <<std::endl;
 		return false;
 	}
@@ -85,13 +96,12 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
-	else if (found->isInvited(getClient(fd))){
+	else if (found->isInvited(getClient(fd)->getUsername())) {
 		std::cout << "Esta invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
 		return true;
 	}
-	else {
+	else 
 		std::cout << "NO invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
-	}
 	return true;
 }
 
@@ -103,17 +113,18 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		std::cout << "i: " << i << std::endl;
 		if (flag == 1) {
 			string channelPass = "";
-			sendMsg("bro no pusiste key y se necesita XD", fd);
+			sendMsg("bro no pusiste key y se necesita XD\n", fd);
 			return ;
 		}
 		if (channelPass == found->getPassword())
 		{
 			if (channelConnStatus(fd, found, channelPass, channelName))
 			{
-				found->addClient(getClient(fd));
-				getClient(fd)->addChannel(found);
-				sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
+				found->addClient(getClient(fd)->getUsername());
+				getClient(fd)->addChannel(found->getName());
+				//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
 				//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
+				joinMsg(found, fd);
 			}
 		}
 		else
@@ -123,10 +134,11 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 	{
 		if (channelConnStatus(fd, found, channelPass, channelName))
 		{
-			found->addClient(getClient(fd));
-			getClient(fd)->addChannel(found);
-			sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
+			found->addClient(getClient(fd)->getUsername());
+			getClient(fd)->addChannel(found->getName());
+			//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
 			//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
+			joinMsg(found, fd);
 		}
 	}
 		std::cout << "no tiee pass" << std::endl;
@@ -157,7 +169,6 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 		printVecStr(channelPass);
 		pass = channelPass.size();
 	}
-
 	// Check if channel exist
 	Channel* found = NULL;
 	int flag = 0;

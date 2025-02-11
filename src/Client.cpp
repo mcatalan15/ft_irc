@@ -114,9 +114,12 @@ void	Client::cleanBuff() {
 
 void	Client::appendToMsg(const string &msg) { _msg += msg; }
 
-void	Client::addChannel(Channel* channel) { _channels.push_back(channel); }
+void	Client::addChannel(string channelname)
+{
+	 _channels.push_back(channelname);
+}
 
-const std::vector<Channel*> &Client::getChannels() const
+const std::vector<string> &Client::getChannels() const
 {
 	return (_channels);
 }
@@ -127,4 +130,26 @@ bool Client::clientMaxChannel() const
 	if(_channels.size() >= MAX_CHANNELS)
 		return (true);
 	return (false);
+}
+
+bool	Client::removeChannel(string channelname)
+{
+	std::vector<string>::iterator		it;
+	//(void)channelname;
+	/*for (size_t i = 0; i < _channels.size(); i++)
+	{
+		std::cout << _channels[i]->getName() << std::endl;
+	}*/
+	//std::cout << _channels[0]->getName() << std::endl;
+	for (it = _channels.begin(); it != _channels.end(); it++)
+	{
+		//std::cout << *it << std::endl;
+		std::cout << "name channel from client: " << *it << std::endl;
+		if (*it == channelname)
+		{
+			_channels.erase(it);
+			return true;
+		}
+	}
+	return false;
 }

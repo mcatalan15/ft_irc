@@ -76,12 +76,10 @@ bool	Server::isModeCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 		sendMsg(RPL_CREATIONTIME(getClient(fd)->getNickname(), cmd[1], getCreationTime()), fd);
 		return(false);
 	}
-	if (!channel->isOperator(getClient(fd)))
-	{
-		std::set<Client*> list = channel->getOperators();
-		for (std::set<Client*>::iterator it = list.begin(); it != list.end(); ++it) {
-        Client* client = *it;
-        std::cout << "OperList: " << client << std::endl;
+	if (!channel->isOperator(getClient(fd)->getUsername())) {
+		std::vector<string> list = channel->getOperators();
+		for (std::vector<string>::iterator it = list.begin(); it != list.end(); ++it) {
+        	std::cout << "OperList: " << *it << std::endl;
         }
 		std::cout << "noOper " << getClient(fd)->getNickname() << std::endl;
 		sendMsg("ERROR NO ES OPERATOR buscar err\n", fd);
@@ -98,7 +96,7 @@ bool	Server::isModeCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 
 Client*	Server::findNickname(string nick, Channel* channel)
 {
-	const std::vector<Client*>&	lstClients = channel->getClients();
+	const std::vector<string>&	lstClients = channel->getClients();
 	std::cout << "findNickname: " << std::endl;
 	(void)nick;
 	(void)channel;
@@ -110,8 +108,8 @@ Client*	Server::findNickname(string nick, Channel* channel)
 	}
 	for (size_t i = 0; i < lstClients.size(); i++)
 	{
-		if (lstClients[i]->getNickname() == nick)
-			return lstClients[i];
+		if (getUser(lstClients[i])->getNickname() == nick)
+			return getUser(lstClients[i]);
 	}
 	/*for (size_t i = 0; i < _clients.size(); i++)
 	{
@@ -167,13 +165,13 @@ void	Server::flagModeO(bool flag, Channel* channel, string cmd)
 	if (flag)
 	{
 		std::cout << "entra a addOperator\n";
-		channel->addOperator(findNickname(cmd, channel));
+		channel->addOperator(findNickname(cmd, channel)->getUsername());
 	 	std::cout << "para confirmar\n" << std::endl;//REVISAR que cliente es
 	}
 	else
 	{
 		std::cout << "entra a removeOperator\n";
-		channel->removeOperator(findNickname(cmd, channel));
+		channel->removeOperator(findNickname(cmd, channel)->getUsername());
 	}
 }
 
