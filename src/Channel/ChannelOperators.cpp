@@ -1,34 +1,35 @@
 #include "../../include/Channel.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 
-const std::set<Client*> &Channel::getOperators() const
+const std::vector<string> &Channel::getOperators() const
 {
 	return (_operators);
 }
 
-void Channel::addOperator(Client *client)
+void Channel::addOperator(string clientname)
 {
-	std::cout << client << " addOperator" << std::endl;
-	_operators.insert(client);
+	//std::cout << client << " addOperator" << std::endl;
+	_operators.insert(std::find(_operators.begin(), _operators.end(), clientname));
 	std::cout << "sddgadfgdfgafgadfhdghhlilgusdfgluifdlgi wruilg hlw" << std::endl;
 	// We can use the return value if the client is allready
 	// an operator. Should we ?
 }
 
-void Channel::removeOperator(Client *client)
+void Channel::removeOperator(string clientname)
 {
-	std::set<Client*>::iterator it = getOperators().find(client);
+	std::set<string>::iterator it = std::find(_operators.begin(), _operators.end(), clientname);
 	if (it == getOperators().end())
 		throw std::runtime_error("Client is not in the invitation list.");
 	// Maybe we need to implement a different message error
-	_operators.erase(client);
+	_operators.erase(it);
 }
 
-bool Channel::isOperator(Client *client) const
+bool Channel::isOperator(string clientname) const
 {
-	std::set<Client*>::iterator it = getOperators().find(client);
+	std::set<string>::iterator it = std::find(_operators.begin(), _operators.end(), clientname);
 	if (it == getOperators().end())
 		return (false);
 	return (true);

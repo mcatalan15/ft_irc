@@ -443,10 +443,11 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
 	
 	channelsVec = joinDivisor(cmd[1]);
+	std::cout << "channelsVec 0: " << channelsVec[0] << std::endl;
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		channel = findChannel(channelsVec[i]);
-		std::cout << "channelname: " << channel->getName() << std::endl;
+		//std::cout << "channelname: " << channel->getName() << std::endl;
 		//std::cout << "hihihihi" << std::endl;
 		if (!channel)
 			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
