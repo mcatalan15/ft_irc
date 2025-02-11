@@ -35,15 +35,14 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 }
 
 void	Server::joinMsg(Channel *channel, int fd) {
-	std::vector<Client*> clients_fd = channel->getClients();
-	(void)fd;
+	std::vector<string> usersList = channel->getClients();
 	sendMsg(RPL_CONNECT(getClient(fd)->getNickname(), getClient(fd)->getUsername(), channel->getName()), fd);
 	string msg = "";
-	for (size_t i = 0; i < clients_fd.size(); i++) {
+	for (size_t i = 0; i < usersList.size(); i++) {
 		msg.append(" ");
-		if (channel->isOperator(clients_fd[i]))
+		if (channel->isOperator(usersList[i]))
 			msg.append("@");
-		msg.append(clients_fd[i]->getNickname());
+		msg.append(getUser(usersList[i])->getNickname()); // cambiar a nick (es user)
 	}
 	std::cout << msg << std::endl;
 	sendMsg(RPL_NAMREPLY(getClient(fd)->getNickname(), channel->getName(), msg), fd); //RPL_NAMREPLY 353
@@ -76,7 +75,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	//std::cout << "channels server addr: " << &_channels[0] << std::endl;
 	//std::cout << "channels client addr: " << getClient(fd)->getChannels()[0] << std::endl;
 	sendMsg("channel " + channelName + " created!\n", fd);
-//	joinMsg(mewchannel, fd);
+	joinMsg(&newchannel, fd);
 }
 
 bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
@@ -123,8 +122,9 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 			{
 				found->addClient(getClient(fd)->getUsername());
 				getClient(fd)->addChannel(found->getName());
-				sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
+				//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
 				//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
+				joinMsg(found, fd);
 			}
 		}
 		else
@@ -136,7 +136,7 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		{
 			found->addClient(getClient(fd)->getUsername());
 			getClient(fd)->addChannel(found->getName());
-			sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
+			//sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channelName, "EMTPY TO-DO TOPIC"), fd);
 			//sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channelName, getClient(fd)->getNickname(), "EMPTY TO-DO hora de creacion"), fd);
 			joinMsg(found, fd);
 		}
