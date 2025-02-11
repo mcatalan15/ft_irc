@@ -433,7 +433,6 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd)
 // PART COMMAND
 void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PART cmd" << std::endl;
-
 	Client*		client = getClient(fd);
 	Channel*	channel;
 	string		message;
@@ -457,7 +456,7 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 			cmd.push_back("");
 		message = "PART " + channelsVec[i] + " " + cmd[2];
 		sendMsgToChannel(message, channel, fd);
-		channel->removeClient(client);
+		channel->removeClient(client->getUsername());
 		if (channel->getClients().size() <= 0)
 			removeChannel(channel->getName());
 	}

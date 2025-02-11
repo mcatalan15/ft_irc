@@ -61,7 +61,8 @@ class Server {
 		string			getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
-		
+		Client*			getUser(string clientname);
+
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };

@@ -321,14 +321,23 @@ void	Server::sendMsgToChannel(string message, Channel* channel, int fd)
 {
 	if (!channel)
 		return ;
-	Client*			client = getClient(fd);
-	std::vector<Client*>	clientsVec = channel->getClients();
+	Client*				client = getClient(fd);
+	std::vector<string>	clientsVec = channel->getClients();
 
-	for (size_t i = 0; i < clientsVec.size(); i++)
-	{
+	for (size_t i = 0; i < clientsVec.size(); i++) {
 		//std::cout << "entra en for\n";
 		//std::cout << "clientsVec " << i << ": " << clientsVec[i] << std::endl;
 		//std::cout << "clientsVec 1: " << clientsVec[i]->getNickname() << std::cout;
-		sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, clientsVec[i]->getFd());
+		sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, getUser(clientsVec[i])->getFd());
 	}
+}
+
+Client*		Server::getUser(string clientname)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].getUsername() == clientname)
+			return &_clients[i];
+	}
+	return NULL;
 }

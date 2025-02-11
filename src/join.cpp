@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <string>
 /*
@@ -61,7 +62,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	newchannel.addClient(username);
 	newchannel.addOperator(username);
 	_channels.push_back(newchannel);
-	getClient(fd)->addChannel(channelname);
+	getClient(fd)->addChannel(channelName);
 	//std::cout << "name channel: " << newchannel.getName() << std::endl;
 	//std::cout << "channels server addr: " << &_channels[0] << std::endl;
 	//std::cout << "channels client addr: " << getClient(fd)->getChannels()[0] << std::endl;
@@ -87,7 +88,7 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
-	else if (found->isInvited(getClient(fd))){
+	else if (found->isInvited(getClient(fd)->getUsername())) {
 		std::cout << "Esta invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
 		return true;
 	}
@@ -159,7 +160,6 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 		printVecStr(channelPass);
 		pass = channelPass.size();
 	}
-
 	// Check if channel exist
 	Channel* found = NULL;
 	int flag = 0;

@@ -24,8 +24,7 @@ enum Mode {
 
 class Client;
 
-class Channel
-{
+class Channel {
 	public:
 		Channel(const string& name);
 		Channel(const Channel& cpy);
@@ -77,14 +76,14 @@ class Channel
 		string	getCreationTime() { return _creationTime; };
 
 		private:
-			string					_name;          // name of the channel
+			string					_name;				// name of the channel
 			string					_topic;
-			std::vector<string>		_clients;       // list of clients in the channel
-			size_t					_userLimit;   	// max num of clients in the channel
-			std::vector<string>		_operators;     // set of operators in the channel
-			std::vector<string>		_invitedClients; // set of clients invited to the channel
-			std::vector<string>		_bannedClients; // set of clients banned 
-			string					_password; // password required to join the channel
+			std::vector<string>		_clients;			// list of clients in the channel
+			size_t					_userLimit;			// max num of clients in the channel
+			std::vector<string>		_operators;			// set of operators in the channel
+			std::vector<string>		_invitedClients;	// set of clients invited to the channel
+			std::vector<string>		_bannedClients;		// set of clients banned 
+			string					_password;			// password required to join the channel
 			unsigned int			_modes;
 			string					_creationTime;
 };

@@ -1,6 +1,6 @@
 #include "../../include/Channel.hpp"
 
-const string Channel:: getName() const 
+const string Channel::getName() const 
 {
 	return (_name); 
 }

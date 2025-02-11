@@ -13,8 +13,7 @@ const std::vector<string> &Channel::getClients() const
 	return (_clients);
 }
 
-void Channel::addClient(string clientname)
-{
+void Channel::addClient(string clientname) {
 	if (isFull())
 		throw std::runtime_error("Channel is full");
 		// Need to implement ErrorMessage with : throw
@@ -32,7 +31,7 @@ void Channel::removeClient(string clientname)
 
 bool Channel::hasClient(string clientname) const
 {
-	std::vector<string>::const_iterator it = std::find(_clients.begin(), _clients.end(), client);
+	std::vector<string>::const_iterator it = std::find(_clients.begin(), _clients.end(), clientname);
 	if (it == _clients.end())
 		return (false);
 	return (true);
