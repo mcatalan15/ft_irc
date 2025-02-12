@@ -442,12 +442,9 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
 	
 	channelsVec = joinDivisor(cmd[1]);
-	std::cout << "channelsVec 0: " << channelsVec[0] << std::endl;
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		channel = findChannel(channelsVec[i]);
-		//std::cout << "channelname: " << channel->getName() << std::endl;
-		//std::cout << "hihihihi" << std::endl;
 		if (!channel)
 			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
 		if (!client->removeChannel(channelsVec[i]))
@@ -457,8 +454,12 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 		message = "PART " + channelsVec[i] + " " + cmd[2];
 		sendMsgToChannel(message, channel, fd);
 		channel->removeClient(client->getUsername());
+		if (channel->isOperator(client->getUsername()))
+			channel->removeOperator(client->getUsername());
 		if (channel->getClients().size() <= 0)
 			removeChannel(channel->getName());
+		else if (!channel->getOperators().size())
+			channel->addOperator(channel->getClients()[0]);
 	}
 }
 
