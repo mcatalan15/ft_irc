@@ -487,13 +487,15 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[1]), fd));
 	if (!channel->isOperator(client->getUsername()))
 		return (sendMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), cmd[1]), fd));
+	if (cmd.size() < 4)
+		cmd.push_back("");
 	clientsVec = joinDivisor(cmd[2]);
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
-		string	message = "KICK " + cmd[1] + " " + clientsVec[i];
+		string	message = "KICK " + cmd[1] + " " + clientsVec[i] + " " + cmd[3];
 		Client*	kick = findNickname(clientsVec[i], channel);
 
-		if (!channel->hasClient(kick->getUsername()))
+		if (!kick)
 			return (sendMsg(ERR_USERNOTINCHANNEL(client->getNickname(), clientsVec[i], channel->getName()), fd));
 		if (channel->isOperator(kick->getUsername()))
 			return (sendMsg(ERR_CANNOTKICK(client->getNickname(), clientsVec[i], channel->getName()), fd));
