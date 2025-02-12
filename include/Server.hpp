@@ -59,6 +59,8 @@ class Server {
 		
 		//Topic
 		bool			isOnChan(string& cmd, int fd);
+		void			topicDisplay(string& cmd, int fd);
+		void			topicSetter(std::vector<string>& cmd, int fd);
 
 		//Getters
 		string			getPassword();

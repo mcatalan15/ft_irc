@@ -133,7 +133,7 @@ bool validChannel(string& channelName, int fd);
 
 // JOIN CMD RPL
 #define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
-#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) +zZZZ (msg) + CRLF)
+#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + (msg) + CRLF)
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
 #define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 #define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)

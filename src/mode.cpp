@@ -90,8 +90,6 @@ Client*	Server::findNickname(string nick, Channel* channel)
 	std::cout << "findNickname: " << std::endl;
 	(void)nick;
 	(void)channel;
-	//(void)lstClients;
-	//std::cout << "sizeclients: " << channel->getClients().size();
 	if (lstClients.size() <= 0) {
 		std::cout << "No hay clients en este channel" << std::endl;
 		return NULL;
@@ -101,11 +99,6 @@ Client*	Server::findNickname(string nick, Channel* channel)
 		if (getUser(lstClients[i])->getNickname() == nick)
 			return getUser(lstClients[i]);
 	}
-	/*for (size_t i = 0; i < _clients.size(); i++)
-	{
-		if (_clients[i].getNickname() == nick)
-			return &_clients[i];
-	}*/
 	return NULL;
 }
 
