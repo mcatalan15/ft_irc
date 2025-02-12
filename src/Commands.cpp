@@ -439,16 +439,16 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::vector<string>	channelsVec;
 
 	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
 	
 	channelsVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		channel = findChannel(channelsVec[i]);
 		if (!channel)
-			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
+			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (!client->removeChannel(channelsVec[i]))
-			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[0]), fd));
+			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (cmd.size() < 3)
 			cmd.push_back("");
 		message = "PART " + channelsVec[i] + " " + cmd[2];
@@ -473,8 +473,34 @@ void	Server::topicCmd(std::vector<string>& cmd, int fd){
 // KICK COMMAND
 void	Server::kickCmd(std::vector<string>& cmd, int fd){
 	std::cout << "KICK cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+
+	Client*			client = getClient(fd);
+	Channel*		channel;
+	std::vector<string>	clientsVec;
+
+	if (cmd.size() < 3)
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"), fd));
+	channel = findChannel(cmd[1]);
+	if (!channel)
+		return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[1]), fd));
+	if (!channel->hasClient(client->getUsername()))
+		return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[1]), fd));
+	if (!channel->isOperator(client->getUsername()))
+		return (sendMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), cmd[1]), fd));
+	clientsVec = joinDivisor(cmd[2]);
+	for (size_t i = 0; i < clientsVec.size(); i++)
+	{
+		if (!channel->hasClient(clientsVec[i]))
+			return (sendMsg(ERR_USERNOTINCHANNEL(client->getNickname(), clientsVec[i], channel->getName()), fd));
+		if (!channel->isOperator(clientsVec[i]))
+			return (sendMsg(ERR_CANNOTKICK(client->getNickname(), clientsVec[i], channel->getName()), fd));
+
+		string	message = "KICK " + cmd[1] + " " + clientsVec[i];
+
+		getUser(clientsVec[i])->removeChannel(channel->getName());
+		sendMsgToChannel(message, channel, fd);
+		channel->removeClient(clientsVec[i]);
+	}
 }
 
 // PRIVMSG COMMAND
