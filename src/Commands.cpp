@@ -490,16 +490,18 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 	clientsVec = joinDivisor(cmd[2]);
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
-		if (!channel->hasClient(clientsVec[i]))
+		string	message = "KICK " + cmd[1] + " " + clientsVec[i];
+		Client*	kick = findNickname(clientsVec[i], channel);
+
+		if (!channel->hasClient(kick->getUsername()))
 			return (sendMsg(ERR_USERNOTINCHANNEL(client->getNickname(), clientsVec[i], channel->getName()), fd));
-		if (!channel->isOperator(clientsVec[i]))
+		if (channel->isOperator(kick->getUsername()))
 			return (sendMsg(ERR_CANNOTKICK(client->getNickname(), clientsVec[i], channel->getName()), fd));
 
-		string	message = "KICK " + cmd[1] + " " + clientsVec[i];
-
-		getUser(clientsVec[i])->removeChannel(channel->getName());
+		kick->removeChannel(channel->getName());
 		sendMsgToChannel(message, channel, fd);
-		channel->removeClient(clientsVec[i]);
+		channel->removeClient(kick->getUsername());
+		channel->addBannedClient(kick->getUsername());
 	}
 }
 

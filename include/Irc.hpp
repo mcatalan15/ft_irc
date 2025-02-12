@@ -155,7 +155,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define  ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 
 //KICK cmd
-#define ERR_USERNOTINCHANNEL(client, nick, channel)(":localhost 441 " + (client) + " " (nick) + " " + (channel) + " :They aren't on that channel" + CRLF)
+#define ERR_USERNOTINCHANNEL(client, nick, channel)(":localhost 441 " + (client) + " " + (nick) + " " + (channel) + " :They aren't on that channel" + CRLF)
 #define  ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
 #define  ERR_CANNOTKICK(client, nick, channel)(":localhost 482 " + (client) + " " + (nick) + " " + (channel) + " :can't kick" + CRLF)
 
