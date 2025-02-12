@@ -64,4 +64,3 @@ void	Channel::setMode(Mode mode) { _modes |= mode; }
 
 // Unsets the mode given changing the 1 to 0
 void	Channel::unsetMode(Mode mode) { _modes &= ~mode; }
-

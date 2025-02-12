@@ -149,6 +149,11 @@ std::vector<string>	joinDivisor(string cmd);
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
 #define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329 " + (client) + " " + (channel) + " " + (ctime) + CRLF)
 #define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
+//#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
+#define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
+#define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
+#define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
+#define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
 
 // PART cmd
 #define  ERR_NOTONCHANNEL(client, channel)(":localhost 442 " + (client) + " " + (channel) + " :You're not on that channel" + CRLF)
@@ -160,8 +165,9 @@ std::vector<string>	joinDivisor(string cmd);
 #define  ERR_CANNOTKICK(client, nick, channel)(":localhost 482 " + (client) + " " + (nick) + " " + (channel) + " :can't kick" + CRLF)
 
 
+#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 // GENERAL ERR
-#define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " : Not enought parameters" + CRLF)
+#define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)
 #define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)
 
 
