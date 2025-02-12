@@ -53,9 +53,9 @@ void Channel::removeInvitation(string clientname) {
 }
 
 bool Channel::isInvited(string clientname) const {
-	std::vector<string>::iterator it;
+	std::vector<string>::const_iterator it;
 
-	for (it == _invitedClients.begin(); it != _invitedClients.end(); ++it) {
+	for (it = _invitedClients.begin(); it != _invitedClients.end(); ++it) {
 		if (*it == clientname) {
 			std::cout << "Client [" << clientname << "] not invited" << std::endl;
 			return true;
@@ -67,9 +67,9 @@ bool Channel::isInvited(string clientname) const {
 
 bool Channel::isBanned(string clientname) const
 {
-	std::vector<string>::iterator it;
+	std::vector<string>::const_iterator it;
 		
-	for (it == _bannedClients.begin(); it != _bannedClients.end(); it++) {
+	for (it = _bannedClients.begin(); it != _bannedClients.end(); it++) {
 		if (*it == clientname) {
 			std::cout << "Client [" << clientname << "] is banned" << std::endl;
 			return true;
