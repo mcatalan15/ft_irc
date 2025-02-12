@@ -3,19 +3,20 @@
 #include <iostream>
 #include <ostream>
 #include <cctype>
-#include <set>
 #include <vector>
 
-bool	Server::validFlags(string cmd)
+bool	Server::validFlags(Channel* channel, std::vector<string>& cmd, int fd)
 {
+	(void) channel;
+	(void) fd;
 	std::vector<bool> charactersRepeat(128, false);
 
-	for (std::string::iterator it = cmd.begin(); it != cmd.end(); it++)
+	for (std::string::iterator it = cmd[2].begin(); it != cmd[2].end(); it++)
 	{
 		char c = *it;
 		if (charactersRepeat[static_cast<unsigned char>(c)])
 		{
-			// LANNZAR MENSAJE DE ERROR
+			sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getNickname(), cmd[1], cmd[2], c, "A Mode Operator is repeat"), fd);
             return (false);
 		}
         charactersRepeat[static_cast<unsigned char>(c)] = true;
@@ -23,19 +24,18 @@ bool	Server::validFlags(string cmd)
     return (true);
 }
 
-bool	Server::isFlagMode(Channel* channel, std::vector<string>& cmd, int num)
+bool	Server::isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd)
 {
 	(void)channel;
-	if (cmd[2].size() < 2) {
-		std::cout << "Invalid flag size" << std::endl;
-		return (false);
-	}
 	if (num == 1)
 	{
 		for (size_t i = 1; i < cmd[2].size(); i++)
 		{
 			if (cmd[2].find_first_of(CHANNEL_MODES) == string::npos)
+			{
+				sendMsg(ERR_UMODEUNKOWNFLAG(getClient(fd)->getUsername()), fd);
 				return (false);
+			}
 		}
 	}
 	if (num == 2)
@@ -51,16 +51,12 @@ bool	Server::isFlagMode(Channel* channel, std::vector<string>& cmd, int num)
 
 bool	Server::checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd)
 {
-	if (!isFlagMode(channel, cmd, 2))
+	if (!isFlagMode(channel, cmd, 2, fd))
 	{
-		if (!isFlagMode(channel, cmd, 1))
-		{
-			sendMsg("no such modes...\n", fd);
+		if (!isFlagMode(channel, cmd, 1, fd))
 			return (false);
-		}
 		return (true);
 	}
-	// verificar si los comandos son validos
 	return (true);
 }
 
@@ -68,29 +64,23 @@ bool	Server::isModeCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 {
 	if (!channel)
 	{
-		sendMsg(ERR_NOSUCHCHANNEL(getClient(fd)->getNickname(), cmd[1]), fd);
+		sendMsg(ERR_NOSUCHCHANNEL(getClient(fd)->getUsername(), cmd[1]), fd);
 		return (false);
 	}
 	if (cmd.size() < 3)
 	{
-		sendMsg(RPL_CREATIONTIME(getClient(fd)->getNickname(), cmd[1], getCreationTime()), fd);
+		sendMsg(RPL_CREATIONTIME(getClient(fd)->getUsername(), cmd[1], getCreationTime()), fd);
 		return(false);
 	}
 	if (!channel->isOperator(getClient(fd)->getUsername())) {
-		std::vector<string> list = channel->getOperators();
-		for (std::vector<string>::iterator it = list.begin(); it != list.end(); ++it) {
-        	std::cout << "OperList: " << *it << std::endl;
-        }
-		std::cout << "noOper " << getClient(fd)->getNickname() << std::endl;
-		sendMsg("ERROR NO ES OPERATOR buscar err\n", fd);
+		sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getUsername(), cmd[1]), fd);
 		return (false);
 	}
 	if (cmd[2][0] != '+' && cmd[2][0] != '-'){
 
-		sendMsg("no operator(+-) found\n", fd);
+		sendMsg(ERR_UMODEUNKOWNFLAG(getClient(fd)->getUsername()), fd);
 		return (false);
 	}
-	// Comprobar que no hayan flags  repetidas
 	return (true);
 }
 
@@ -149,29 +139,36 @@ void	Server::flagModeL(bool flag, Channel* channel, string cmd)
 	}
 }
 
-void	Server::flagModeK(bool flag, Channel* channel, string cmd)
+void	Server::flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd)
 {
 	if (flag)
 	{
-		channel->setPassword(cmd);
+		//check password if it's invalid (ERR_INVALIDKEY (525))
+		//if ()
+		//	return (ERR_INVALIDKEY)
+		if (channel->hasPassword())
+			return (sendMsg(ERR_KEYSET(cmd[1]), fd));
+		channel->setPassword(cmd[3]);
 		channel->setMode(PASSWORD_SET);
 	}
 	else
+	{
+		channel->getPassword().clear();
 		channel->unsetMode(PASSWORD_SET);
+	}
 }
 
 void	Server::flagModeO(bool flag, Channel* channel, string cmd)
 {
 	if (flag)
 	{
-		std::cout << "entra a addOperator\n";
 		channel->addOperator(findNickname(cmd, channel)->getUsername());
-	 	std::cout << "para confirmar\n" << std::endl;//REVISAR que cliente es
+	 	// HAY que enviar un mensaje ?
 	}
 	else
 	{
-		std::cout << "entra a removeOperator\n";
 		channel->removeOperator(findNickname(cmd, channel)->getUsername());
+		//hay que enviar un mensaje ?
 	}
 }
 
@@ -202,29 +199,33 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 	{
 		if (cmd[2][i] == 'i')
 			flagModeI(flag, channel);
-		if (cmd[2][i] == 't') {
+		if (cmd[2][i] == 't') 
 			flagModeT(flag, channel);
-		}
-		if (cmd[2][i] == 'o') {
-			if (cmd.size() >= (j + 1)) {
-				//check if the argument is valid
+		if (cmd[2][i] == 'o') 
+		{
+			if (cmd.size() >= (j + 1)) 
+			{
+				if (!channel->hasClient(cmd[j]))
+					return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), cmd[1], cmd[2], cmd[3], "Is not on that channel"), fd));
 				flagModeO(flag, channel, cmd[j]);
 				j++;
 			}
+			else
+				return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getUsername(), cmd[2]), fd));
 		}
 		if (cmd[2][i] == 'k') {
 			if (flag)
 			{
 				if (cmd.size() >= (j + 1))
 				{
-					flagModeK(flag, channel, cmd[j]);
+					flagModeK(flag, channel, cmd, fd);
 					j++;
 				}
-			//	else
-					//mensaje de error
+				else
+					return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getUsername(), cmd[2]), fd));
 			}
 			else
-				flagModeK(flag, channel, cmd[j]);
+				flagModeK(flag, channel, cmd, fd);
 		}
 		if (cmd[2][i] == 'l') {
 			if (flag)
@@ -232,20 +233,17 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 				if (cmd.size() >= (j + 1))
 				{
 					if (!isNumber(cmd[j]))
-					// put error_message;
-						return ;
+						return (sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), cmd[1], cmd[2], cmd[3], "Invalid limit"), fd));
 					flagModeL(flag, channel, cmd[j]);
 					j++;
 				}
-				else {
-					//soltar mensaje de error
-				}
+				else
+					return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getUsername(), cmd[2]), fd));
 			}
 			else
 				flagModeL(flag, channel, cmd[j]);
 		}
 	}
-	std::cout << "Sale de Modemanagement" << std::endl;
 }
 
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
@@ -253,13 +251,13 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 	std::cout << "MODE cmd" << std::endl;
 	printVecStr(cmd);
 	if (cmd.size() < 2)
-		return (sendMsg("no channel as arg ERR_NEEDMOREPARAMS (461) \n", fd));
+		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "MODE"), fd));
 	Channel*	channel = findChannel(cmd[1]);
 	if (!isModeCmdValid(channel, cmd, fd))
 		return ;
 	if (!checkModeFlags(channel, cmd, fd))
 		return ;
-	if (!validFlags(cmd[2]))
+	if (!validFlags(channel, cmd, fd))
 		return ;
 	modeManagement(channel, cmd, fd);
 }

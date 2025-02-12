@@ -71,13 +71,13 @@ class Server {
 		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
 		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
-		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num);
+		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd);
 		void			flagModeI(bool flag, Channel *channel);
 		void			flagModeT(bool flag, Channel *channel);
 		void			flagModeO(bool flag, Channel* channel, string cmd);
-		void			flagModeK(bool flag, Channel* channel, string cmd);
+		void			flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd);
 		void			flagModeL(bool flag, Channel* channel, string cmd);
-		bool			validFlags(string cmd);
+		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
 		bool 			isNumber(string cmd);
 
 		//isUsed commands
