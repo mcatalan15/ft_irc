@@ -351,3 +351,23 @@ bool	Server::alreadyJoined(Channel* channel, string user) {
 	}
 	return false;
 }
+
+std::vector<Client> &Server::getClients() { return (_clients); }
+
+Client*	Server::findNickname(string nick, Channel* channel)
+{
+	const std::vector<string>&	lstClients = channel->getClients();
+	std::cout << "findNickname: " << std::endl;
+	(void)nick;
+	(void)channel;
+	if (lstClients.size() <= 0) {
+		std::cout << "No hay clients en este channel" << std::endl;
+		return NULL;
+	}
+	for (size_t i = 0; i < lstClients.size(); i++)
+	{
+		if (getUser(lstClients[i])->getNickname() == nick)
+			return getUser(lstClients[i]);
+	}
+	return NULL;
+}

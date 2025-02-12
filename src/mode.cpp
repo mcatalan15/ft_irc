@@ -1,9 +1,5 @@
 #include "../include/Server.hpp"
 #include "../include/Channel.hpp"
-#include <iostream>
-#include <ostream>
-#include <cctype>
-#include <vector>
 
 bool	Server::validFlags(Channel* channel, std::vector<string>& cmd, int fd)
 {
@@ -84,7 +80,7 @@ bool	Server::isModeCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 	return (true);
 }
 
-Client*	Server::findNickname(string nick, Channel* channel)
+/*Client*	Server::findNickname(string nick, Channel* channel)
 {
 	const std::vector<string>&	lstClients = channel->getClients();
 	std::cout << "findNickname: " << std::endl;
@@ -100,7 +96,7 @@ Client*	Server::findNickname(string nick, Channel* channel)
 			return getUser(lstClients[i]);
 	}
 	return NULL;
-}
+	}*/
 
 bool Server::isNumber(string cmd)
 {
@@ -137,7 +133,7 @@ void	Server::flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, in
 	if (flag)
 	{
 		//check password if it's invalid (ERR_INVALIDKEY (525))
-		//if ()
+		//if (key is invalid)
 		//	return (ERR_INVALIDKEY)
 		if (channel->hasPassword())
 			return (sendMsg(ERR_KEYSET(cmd[1]), fd));
@@ -183,7 +179,6 @@ void	Server::flagModeI(bool flag, Channel *channel)
 
 void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 {
-	(void)fd;
 	bool flag = false;
 	if (cmd[2][0] == '+')
 		flag = true;

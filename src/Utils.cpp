@@ -1,4 +1,5 @@
 #include "../include/Irc.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <cstddef>

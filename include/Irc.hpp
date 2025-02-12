@@ -160,6 +160,9 @@ bool validChannel(string& channelName, int fd);
 #define  ERR_NOTONCHANNEL(client, channel)(":localhost 442 " + (client) + " " + (channel) + " :You're not on that channel" + CRLF)
 #define  ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 
+// INVITE cmd
+#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)
 #define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)
