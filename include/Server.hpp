@@ -57,11 +57,15 @@ class Server {
 		void			removeChannel(string channelname);
 		bool			alreadyJoined(Channel* channel, string user);
 		
+		//Topic
+		bool			isOnChan(string& cmd, int fd);
+
 		//Getters
 		string			getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
 		Client*			getUser(string clientname);
+		Channel*		getChannel(string channelName);
 
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };

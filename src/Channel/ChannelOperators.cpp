@@ -41,12 +41,6 @@ void Channel::removeOperator(string clientname) {
 // Checks if the clientname is ins _operators
 bool Channel::isOperator(string clientname) const {
 	std::vector<string>::const_iterator it = std::find(_operators.begin(), _operators.end(), clientname);
-
-	//for (it == _operators.begin(); it != _operators.end(); ++it) {
-		//if (*it == clientname) {
-			//	return true;
-			//}
-			//}
 	if (it != _operators.end()) {
 		std::cout << "Client [" << clientname << "] is operator" << std::endl;
 		return true;

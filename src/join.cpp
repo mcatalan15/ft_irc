@@ -47,6 +47,7 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	}
 	newchannel.addClient(username);
 	newchannel.addOperator(username);
+	newchannel.setTopic("");
 	_channels.push_back(newchannel);
 	getClient(fd)->addChannel(channelName);
 	joinMsg(&newchannel, fd);
