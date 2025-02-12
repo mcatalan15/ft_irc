@@ -40,7 +40,7 @@ class Server {
 		//Fds management
 		void			closeFds();
 		void			remove_fd(int fd); // Remove save pollFds
-		
+
 		//Msg management
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
@@ -66,13 +66,20 @@ class Server {
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
-		
-		//MODEi
+
+		//MODE
 		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
 		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
-		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num);
-		
+		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd);
+		void			flagModeI(bool flag, Channel *channel);
+		void			flagModeT(bool flag, Channel *channel);
+		void			flagModeO(bool flag, Channel* channel, string cmd);
+		void			flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd);
+		void			flagModeL(bool flag, Channel* channel, string cmd);
+		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
+		bool 			isNumber(string cmd);
+
 		//isUsed commands
 		bool		nickIsUsed(string cmd);
 		bool		userIsUsed(string cmd);
