@@ -62,7 +62,8 @@ class Server {
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
 		Client*			getUser(string clientname);
-
+		std::vector<Client> &getClients();
+		
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
@@ -79,7 +80,16 @@ class Server {
 		void			flagModeL(bool flag, Channel* channel, string cmd);
 		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
 		bool 			isNumber(string cmd);
-
+		
+		//INVITE
+		void			invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag);
+		void			userOnChannel(Channel* channel, std::vector<string> nickName, string command, int fd);
+		bool			nicknameExist(std::vector<string> nickName, int fd);
+		bool			findNicknameOnServer(string nickName, int fd);
+		std::vector<string>	divisor(string cmd, bool flag);
+		bool			isPositif(string cmd);
+		bool			isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd);
+		
 		//isUsed commands
 		bool		nickIsUsed(string cmd);
 		bool		userIsUsed(string cmd);

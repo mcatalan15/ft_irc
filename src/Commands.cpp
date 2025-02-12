@@ -482,13 +482,13 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
 }
-
+/* 
 // INVITE COMMAND
 void	Server::inviteCmd(std::vector<string>& cmd, int fd){
 	std::cout << "INVITE cmd" << std::endl;
 	(void)cmd;
 	(void)fd;
-}
+	}*/
 
 // WHOIS COMMAND
 void	Server::whoisCmd(std::vector<string>& cmd, int fd){
