@@ -316,7 +316,41 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 }*/
 
 // JOIN COMMAND
+void	Server::joinCmd(std::vector<string>& cmd, int fd) {
+	std::cout << "JOIN cmd" << std::endl;
+	if (cmd.size() < 2)
+		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
 
+	std::vector<string> channelName = joinDivisor(cmd[1]);
+	printVecStr(channelName);
+
+	std::vector<string> channelPass;
+	int pass = 0;
+	if (cmd.size() > 2) {
+		channelPass = joinDivisor(cmd[2]);
+		printVecStr(channelPass);
+		pass = channelPass.size();
+	}
+	// Check if channel exist
+	Channel* found = NULL;
+	int flag = 0;
+	for (size_t i = 0; i < channelName.size(); i++) {
+		if (validChannel(channelName[i], fd)) {
+			found = channelsMng(channelName[i], fd);
+			if (!found)
+				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
+			else {
+				if (!alreadyJoined(found, getClient(fd)->getUsername())) {
+					std::cout << "not joined" << std::endl;
+					if (channelPass.empty())
+						flag = 1;
+					existingChannel(found, channelPass[i], channelName[i], i, fd, flag);
+				} else
+					sendMsg("Already joined to the channel\r\n", fd);
+			}
+		}
+	}
+}
 // PART COMMAND
 void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PART cmd" << std::endl;

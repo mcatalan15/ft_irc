@@ -55,7 +55,7 @@ class Server {
 		Client*			findNickname(string nick, Channel* channel);
 		void			joinMsg(Channel *channel, int fd);
 		void			removeChannel(string channelname);
-
+		bool			alreadyJoined(Channel* channel, string user);
 		
 		//Getters
 		string			getPassword();

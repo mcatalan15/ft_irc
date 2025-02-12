@@ -5,7 +5,7 @@
 #include <string>
 
 Channel* Server::channelsMng(string& channelName, int fd) {
-	(void)fd;
+	(void)fd; // WTF
 	for (size_t j = 0; j < _channels.size(); j++)
 	{
 		if (_channels[j].getName() == channelName)
@@ -16,7 +16,6 @@ Channel* Server::channelsMng(string& channelName, int fd) {
 
 void	Server::joinMsg(Channel *channel, int fd) {
 	std::vector<string> usersList = channel->getClients();
-	//sendMsg(RPL_CONNECT(getClient(fd)->getNickname(), getClient(fd)->getUsername(), channel->getName()), fd);
 	string msg = "";
 	for (size_t i = 0; i < usersList.size(); i++) {
 		msg.append(" ");
@@ -43,12 +42,9 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	if (getClient(fd)->clientMaxChannel()) //User joins max channels
 		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));
 	if (i < pass) {
-		std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
 		newchannel.setPassword(channelPass);
 		newchannel.setMode(PASSWORD_SET);
 	}
-	else
-		std::cout << "channel: " << channelName << "  NO password" << std::endl;
 	newchannel.addClient(username);
 	newchannel.addOperator(username);
 	_channels.push_back(newchannel);
@@ -60,7 +56,6 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 	(void)channelPass;
 	if (found->isBanned(getClient(fd)->getUsername())) { //User is banned from channel
 		sendMsg(ERR_BANNEDFROMCHAN(getClient(fd)->getNickname(), channelName), fd);
-		std::cout << "IS baned" <<std::endl;
 		return false;
 	}
 	if (getClient(fd)->clientMaxChannel()) { //User joins max channels
@@ -72,23 +67,22 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 		return false;
 	}
 	if (found->isModeSet(INVITE_ONLY)) { // IF channel is invite only
-		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
-		return false;
+		if (found->isInvited(getClient(fd)->getUsername())) {
+			std::cout << "Esta invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
+			return true;
+		}
+		else {
+			std::cout << "NO invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
+			sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
+			return false;
+		}
 	}
-	else if (found->isInvited(getClient(fd)->getUsername())) {
-		std::cout << "Esta invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
-		return true;
-	}
-	else 
-		std::cout << "NO invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
 	return true;
 }
 
-void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag) {
-	std::cout << "Existing channel" << std::endl;
+void	Server::existingChannel(Channel* found, string& channelPass, string& channelName,int i, int fd, int flag) {
+	(void)i; //WTF
 	if (found->isModeSet(PASSWORD_SET)) {
-		std::cout << "Entra a tiene contrasenya\n";
-		std::cout << "i: " << i << std::endl;
 		if (flag == 1) {
 			string channelPass = "";
 			sendMsg("bro no pusiste key y se necesita XD\n", fd);
@@ -109,46 +103,6 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 			found->addClient(getClient(fd)->getUsername());
 			getClient(fd)->addChannel(found->getName());
 			joinMsg(found, fd);
-		}
-	}
-		std::cout << "no tiee pass" << std::endl;
-}
-
-bool validChannel(string& channelName, int fd) {
-	if (channelName[0] == '#')
-		return true;
-	sendMsg(ERR_BADCHANMASK(channelName), fd);
-	return false;
-}
-
-void	Server::joinCmd(std::vector<string>& cmd, int fd) {
-	std::cout << "JOIN cmd" << std::endl;
-	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
-
-	std::vector<string> channelName = joinDivisor(cmd[1]);
-	printVecStr(channelName);
-
-	std::vector<string> channelPass;
-	int pass = 0;
-	if (cmd.size() > 2) {
-		channelPass = joinDivisor(cmd[2]);
-		printVecStr(channelPass);
-		pass = channelPass.size();
-	}
-	// Check if channel exist
-	Channel* found = NULL;
-	int flag = 0;
-	for (size_t i = 0; i < channelName.size(); i++) {
-		if (validChannel(channelName[i], fd)) {
-			found = channelsMng(channelName[i], fd);
-			if (!found)
-				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
-			else {
-				if (channelPass.empty())
-					flag = 1;
-				existingChannel(found, channelPass[i], channelName[i], i, fd, flag);
-			}
 		}
 	}
 }
