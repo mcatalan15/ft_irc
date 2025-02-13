@@ -117,9 +117,32 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 // QUIT COMMAND
 void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que envie cmd a todos los usuarios que cmpartan canales.
 	std::cout << "QUIT cmd" << std::endl;
-	string empty;
-	empty.clear();
-	getClient(fd)->setMsg(empty);
+
+	string message;
+	Client*	client = getClient(fd);
+	std::vector<string>	channelsVec = client->getChannels();
+
+	client->setMsg("");
+	if (cmd.size() < 2)
+		cmd.push_back("");
+	message = "QUIT " + cmd[1];
+	for (size_t i = 0; i < channelsVec.size(); i++)
+	{
+		Channel*	channel = findChannel(channelsVec[i]);
+
+		channel->removeClient(client->getUsername());
+		channel->removeOperator(client->getUsername());
+		channel->removeInvitation(client->getUsername());
+		if (!channel->getClients().size())
+			removeChannel(channelsVec[i]);
+		else
+		{
+			if (!channel->getOperators().size())
+				channel->addOperator(channel->getClients()[0]);
+			sendMsgToChannel(message, channel, fd);
+		}
+	}
+	channelsVec.clear();
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd)
 		{
@@ -128,7 +151,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 		}
 	}
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
-		if (it->fd == fd)
+		if (it->fd == fd && fd != _serverFd)
 		{
 			_pollFds.erase(it);
 			break;
