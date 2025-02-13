@@ -6,10 +6,9 @@
 
 // CAP COMMAND
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
-	std::cout << "CAP cmd" << std::endl;
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
-	std::cout << "message send" << std::endl;
+	//std::cout << "message send" << std::endl;
 	(void)cmd;
 }
 
@@ -28,11 +27,8 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 		return ;
 	}
 	else {
-		if (cmd[1] == getPassword()) {
+		if (cmd[1] == getPassword())
 			getClient(fd)->setState(NICK);
-			std::cout << "Correct password!" << std::endl;
-			sendMsg("Correct password\r\n", fd);
-		}
 		else
 			sendMsg(ERR_PASSWDMISMATCH(client->getNickname()), fd);
 	}
@@ -41,17 +37,13 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 // NICKNAME COMMAND
 bool	Server::nickIsUsed(string cmd) {
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "cmdssss: " << cmd << "  client: " << _clients[i].getNickname() << std::endl;
-		if (_clients[i].getNickname() == cmd) {
-			std::cout << "Exists" << std::endl;
+		if (_clients[i].getNickname() == cmd)
 			return false;
-		}
 	}
 	return true;
 }
 
 void	Server::nickCmd(std::vector<string>& cmd, int fd){
-	std::cout << "NICK cmd" << std::endl;
 	Client *client = getClient(fd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NONICKNAMEGIVEN(), fd));
@@ -63,8 +55,6 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 		else {
 				client->setState(LOGIN);
 				client->setNickname(cmd[1]);
-				std::cout << "Nickname: " << client->getNickname() << std::endl;
-				sendMsg("correct nickname\r\n", fd);
 		}
 	}
 	return ;
@@ -74,11 +64,8 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 bool	Server::userIsUsed(string cmd) {
 	// REALMENTE CUAL DEBERIA DE TODOS LOS NOMBRES DEBE MIRAR???
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "cmd: <" << cmd << ">  user: <" << _clients[i].getUsername() << ">" << std::endl;
-		if (_clients[i].getUsername() == cmd) {
-			std::cout << "Exists" << std::endl;
+		if (_clients[i].getUsername() == cmd)
 			return false;
-		}
 	}
 	return true;
 }
@@ -86,24 +73,18 @@ bool	Server::userIsUsed(string cmd) {
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	Client*	client = getClient(fd);
 
-	std::cout << "USER cmd" << std::endl;
-	printVecStr(cmd);
-	std::cout << "User len <" << cmd.size() << ">" << std::endl;
+	//printVecStr(cmd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[1]), fd));
 	if (client->getState() == LOGIN && cmd.size() == 5) {
-		std::cout << "entra if general" << std::endl;
 		if (cmd[1].size() > 18)
 			cmd[1] = cmd[1].substr(0, 18);
 		if (!userIsUsed(cmd[1]))
-			sendMsg("Username is used\r\n", fd);
-			//sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);??????????????
+			sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);
 		else {
 			client->setUsername(cmd[1]);
 			client->setRealname(cmd[3]);
 			client->setState(REGISTERED);
-			std::cout << "Username: " << client->getUsername() << std::endl;
-			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
 			client->welcome(*this, *getClient(fd), fd);
 		}
 	}
@@ -382,7 +363,6 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 //TOPIC COMMAND
 void	Server::topicCmd(std::vector<string>& cmd, int fd){
-	std::cout << "TOPIC cmd" << std::endl;
 	if (cmd.size() == 2)
 		topicDisplay(cmd[1], fd);
 	if (cmd.size() > 2)
@@ -426,13 +406,12 @@ void	Server::adminCmd(std::vector<string>& cmd, int fd){
 
 // INFO COMMAND
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
-	std::cout << "INFO cmd" << std::endl;
 	(void)cmd;
 	(void)fd;
 
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to ExampleIRC Server      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by InspIRCd 3.0         ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Admin: AdminNick  (admin@example.com)  ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Uptime: 12 days, 4 hours, 32 minutes    ║"), fd);
@@ -446,7 +425,7 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit: https://www.youtube.com/watch?v=dQw4w9WgXcQhttps          ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
 	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
 }
