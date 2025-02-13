@@ -100,7 +100,7 @@ bool validChannel(string& channelName, int fd);
 #define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
-#define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
+#define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421 " + nick + " " + cmd + " :Unknown command" + CRLF)
 
 //WELCOME msg (RPL_WELCOME)
 #define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
