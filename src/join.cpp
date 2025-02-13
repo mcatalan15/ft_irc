@@ -4,8 +4,8 @@
 #include <ostream>
 #include <string>
 
-Channel* Server::channelsMng(string& channelName, int fd) {
-	(void)fd; // WTF
+Channel* Server::channelsMng(string& channelName) {
+	//(void)fd; // WTF
 	for (size_t j = 0; j < _channels.size(); j++)
 	{
 		if (_channels[j].getName() == channelName)
@@ -69,11 +69,9 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 	}
 	if (found->isModeSet(INVITE_ONLY)) { // IF channel is invite only
 		if (found->isInvited(getClient(fd)->getUsername())) {
-			std::cout << "Esta invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
 			return true;
 		}
 		else {
-			std::cout << "NO invitado" << getClient(fd)->getNickname() << " " << channelName << std::endl;
 			sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
 			return false;
 		}
@@ -81,12 +79,12 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 	return true;
 }
 
-void	Server::existingChannel(Channel* found, string& channelPass, string& channelName,int i, int fd, int flag) {
-	(void)i; //WTF
+void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int fd, int flag) {
+	//(void)i; //WTF
 	if (found->isModeSet(PASSWORD_SET)) {
 		if (flag == 1) {
 			string channelPass = "";
-			sendMsg("bro no pusiste key y se necesita XD\n", fd);
+			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
 			return ;
 		}
 		if (channelPass == found->getPassword()) {

@@ -317,7 +317,6 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 
 // JOIN COMMAND
 void	Server::joinCmd(std::vector<string>& cmd, int fd) {
-	std::cout << "JOIN cmd" << std::endl;
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
 
@@ -336,17 +335,16 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 	int flag = 0;
 	for (size_t i = 0; i < channelName.size(); i++) {
 		if (validChannel(channelName[i], fd)) {
-			found = channelsMng(channelName[i], fd);
+			found = channelsMng(channelName[i]);
 			if (!found)
 				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
 			else {
 				if (!alreadyJoined(found, getClient(fd)->getUsername())) {
-					std::cout << "not joined" << std::endl;
 					if (channelPass.empty())
 						flag = 1;
-					existingChannel(found, channelPass[i], channelName[i], i, fd, flag);
+					existingChannel(found, channelPass[i], channelName[i], fd, flag);
 				} else
-					sendMsg("Already joined to the channel\r\n", fd);
+					sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
 			}
 		}
 	}
