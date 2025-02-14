@@ -45,6 +45,7 @@ class Server {
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
 		void			sendMsgToChannel(string message, Channel* channel, int fd);
+		void			sendMsgToClients(string message, string channelname, int fd);
 		
 		//Channel Management
 		Channel*		channelsMng(string& channelName, int fd);
@@ -62,6 +63,7 @@ class Server {
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
 		Client*			getUser(string clientname);
+		Client*			getNick(string clientname);
 		std::vector<Client> &getClients();
 		
 		// Time

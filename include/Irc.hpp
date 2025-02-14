@@ -164,6 +164,8 @@ std::vector<string>	joinDivisor(string cmd);
 #define  ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
 #define  ERR_CANNOTKICK(client, nick, channel)(":localhost 482 " + (client) + " " + (nick) + " " + (channel) + " :can't kick" + CRLF)
 
+//PRIVMSG cmd
+#define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
 
 #define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 // GENERAL ERR

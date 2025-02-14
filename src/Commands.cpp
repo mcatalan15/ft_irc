@@ -533,8 +533,29 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 // PRIVMSG COMMAND
 void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PRIVMSG cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	
+	Client*		client = getClient(fd);
+	Channel*	channel = NULL;
+	Client*		user = NULL;
+	string		message;
+	std::vector<string>	destinationVec;
+
+	if (cmd.size() < 3)
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"), fd));
+	destinationVec = joinDivisor(cmd[1]);
+	for (size_t i = 0; i < destinationVec.size(); i++)
+	{
+		channel = findChannel(destinationVec[i]);
+		user = getNick(destinationVec[i]);
+		message = "PRIVMSG " + destinationVec[i] + " " + cmd[2];
+
+		if (channel)
+			sendMsgToChannel(message, channel, fd);
+		else if (user)
+			sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, user->getFd());
+		else
+			return (sendMsg(ERR_NOSUCHCHANNELORCLIENT(client->getNickname(), destinationVec[i]), fd));
+	}
 }
 /* 
 // INVITE COMMAND
