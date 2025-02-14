@@ -23,9 +23,9 @@
 #include <sys/socket.h>// -> socket(), bind(), listen(), accept(), connect()
 #include <netinet/in.h>// -> sockaddr_in()
 #include <errno.h>		// -> errno
-#include <unistd.h>	
+#include <unistd.h>
 #include <sstream>
-#include <fcntl.h>		// -> fcntl()		
+#include <fcntl.h>		// -> fcntl()
 #include <ctime>
 #include <string>
 #include <arpa/inet.h> // -> inet_ntoa()
@@ -77,7 +77,7 @@ std::vector<string>	splitCommand(string &cmd);
 std::vector<string>	splitUserCmd(string &cmd);
 void				printVecStr(std::vector<string> cmd);
 string				addHostname();
-void				sendMsg(string msg, int fd); 
+void				sendMsg(string msg, int fd);
 bool				nickChecker(string cmd);
 string				getCurrentDataTime();
 std::vector<string>	joinDivisor(string cmd);
@@ -160,12 +160,14 @@ std::vector<string>	joinDivisor(string cmd);
 #define  ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 
 // INVITE cmd
-#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+#define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+#define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
+#define RPL_INVITING(client, nick, channel)(":localhost 341 " + (client) + " " + (nick) + " " + (channel) + CRLF)
 
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)
 #define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)
-
+#define ERR_NOSUCHNICK(client, nick)(":localhost 401 " + (client) + " " + (nick) + " :No such nick" + CRLF)
 
 //:localhost 464 marc :Password incorrect
 //nickname

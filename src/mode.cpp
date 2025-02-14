@@ -152,12 +152,12 @@ void	Server::flagModeO(bool flag, Channel* channel, string cmd)
 	if (flag)
 	{
 		channel->addOperator(findNickname(cmd, channel)->getUsername());
-	 	// HAY que enviar un mensaje ?
+	 	// HAY que enviar un mensaje  general en el canal de estilo :":<client> MODE #channel +o <nick>"
 	}
 	else
 	{
 		channel->removeOperator(findNickname(cmd, channel)->getUsername());
-		//hay que enviar un mensaje ?
+		// HAY que enviar un mensaje  general en el canal de estilo :":<client> MODE #channel -o <nick>"
 	}
 }
 
@@ -187,11 +187,11 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 	{
 		if (cmd[2][i] == 'i')
 			flagModeI(flag, channel);
-		if (cmd[2][i] == 't') 
+		if (cmd[2][i] == 't')
 			flagModeT(flag, channel);
-		if (cmd[2][i] == 'o') 
+		if (cmd[2][i] == 'o')
 		{
-			if (cmd.size() >= (j + 1)) 
+			if (cmd.size() >= (j + 1))
 			{
 				if (!channel->hasClient(cmd[j]))
 					return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), cmd[1], cmd[2], cmd[3], "Is not on that channel"), fd));

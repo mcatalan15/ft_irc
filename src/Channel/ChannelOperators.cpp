@@ -5,12 +5,14 @@
 #include <stdexcept>
 
 // Return the username of the operators
-const std::vector<string> &Channel::getOperators() const {
+const std::vector<string> &Channel::getOperators() const
+{
 	return (_operators);
 }
 
 // Add the operators to _operators
-void Channel::addOperator(string clientname) {
+void Channel::addOperator(string clientname)
+{
 	std::cout << clientname << " addOperator" << std::endl;
 	std::vector<string>::iterator it;
 	for (it = _operators.begin(); it != _operators.end(); ++it){
@@ -26,7 +28,8 @@ void Channel::addOperator(string clientname) {
 }
 
 // Remove operators from _operatos
-void Channel::removeOperator(string clientname) {
+void Channel::removeOperator(string clientname)
+{
 	std::vector<string>::iterator it;
 	for (it = _operators.begin(); it != _operators.end(); ++it) {
 		if (*it == clientname) {
@@ -39,14 +42,10 @@ void Channel::removeOperator(string clientname) {
 }
 
 // Checks if the clientname is ins _operators
-bool Channel::isOperator(string clientname) const {
+bool Channel::isOperator(string clientname) const
+{
 	std::vector<string>::const_iterator it = std::find(_operators.begin(), _operators.end(), clientname);
 
-	//for (it == _operators.begin(); it != _operators.end(); ++it) {
-		//if (*it == clientname) {
-			//	return true;
-			//}
-			//}
 	if (it != _operators.end()) {
 		std::cout << "Client [" << clientname << "] is operator" << std::endl;
 		return true;
@@ -56,12 +55,20 @@ bool Channel::isOperator(string clientname) const {
 }
 
 // Checks if the mode given is 1(set) or 0(unset)
-bool	Channel::isModeSet(Mode mode) { 
+bool	Channel::isModeSet(Mode mode)
+{
 	std::cout << "Checking mode: " << mode << ", current modes: " << this->_modes << std::endl;
-	return _modes & mode; }
+	return _modes & mode;
+}
 
 // Set the mode given changing the 0 to 1
-void	Channel::setMode(Mode mode) { _modes |= mode; }
+void	Channel::setMode(Mode mode)
+{
+    _modes |= mode;
+}
 
 // Unsets the mode given changing the 1 to 0
-void	Channel::unsetMode(Mode mode) { _modes &= ~mode; }
+void	Channel::unsetMode(Mode mode)
+{
+    _modes &= ~mode;
+}
