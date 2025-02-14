@@ -21,6 +21,7 @@ Channel::Channel(const Channel& cpy)
 	_invitedClients = cpy._invitedClients;
 	_password = cpy._password;
 	_modes = cpy._modes;
+	_creationTime = cpy._creationTime;
 }
 
 Channel::~Channel()

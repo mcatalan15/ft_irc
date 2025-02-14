@@ -54,7 +54,7 @@ void	Server::topicSetter(std::vector<string>& cmd, int fd) {
 	} else {
 		// channel not restricted
 		findChannel(cmd[1])->setTopic(cmd[2]);
-		string msg = " TOPIC ";
+		string msg = "TOPIC ";
 		msg.append(cmd[1]);
 		msg.append(" ");
 		msg.append(cmd[2]);
