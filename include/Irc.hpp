@@ -6,7 +6,7 @@
 /*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/02/09 14:29:14 by jpaul-kr         ###   ########.fr       */
+/*   Updated: 2025/02/12 13:10:45 by jpaul-kr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,9 +160,15 @@ bool validChannel(string& channelName, int fd);
 #define  ERR_NOTONCHANNEL(client, channel)(":localhost 442 " + (client) + " " + (channel) + " :You're not on that channel" + CRLF)
 #define  ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 
-// INVITE cmd
-#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+//KICK cmd
+#define ERR_USERNOTINCHANNEL(client, nick, channel)(":localhost 441 " + (client) + " " + (nick) + " " + (channel) + " :They aren't on that channel" + CRLF)
+#define  ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
+#define  ERR_CANNOTKICK(client, nick, channel)(":localhost 482 " + (client) + " " + (nick) + " " + (channel) + " :can't kick" + CRLF)
 
+//PRIVMSG cmd
+#define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
+
+#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)
 #define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)

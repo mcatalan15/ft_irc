@@ -342,6 +342,16 @@ Client*		Server::getUser(string clientname)
 	return NULL;
 }
 
+Client*		Server::getNick(string clientname)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].getNickname() == clientname)
+			return &_clients[i];
+	}
+	return NULL;
+}
+
 bool	Server::alreadyJoined(Channel* channel, string user) {
 	std::vector<string> list = channel->getClients();
 	if (channel)
@@ -370,4 +380,18 @@ Client*	Server::findNickname(string nick, Channel* channel)
 			return getUser(lstClients[i]);
 	}
 	return NULL;
+}
+
+void	Server::sendMsgToClients(string message, string channelname, int fd)
+{
+	Client*								client = getClient(fd);
+	std::vector<string>::const_iterator	it;
+
+	for (size_t i = 0; i < _clients.size(); i++) {
+		//std::cout << "entra en for\n";
+		it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelname);
+
+		if (it != _clients[i].getChannels().end() && _clients[i].getNickname() != client->getNickname())
+			sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
+	}
 }
