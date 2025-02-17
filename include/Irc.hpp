@@ -155,6 +155,7 @@ bool validChannel(string& channelName, int fd);
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
 #define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
 #define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
+#define MODE_MESSAGE(nick, user, channel, message, target)(":" + (nick) + "!" + (user) + "@localhost MODE " + (channel) +  " " + (message) + " " + (target) +CRLF)
 
 // PART cmd
 #define  ERR_NOTONCHANNEL(client, channel)(":localhost 442 " + (client) + " " + (channel) + " :You're not on that channel" + CRLF)
@@ -172,6 +173,7 @@ bool validChannel(string& channelName, int fd);
 #define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 #define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
 #define RPL_INVITING(client, nick, channel)(":localhost 341 " + (client) + " " + (nick) + " " + (channel) + CRLF)
+#define INVITE_MESSAGE(nick, user, client, channel)(":" + (nick) + "!" + (user) + "@localhost INVITE " + (client) + " " + (channel) + CRLF)
 
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)

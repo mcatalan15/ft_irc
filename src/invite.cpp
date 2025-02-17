@@ -90,15 +90,22 @@ bool	Server::userOnChannel(Channel* channel, std::vector<string> nickName, int f
 	return (false);
 }
 
+void    Server::sendInvitationMsg(Channel *channel, string nickName, int fd)
+{
+    Client* user = getNick(nickName);
+
+    sendMsg(INVITE_MESSAGE(getClient(fd)->getNickname(), getClient(fd)->getUsername(), nickName, channel->getName()), user->getFd());
+}
+
 void	Server::invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag)
 {
-	for (size_t i = 0; i < nickName.size(); i++)
+    for (size_t i = 0; i < nickName.size(); i++)
 	{
 		if (flag)
 		{
 			channel->addInvitation(nickName[i]);
 			sendMsg(RPL_INVITING(getClient(fd)->getNickname(), nickName[i], channel->getName()), fd); //RPL_INVITING (341)
-			// enviar un msg a la persona invitada
+			sendInvitationMsg(channel, nickName[i], fd);
 		}
 		else
 		{
@@ -110,7 +117,7 @@ void	Server::invitationManagement(Channel* channel, std::vector<string>& nickNam
 
 void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 {
- 	std::cout << "INVITE cmd" << std::endl;
+    std::cout << "INVITE cmd" << std::endl;
 	string command = cmd[0];
 
 	if (cmd.size() < 3)
@@ -120,7 +127,6 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 	if (!isInviteCmdValid(channel, cmd, fd))
 		return ;
 	bool flag = (cmd[1][0] != '-' ? true : false);
-	//bool flag = isPositif(cmd[1]);
 	std::vector<string> nickName = divisor(cmd[1], flag);
 	if (!nicknameExist(nickName, fd))
 		return ;

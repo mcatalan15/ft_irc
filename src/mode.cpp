@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/Channel.hpp"
+#include <string>
 
 bool	Server::validFlags(Channel* channel, std::vector<string>& cmd, int fd)
 {
@@ -147,17 +148,27 @@ void	Server::flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, in
 	}
 }
 
-void	Server::flagModeO(bool flag, Channel* channel, string cmd)
+void    Server::sendModeMsg(Channel *channel, string s1, string target, int fd)
 {
-	if (flag)
+    Client* client = getClient(fd);
+    string  channelName = channel->getName();
+    std::vector<string>	clientsVec = channel->getClients();
+
+    for (size_t i = 0; i < clientsVec.size(); i++)
+        sendMsg(MODE_MESSAGE(client->getNickname(), client->getUsername(), channelName, s1, target), getUser(clientsVec[i])->getFd());
+}
+
+void	Server::flagModeO(bool flag, Channel* channel, string cmd, int fd)
+{
+    if (flag)
 	{
 		channel->addOperator(findNickname(cmd, channel)->getUsername());
-	 	// HAY que enviar un mensaje  general en el canal de estilo :":<client> MODE #channel +o <nick>"
+	 	sendModeMsg(channel, "+o", cmd, fd);
 	}
 	else
 	{
 		channel->removeOperator(findNickname(cmd, channel)->getUsername());
-		// HAY que enviar un mensaje  general en el canal de estilo :":<client> MODE #channel -o <nick>"
+		sendModeMsg(channel, "-o", cmd, fd);
 	}
 }
 
@@ -195,7 +206,7 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 			{
 				if (!channel->hasClient(cmd[j]))
 					return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), cmd[1], cmd[2], cmd[3], "Is not on that channel"), fd));
-				flagModeO(flag, channel, cmd[j]);
+				flagModeO(flag, channel, cmd[j], fd);
 				j++;
 			}
 			else
