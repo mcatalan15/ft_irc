@@ -168,7 +168,6 @@ bool validChannel(string& channelName, int fd);
 //PRIVMSG cmd
 #define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
 
-#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 // INVITE cmd
 #define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
 #define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
