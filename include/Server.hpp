@@ -48,22 +48,29 @@ class Server {
 		void			sendMsgToClients(string message, string channelname, int fd);
 		
 		//Channel Management
-		Channel*		channelsMng(string& channelName, int fd);
+		Channel*		channelsMng(string& channelName);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
-		void			existingChannel(Channel* found, string& channelPass, string& channelName, int i, int fd, int flag);
+		void			existingChannel(Channel* found, string& channelPass, string& channelName, int fd, int flag);
 		Channel*		findChannel(string channelName);
 		bool			channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName);
 		Client*			findNickname(string nick, Channel* channel);
 		void			joinMsg(Channel *channel, int fd);
 		void			removeChannel(string channelname);
-
+		bool			alreadyJoined(Channel* channel, string user);
 		
+		//Topic
+		bool			isOnChan(string& cmd, int fd);
+		void			topicDisplay(string& cmd, int fd);
+		void			topicSetter(std::vector<string>& cmd, int fd);
+
 		//Getters
 		string			getPassword();
 		Client			*getClient(int fd);
 		Client			*getClientNickname(std::string nickname);
 		Client*			getUser(string clientname);
 		Client*			getNick(string clientname);
+		Channel*		getChannel(string channelName);
+
 		std::vector<Client> &getClients();
 		
 		// Time

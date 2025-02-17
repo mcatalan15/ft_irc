@@ -31,7 +31,9 @@ class Channel {
 		~Channel();
 
 		/*------------ CHANNEL INFO ---------------*/
-		const string getName() const;
+		const string 	getName() const;
+		const string	getTopic() const;
+		void			setTopic(const string& topic);
 
 		// Password management
 		string getPassword() const;
@@ -52,7 +54,7 @@ class Channel {
 		void removeOperator(string clientname);
 		bool isOperator(string clientname) const;
 		void	setMode(Mode mode);
-		void	unsetMode(Mode mode);
+		void	unsetMode(Mode modev);
 		bool	isModeSet(Mode mode);
 
 

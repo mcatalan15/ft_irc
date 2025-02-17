@@ -157,3 +157,10 @@ std::vector<string>	joinDivisor(string cmd) {
 	vec.push_back(cmd.substr(init, -1));
 	return vec;
 }
+
+bool validChannel(string& channelName, int fd) {
+	if (channelName[0] == '#' && channelName.size() > 1)
+		return true;
+	sendMsg(ERR_BADCHANMASK(channelName), fd);
+	return false;
+}

@@ -352,6 +352,16 @@ Client*		Server::getNick(string clientname)
 	return NULL;
 }
 
+bool	Server::alreadyJoined(Channel* channel, string user) {
+	std::vector<string> list = channel->getClients();
+	if (channel)
+	for(size_t i = 0; i < list.size(); i++) {
+		if (list[i] == user)
+			return true;
+	}
+	return false;
+}
+
 std::vector<Client> &Server::getClients() { return (_clients); }
 
 Client*	Server::findNickname(string nick, Channel* channel)
