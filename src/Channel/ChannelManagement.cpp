@@ -25,7 +25,7 @@ void Channel::removeClient(string clientname)
 		std::cerr << "Client doesn't exist" << std::endl;
 	else
 		_clients.erase(it);
-		//throw std::runtime_error("Client doesn't exist");
+	//throw std::runtime_error("Client doesn't exist");
 	// maybe We need to put a diff message
 }
 

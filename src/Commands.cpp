@@ -126,13 +126,15 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	if (cmd.size() < 2)
 		cmd.push_back("");
 	message = "QUIT " + cmd[1];
-	std::cout << "sale de quit\n"; 
+	//std::cout << "sale de quit\n"; 
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		Channel*	channel = findChannel(channelsVec[i]);
-
-		channel->removeClient(client->getUsername());
-		channel->removeOperator(client->getUsername());
+		
+		if (channel->hasClient(client->getUsername()))
+			channel->removeClient(client->getUsername());
+		if (channel->isOperator(client->getUsername()))
+			channel->removeOperator(client->getUsername());
 		channel->removeInvitation(client->getUsername());
 		if (!channel->getClients().size())
 			removeChannel(channelsVec[i]);
