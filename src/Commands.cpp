@@ -115,7 +115,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 }
 
 // QUIT COMMAND
-void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que envie cmd a todos los usuarios que cmpartan canales.
+void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	std::cout << "QUIT cmd" << std::endl;
 
 	string message;
@@ -126,6 +126,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 	if (cmd.size() < 2)
 		cmd.push_back("");
 	message = "QUIT " + cmd[1];
+	std::cout << "sale de quit\n"; 
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		Channel*	channel = findChannel(channelsVec[i]);
@@ -135,13 +136,10 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 		channel->removeInvitation(client->getUsername());
 		if (!channel->getClients().size())
 			removeChannel(channelsVec[i]);
-		else
-		{
-			if (!channel->getOperators().size())
-				channel->addOperator(channel->getClients()[0]);
-			sendMsgToChannel(message, channel, fd);
-		}
+		else if (!channel->getOperators().size())
+			channel->addOperator(channel->getClients()[0]);
 	}
+	sendMsgToClients(message, channelsVec, fd);
 	channelsVec.clear();
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd)
@@ -157,8 +155,8 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que e
 			break;
 		}
 	}
-	close(fd);
-	(void)cmd;
+	if (fd != _serverFd)
+		close(fd);
 }
 // MODE COMMAND ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

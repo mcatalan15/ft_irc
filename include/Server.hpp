@@ -45,7 +45,7 @@ class Server {
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
 		void			sendMsgToChannel(string message, Channel* channel, int fd);
-		void			sendMsgToClients(string message, string channelname, int fd);
+		void			sendMsgToClients(string message, std::vector<string> channelnames, int fd);
 		
 		//Channel Management
 		Channel*		channelsMng(string& channelName, int fd);
