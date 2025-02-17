@@ -6,12 +6,9 @@
 
 // CAP COMMAND
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
-	std::cout << "CAP cmd" << std::endl;
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
-	//if (cmd[1] == "END")
-		//sendMsg("CAP END\r\n", fd);
-	std::cout << "message send" << std::endl;
+	//std::cout << "message send" << std::endl;
 	(void)cmd;
 }
 
@@ -30,11 +27,8 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 		return ;
 	}
 	else {
-		if (cmd[1] == getPassword()) {
+		if (cmd[1] == getPassword())
 			getClient(fd)->setState(NICK);
-			std::cout << "Correct password!" << std::endl;
-			sendMsg("Correct password\r\n", fd);
-		}
 		else
 			sendMsg(ERR_PASSWDMISMATCH(client->getNickname()), fd);
 	}
@@ -43,17 +37,13 @@ void	Server::passCmd(std::vector<string>& cmd, int fd){
 // NICKNAME COMMAND
 bool	Server::nickIsUsed(string cmd) {
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "cmdssss: " << cmd << "  client: " << _clients[i].getNickname() << std::endl;
-		if (_clients[i].getNickname() == cmd) {
-			std::cout << "Exists" << std::endl;
+		if (_clients[i].getNickname() == cmd)
 			return false;
-		}
 	}
 	return true;
 }
 
 void	Server::nickCmd(std::vector<string>& cmd, int fd){
-	std::cout << "NICK cmd" << std::endl;
 	Client *client = getClient(fd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NONICKNAMEGIVEN(), fd));
@@ -65,8 +55,6 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 		else {
 				client->setState(LOGIN);
 				client->setNickname(cmd[1]);
-				std::cout << "Nickname: " << client->getNickname() << std::endl;
-				sendMsg("correct nickname\r\n", fd);
 		}
 	}
 	return ;
@@ -76,11 +64,8 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 bool	Server::userIsUsed(string cmd) {
 	// REALMENTE CUAL DEBERIA DE TODOS LOS NOMBRES DEBE MIRAR???
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "cmd: <" << cmd << ">  user: <" << _clients[i].getUsername() << ">" << std::endl;
-		if (_clients[i].getUsername() == cmd) {
-			std::cout << "Exists" << std::endl;
+		if (_clients[i].getUsername() == cmd)
 			return false;
-		}
 	}
 	return true;
 }
@@ -88,24 +73,18 @@ bool	Server::userIsUsed(string cmd) {
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	Client*	client = getClient(fd);
 
-	std::cout << "USER cmd" << std::endl;
-	printVecStr(cmd);
-	std::cout << "User len <" << cmd.size() << ">" << std::endl;
+	//printVecStr(cmd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[1]), fd));
 	if (client->getState() == LOGIN && cmd.size() == 5) {
-		std::cout << "entra if general" << std::endl;
 		if (cmd[1].size() > 18)
 			cmd[1] = cmd[1].substr(0, 18);
 		if (!userIsUsed(cmd[1]))
-			sendMsg("Username is used\r\n", fd);
-			//sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);??????????????
+			sendMsg(ERR_USERNAMEINUSE(client->getUsername()), fd);
 		else {
 			client->setUsername(cmd[1]);
 			client->setRealname(cmd[3]);
 			client->setState(REGISTERED);
-			std::cout << "Username: " << client->getUsername() << std::endl;
-			std::cout << GREEN << "CONNECTED AND REGISTERED!!!!!" << RESET << std::endl;
 			client->welcome(*this, *getClient(fd), fd);
 		}
 	}
@@ -117,19 +96,40 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 // QUIT COMMAND
 void	Server::quitCmd(std::vector<string>& cmd, int fd){  			// falta hacer que envie cmd a todos los usuarios que cmpartan canales.
 	std::cout << "QUIT cmd" << std::endl;
-	string empty;
-	empty.clear();
-	getClient(fd)->setMsg(empty);
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-		if (it->getFd() == fd)
+
+	string message;
+	Client*	client = getClient(fd);
+	std::vector<string>	channelsVec = client->getChannels();
+
+	client->setMsg("");
+	if (cmd.size() < 2)
+		cmd.push_back("");
+	message = "QUIT " + cmd[1];
+	for (size_t i = 0; i < channelsVec.size(); i++)
+	{
+		Channel*	channel = findChannel(channelsVec[i]);
+
+		channel->removeClient(client->getUsername());
+		channel->removeOperator(client->getUsername());
+		channel->removeInvitation(client->getUsername());
+		if (!channel->getClients().size())
+			removeChannel(channelsVec[i]);
+		else
 		{
+			if (!channel->getOperators().size())
+				channel->addOperator(channel->getClients()[0]);
+			sendMsgToChannel(message, channel, fd);
+		}
+	}
+	channelsVec.clear();
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->getFd() == fd) {
 			_clients.erase(it);
 			break;
 		}
 	}
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
-		if (it->fd == fd)
-		{
+		if (it->fd == fd) {
 			_pollFds.erase(it);
 			break;
 		}
@@ -319,117 +319,41 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 	modeManagement(channel, cmd, fd);
 }*/
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*void	Server::successJoin(int fd) {
-	//get channel
-	sendMsg();
-	}*/
 // JOIN COMMAND
+void	Server::joinCmd(std::vector<string>& cmd, int fd) {
+	if (cmd.size() < 2)
+		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
 
-/*std::vector<string>	joinDivisor(string cmd) {
+	std::vector<string> channelName = joinDivisor(cmd[1]);
+	printVecStr(channelName);
 
-	size_t	i;
-	size_t	init = 0;
-	std::vector<string>	vec;
-	int		num_ch = 0;
-	for (i = 0; i < cmd.size(); i++) {
-		if (cmd[i] == ',')
-		{
-			vec.push_back(cmd.substr(init, i - init));
-			//std::cout << "cmd[" << num_ch << "]: " << cmd[i] << std::endl;
-			init = i + 1;
-			num_ch++;
+	std::vector<string> channelPass;
+	int pass = 0;
+	if (cmd.size() > 2) {
+		channelPass = joinDivisor(cmd[2]);
+		printVecStr(channelPass);
+		pass = channelPass.size();
+	}
+	// Check if channel exist
+	Channel* found = NULL;
+	int flag = 0;
+	for (size_t i = 0; i < channelName.size(); i++) {
+		if (validChannel(channelName[i], fd)) {
+			found = channelsMng(channelName[i]);
+			if (!found)
+				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
+			else {
+				if (!alreadyJoined(found, getClient(fd)->getUsername())) {
+					if (channelPass.empty())
+						flag = 1;
+					existingChannel(found, channelPass[i], channelName[i], fd, flag);
+				} else
+					sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
+			}
 		}
 	}
-	vec.push_back(cmd.substr(init, -1));
-	//std::cout << "cmd[" << num_ch << "]: " <<  << std::endl;
-	return vec;
-}*/
-/*
-void	Server::channelsMng(string& channelName, string& channelPass, std::vector<string>& cmd, int i, int fd) {
-	Client*		client = getClient(fd);
-	Channel*	found = NULL;
-	std::cout << "empieza" << _channels.size() << "Channel: " << channelName.size() << std::endl;
-	for (size_t j = 0; j < _channels.size(); j++)
-	{
-		if (channelName[0] != '#') {
-			return(sendMsg("channel needs to start with '#'\n", fd));
-		}
-		if (_channels[j].getName() == channelName) {
-			found = &_channels[j];
-			break ;
-		}
-	}
-	// If channel doesnt exist
-	if (!found)
-	{
-		//_channels.push_back(channelsNames[i]); //Stores object
-		Channel newchannel(channelName);
-
-		if (cmd.size() > 2 && i < channelPass.size()) {
-			std::cout << "channel: " << channelName << "  hay password: " << channelPass << std::endl;
-			newchannel.setPassword(channelPass);
-		}
-		else {
-			std::cout << "channel: " << channelName << "  NO password" << std::endl;
-		}
-		newchannel.addClient(client);
-		newchannel.addOperator(client);
-		_channels.push_back(newchannel);
-		client->addChannel(&newchannel);
-		
-		sendMsg("channel " + channelName + " created!\n", fd);
-	}
-	else //Existe el channel
-	{
-		// mierdas de mode y password
-		std::cout << "LA size: " << cmd.size() << std::endl;
-		if (found->hasPassword()) {
-			if (channelPass == found->getPassword())
-				std::cout << "Contrasenya correcte" <<"cdm[" << channelName << "] channelpass [" << channelPass<< "]" << std::endl;
-			else
-				std::cout << "Contrasenya incorecte" << "cdm[" << channelName << "] channelpass [" << channelPass << "]" << std::endl;
-		}
-			//std::cout << "Size channelPass" << channelsPass.size() << std::endl;
-			//if ((i < channelsPass.size() && found->hasPassword()) || found->getPassword() != channelsPass[i])
-			//	std::cout << "Contrasenya incorrecta" << std::endl;
-			//found->addClient(client);
-			//sendMsg("you joined " + channelsNames[i] + " channel!\n", fd);
-	}
-	std::cout << "acaba  " << _channels.size() << std::endl;
 }
 
-void	Server::joinCmd(std::vector<string>& cmd, int fd)
-{
-	std::cout << "JOIN cmd" << std::endl;
-	Client*		client = getClient(fd);
-	// Checkers
-	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
-	
-	std::cout << "CANALES!!!" << std::endl;
-	std::vector<string> channelsNames = joinDivisor(cmd[1]);
-	printVecStr(channelsNames);
-	std::vector<string> channelsPass;
-	if (cmd.size() > 2) {
-		std::cout << std::endl << "KEYYSSS!!!!" <<std::endl;
-		channelsPass = joinDivisor(cmd[2]);
-		printVecStr(channelsPass);
-	}
-
-	// Check if channel exist
-	
-	for (size_t i = 0; i < channelsNames.size(); i++)
-		if (cmd.size() > 2) {
-			if (i < channelsPass.size())
-				channelsMng(channelsNames[i], channelsPass[i], cmd, i, fd);
-			else
-				std::cout << "no tiene password" << std::endl;
-		} else
-			std::cout << " no hay contrasenyas" << std::endl;
-}*/
-//--------------------------------------------------------------------------------------------
 // PART COMMAND
 void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PART cmd" << std::endl;
@@ -439,48 +363,101 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 	std::vector<string>	channelsVec;
 
 	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[0]), fd));
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
 	
 	channelsVec = joinDivisor(cmd[1]);
-	std::cout << "channelsVec 0: " << channelsVec[0] << std::endl;
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		channel = findChannel(channelsVec[i]);
-		//std::cout << "channelname: " << channel->getName() << std::endl;
-		//std::cout << "hihihihi" << std::endl;
 		if (!channel)
-			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[0]), fd));
+			return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (!client->removeChannel(channelsVec[i]))
-			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[0]), fd));
+			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (cmd.size() < 3)
 			cmd.push_back("");
 		message = "PART " + channelsVec[i] + " " + cmd[2];
 		sendMsgToChannel(message, channel, fd);
 		channel->removeClient(client->getUsername());
+		if (channel->isOperator(client->getUsername()))
+			channel->removeOperator(client->getUsername());
 		if (channel->getClients().size() <= 0)
 			removeChannel(channel->getName());
+		else if (!channel->getOperators().size())
+			channel->addOperator(channel->getClients()[0]);
 	}
 }
 
 //TOPIC COMMAND
 void	Server::topicCmd(std::vector<string>& cmd, int fd){
-	std::cout << "TOPIC cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	if (cmd.size() == 2)
+		topicDisplay(cmd[1], fd);
+	if (cmd.size() > 2)
+		topicSetter(cmd, fd);
 }
 
 // KICK COMMAND
 void	Server::kickCmd(std::vector<string>& cmd, int fd){
 	std::cout << "KICK cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+
+	Client*			client = getClient(fd);
+	Channel*		channel;
+	std::vector<string>	clientsVec;
+
+	if (cmd.size() < 3)
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"), fd));
+	channel = findChannel(cmd[1]);
+	if (!channel)
+		return (sendMsg(ERR_NOSUCHCHANNEL(client->getNickname(), cmd[1]), fd));
+	if (!channel->hasClient(client->getUsername()))
+		return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), cmd[1]), fd));
+	if (!channel->isOperator(client->getUsername()))
+		return (sendMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), cmd[1]), fd));
+	if (cmd.size() < 4)
+		cmd.push_back("");
+	clientsVec = joinDivisor(cmd[2]);
+	for (size_t i = 0; i < clientsVec.size(); i++)
+	{
+		string	message = "KICK " + cmd[1] + " " + clientsVec[i] + " " + cmd[3];
+		Client*	kick = findNickname(clientsVec[i], channel);
+
+		if (!kick)
+			return (sendMsg(ERR_USERNOTINCHANNEL(client->getNickname(), clientsVec[i], channel->getName()), fd));
+		if (channel->isOperator(kick->getUsername()))
+			return (sendMsg(ERR_CANNOTKICK(client->getNickname(), clientsVec[i], channel->getName()), fd));
+
+		kick->removeChannel(channel->getName());
+		sendMsgToChannel(message, channel, fd);
+		channel->removeClient(kick->getUsername());
+		channel->addBannedClient(kick->getUsername());
+	}
 }
 
 // PRIVMSG COMMAND
 void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PRIVMSG cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
+	
+	Client*		client = getClient(fd);
+	Channel*	channel = NULL;
+	Client*		user = NULL;
+	string		message;
+	std::vector<string>	destinationVec;
+
+	if (cmd.size() < 3)
+		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"), fd));
+	destinationVec = joinDivisor(cmd[1]);
+	for (size_t i = 0; i < destinationVec.size(); i++)
+	{
+		channel = findChannel(destinationVec[i]);
+		user = getNick(destinationVec[i]);
+		message = "PRIVMSG " + destinationVec[i] + " " + cmd[2];
+
+		if (channel)
+			sendMsgToChannel(message, channel, fd);
+		else if (user)
+			sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, user->getFd());
+		else
+			return (sendMsg(ERR_NOSUCHCHANNELORCLIENT(client->getNickname(), destinationVec[i]), fd));
+	}
 }
 /* 
 // INVITE COMMAND
@@ -506,13 +483,12 @@ void	Server::adminCmd(std::vector<string>& cmd, int fd){
 
 // INFO COMMAND
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
-	std::cout << "INFO cmd" << std::endl;
 	(void)cmd;
 	(void)fd;
 
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to ExampleIRC Server      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by InspIRCd 3.0         ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Admin: AdminNick  (admin@example.com)  ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Uptime: 12 days, 4 hours, 32 minutes    ║"), fd);
@@ -526,7 +502,7 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit: https://www.youtube.com/watch?v=dQw4w9WgXcQhttps          ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
 	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
 }

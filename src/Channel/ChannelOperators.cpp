@@ -28,14 +28,12 @@ void Channel::addOperator(string clientname)
 }
 
 // Remove operators from _operatos
-void Channel::removeOperator(string clientname)
-{
-	std::vector<string>::iterator it;
-	for (it = _operators.begin(); it != _operators.end(); ++it) {
-		if (*it == clientname) {
-			_operators.erase(it);
-			std::cout << "Client [" << clientname << "] not an operator anymore" << std::endl;
-		}
+void Channel::removeOperator(string clientname) {
+	std::vector<string>::iterator it = std::find(_operators.begin(), _operators.end(), clientname);
+
+	if (it != _operators.end()) {
+		_operators.erase(it);
+		std::cout << "Client [" << clientname << "] not an operator anymore" << std::endl;
 	}
 	std::cout << "Client [" << clientname << "] not an operator" << std::endl;
 	// Maybe we need to implement a different message error
@@ -45,7 +43,6 @@ void Channel::removeOperator(string clientname)
 bool Channel::isOperator(string clientname) const
 {
 	std::vector<string>::const_iterator it = std::find(_operators.begin(), _operators.end(), clientname);
-
 	if (it != _operators.end()) {
 		std::cout << "Client [" << clientname << "] is operator" << std::endl;
 		return true;
