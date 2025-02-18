@@ -106,7 +106,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		cmd.push_back("");
 	else
 		cmd[1] = ":" + cmd[1];
-	message = "QUIT :" + cmd[1];
+	message = "QUIT " + cmd[1];
 	//std::cout << "sale de quit\n"; 
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
