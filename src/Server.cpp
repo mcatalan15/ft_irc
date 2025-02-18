@@ -271,10 +271,7 @@ std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::creat
 	map["KICK"] = &Server::kickCmd;
 	map["PRIVMSG"] = &Server::privmsgCmd;
 	map["INVITE"] = &Server::inviteCmd;
-	map["WHOIS"] = &Server::whoisCmd;
-	map["ADMIN"] = &Server::adminCmd;
 	map["INFO"] = &Server::infoCmd;
-	map["PONG"] = &Server::pongCmd;
 	map["PING"] = &Server::pingCmd;
 	return map;
 }

@@ -98,9 +98,8 @@ bool validChannel(string& channelName, int fd);
 #define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
 
 #define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
-#define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
-#define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421 " + nick + " " + cmd + " :Unknown command" + CRLF)
+#define	ERR_NOTREGISTERED(hostname) (":localhost 451 " + (hostname) + " :You have not registered" + CRLF)
 
 //WELCOME msg (RPL_WELCOME)
 #define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
@@ -171,7 +170,7 @@ bool validChannel(string& channelName, int fd);
 
 // INVITE cmd
 #define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
-#define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
+#define RPL_ENDOFINVITELIST(client)(":localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
 #define RPL_INVITING(client, nick, channel)(":localhost 341 " + (client) + " " + (nick) + " " + (channel) + CRLF)
 #define INVITE_MESSAGE(nick, user, client, channel)(":" + (nick) + "!" + (user) + "@localhost INVITE " + (client) + " " + (channel) + CRLF)
 

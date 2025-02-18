@@ -8,7 +8,6 @@
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
-	//std::cout << "message send" << std::endl;
 	(void)cmd;
 }
 
@@ -49,9 +48,9 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_NONICKNAMEGIVEN(), fd));
 	if (client->getState() == NICK || client->getState() == REGISTERED) {
 		if (!nickChecker(cmd[1]))
-			sendMsg(ERR_ERRONEUSNICKNAME(cmd[1]), fd); // cambiar al error q toca
+			sendMsg(ERR_ERRONEUSNICKNAME(cmd[1]), fd);
 		else if (!nickIsUsed(cmd[1]))
-			sendMsg(ERR_NICKNAMEINUSE(cmd[1]), fd); // cambiar al error q toca
+			sendMsg(ERR_NICKNAMEINUSE(cmd[1]), fd);
 		else {
 				client->setState(LOGIN);
 				client->setNickname(cmd[1]);
@@ -73,7 +72,6 @@ bool	Server::userIsUsed(string cmd) {
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	Client*	client = getClient(fd);
 
-	//printVecStr(cmd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[1]), fd));
 	if (client->getState() == LOGIN && cmd.size() == 5) {
@@ -89,7 +87,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 		}
 	}
 	else
-		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
+		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd); //???
 	return ;
 }
 
@@ -105,7 +103,6 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	if (cmd.size() < 2)
 		cmd.push_back("");
 	message = "QUIT " + cmd[1];
-	//std::cout << "sale de quit\n"; 
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		Channel*	channel = findChannel(channelsVec[i]);
@@ -321,37 +318,40 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 
 // JOIN COMMAND
 void	Server::joinCmd(std::vector<string>& cmd, int fd) {
-	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
-
-	std::vector<string> channelName = joinDivisor(cmd[1]);
-	printVecStr(channelName);
-
-	std::vector<string> channelPass;
-	int pass = 0;
-	if (cmd.size() > 2) {
-		channelPass = joinDivisor(cmd[2]);
-		printVecStr(channelPass);
-		pass = channelPass.size();
-	}
-	// Check if channel exist
-	Channel* found = NULL;
-	int flag = 0;
-	for (size_t i = 0; i < channelName.size(); i++) {
-		if (validChannel(channelName[i], fd)) {
-			found = channelsMng(channelName[i]);
-			if (!found)
-				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
-			else {
-				if (!alreadyJoined(found, getClient(fd)->getUsername())) {
-					if (channelPass.empty())
-						flag = 1;
-					existingChannel(found, channelPass[i], channelName[i], fd, flag);
-				} else
-					sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
+	if (getClient(fd)->getState() == REGISTERED) {
+		if (cmd.size() < 2)
+			return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
+	
+		std::vector<string> channelName = joinDivisor(cmd[1]);
+		printVecStr(channelName);
+	
+		std::vector<string> channelPass;
+		int pass = 0;
+		if (cmd.size() > 2) {
+			channelPass = joinDivisor(cmd[2]);
+			printVecStr(channelPass);
+			pass = channelPass.size();
+		}
+		// Check if channel exist
+		Channel* found = NULL;
+		int flag = 0;
+		for (size_t i = 0; i < channelName.size(); i++) {
+			if (validChannel(channelName[i], fd)) {
+				found = channelsMng(channelName[i]);
+				if (!found)
+					createNewChannel(channelName[i], channelPass[i], pass, i, fd);
+				else {
+					if (!alreadyJoined(found, getClient(fd)->getUsername())) {
+						if (channelPass.empty())
+							flag = 1;
+						existingChannel(found, channelPass[i], channelName[i], fd, flag);
+					} else
+						sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
+				}
 			}
 		}
-	}
+	} else
+	sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 }
 
 // PART COMMAND
@@ -389,10 +389,15 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 //TOPIC COMMAND
 void	Server::topicCmd(std::vector<string>& cmd, int fd){
-	if (cmd.size() == 2)
-		topicDisplay(cmd[1], fd);
-	if (cmd.size() > 2)
-		topicSetter(cmd, fd);
+	if (getClient(fd)->getState() == REGISTERED) {
+		if (cmd.size() == 2)
+			topicDisplay(cmd[1], fd);
+		else if (cmd.size() > 2)
+			topicSetter(cmd, fd);
+		else
+			sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "TOPIC"), fd);
+	} else
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 }
 
 // KICK COMMAND
@@ -467,20 +472,6 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd){
 	(void)fd;
 	}*/
 
-// WHOIS COMMAND
-void	Server::whoisCmd(std::vector<string>& cmd, int fd){
-	std::cout << "WHOIS cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-}
-
-// ADMIN COMMAND
-void	Server::adminCmd(std::vector<string>& cmd, int fd){
-	std::cout << "ADMIN cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-}
-
 // INFO COMMAND
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
@@ -505,13 +496,6 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
 	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
-}
-
-// PONG COMMAND
-void	Server::pongCmd(std::vector<string>& cmd, int fd){
-	std::cout << "PONG cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
 }
 
 // PING COMMAND
