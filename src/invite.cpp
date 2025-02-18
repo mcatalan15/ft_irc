@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/Channel.hpp"
+#include "../include/Irc.hpp"
 
 /*
 RPL_INVITING (341)
