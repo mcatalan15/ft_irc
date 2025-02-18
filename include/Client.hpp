@@ -3,7 +3,6 @@
 
 #include "Irc.hpp"
 #include "Channel.hpp"
-#include <string>
 //#include "MessageHandler.hpp"
 
 // Definition of possible client state
@@ -46,7 +45,7 @@ class Client
 		~Client();
 		Client(const Client &src);
 		Client &operator=(const Client &src);
-		
+
 		//void			newClient(int &numfd);
 		//GETTERS
 		struct sockaddr_in6	getAddr(); // PARA QUE LO NECESITAMOS ?
@@ -62,7 +61,7 @@ class Client
 		State			getState() const;
 		const std::vector<string> &getChannels() const;
 		bool			clientMaxChannel() const;
-		
+
 		//SETTERS
 		void setNickname(const string& nickname);
 		void setUsername(const string& username);
