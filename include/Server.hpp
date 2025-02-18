@@ -45,7 +45,7 @@ class Server {
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
 		void			sendMsgToChannel(string message, Channel* channel, int fd);
-		void			sendMsgToClients(string message, string channelname, int fd);
+		void			sendMsgToClients(string message, std::vector<string> channelnames, int fd);
 		
 		//Channel Management
 		Channel*		channelsMng(string& channelName);
@@ -57,7 +57,7 @@ class Server {
 		void			joinMsg(Channel *channel, int fd);
 		void			removeChannel(string channelname);
 		bool			alreadyJoined(Channel* channel, string user);
-		
+
 		//Topic
 		bool			isOnChan(string& cmd, int fd);
 		void			topicDisplay(string& cmd, int fd);
@@ -72,7 +72,7 @@ class Server {
 		Channel*		getChannel(string channelName);
 
 		std::vector<Client> &getClients();
-		
+
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
@@ -84,21 +84,22 @@ class Server {
 		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd);
 		void			flagModeI(bool flag, Channel *channel);
 		void			flagModeT(bool flag, Channel *channel);
-		void			flagModeO(bool flag, Channel* channel, string cmd);
+		void			flagModeO(bool flag, Channel* channel, string cmd, int fd);
 		void			flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd);
 		void			flagModeL(bool flag, Channel* channel, string cmd);
 		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
 		bool 			isNumber(string cmd);
-		
+		void            sendModeMsg(Channel *channel, string s1, string target, int fd);
+
 		//INVITE
 		void			invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag);
-		void			userOnChannel(Channel* channel, std::vector<string> nickName, string command, int fd);
+		bool			userOnChannel(Channel* channel, std::vector<string> nickName, int fd);
 		bool			nicknameExist(std::vector<string> nickName, int fd);
 		bool			findNicknameOnServer(string nickName, int fd);
 		std::vector<string>	divisor(string cmd, bool flag);
-		bool			isPositif(string cmd);
 		bool			isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd);
-		
+		void            sendInvitationMsg(Channel *channel, string nickName, int fd);
+
 		//isUsed commands
 		bool		nickIsUsed(string cmd);
 		bool		userIsUsed(string cmd);

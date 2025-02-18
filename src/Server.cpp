@@ -382,16 +382,24 @@ Client*	Server::findNickname(string nick, Channel* channel)
 	return NULL;
 }
 
-void	Server::sendMsgToClients(string message, string channelname, int fd)
+void	Server::sendMsgToClients(string message, std::vector<string> channelnames, int fd)
 {
 	Client*								client = getClient(fd);
 	std::vector<string>::const_iterator	it;
 
 	for (size_t i = 0; i < _clients.size(); i++) {
-		//std::cout << "entra en for\n";
-		it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelname);
+		std::cout << "entra en for 1  " << std::endl;
+		for (size_t j = 0; j < channelnames.size(); j++)
+		{
+			it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelnames[j]);
+		//std::cout << "entra en for :  " << *it << std::endl;
+		std::cout << "entra en for 2  " << std::endl;
 
-		if (it != _clients[i].getChannels().end() && _clients[i].getNickname() != client->getNickname())
-			sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
+			if (it != _clients[i].getChannels().end() && _clients[i].getNickname() != client->getNickname())
+			{
+				sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
+				break ;
+			}
+		}
 	}
 }
