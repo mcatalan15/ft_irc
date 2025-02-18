@@ -2,14 +2,14 @@
 
 #include <stdexcept>
 #include <algorithm>
-#include <string>
 
 const std::vector<string> &Channel::getClients() const
 {
 	return (_clients);
 }
 
-void Channel::addClient(string clientname) {
+void Channel::addClient(string clientname)
+{
 	if (isFull())
 		std::cerr << "Channel is full" << std::endl;
 	else
@@ -43,7 +43,7 @@ Client*	Channel::findNickname(string nick)
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (_clients[i]->getNickname() == nick)
-			return _clients[i];	
+			return _clients[i];
 	}
 	return NULL;
 	}*/

@@ -23,9 +23,9 @@
 #include <sys/socket.h>// -> socket(), bind(), listen(), accept(), connect()
 #include <netinet/in.h>// -> sockaddr_in()
 #include <errno.h>		// -> errno
-#include <unistd.h>	
+#include <unistd.h>
 #include <sstream>
-#include <fcntl.h>		// -> fcntl()		
+#include <fcntl.h>		// -> fcntl()
 #include <ctime>
 #include <string>
 #include <arpa/inet.h> // -> inet_ntoa()
@@ -77,10 +77,11 @@ std::vector<string>	splitCommand(string &cmd);
 std::vector<string>	splitUserCmd(string &cmd);
 void				printVecStr(std::vector<string> cmd);
 string				addHostname();
-void				sendMsg(string msg, int fd); 
+void				sendMsg(string msg, int fd);
 bool				nickChecker(string cmd);
 string				getCurrentDataTime();
 std::vector<string>	joinDivisor(string cmd);
+bool validChannel(string& channelName, int fd);
 
 // Defines
 #define NICK_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-"
@@ -99,7 +100,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
-#define ERR_UNKNOWNCOMMAND(nick, cmd) ("Unknown command: " + (nick) + " -> " + (cmd) + CRLF)
+#define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421 " + nick + " " + cmd + " :Unknown command" + CRLF)
 
 //WELCOME msg (RPL_WELCOME)
 #define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
@@ -132,17 +133,17 @@ std::vector<string>	joinDivisor(string cmd);
 
 // JOIN CMD RPL
 #define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
-#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + " " + (msg) + CRLF)
+#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + (msg) + CRLF)
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
 #define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 #define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 #define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
 #define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
-#define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + ":Cannot join channel (+k)" + CRLF)
-#define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474 " (client) + " " + (channel) + ":Cannot join channel (+b)"+ CRLF)
+#define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + " :Cannot join channel (+k)" + CRLF)
+#define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474 " + (client) + " " + (channel) + " :Cannot join channel (+b)"+ CRLF)
 #define	ERR_CHANNELISFULL(client, channel)(":localhost 471 " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
 #define ERR_INVITEONLYCHAN(client, channel)(":localhost 473 " +(client) + " " + (channel) + " :Cannot join channel (+i)" + CRLF)
-#define ERR_BADCHANMASK(channel)(":localhost  " + (channel) + " :Bad Channel Mask" + CRLF)
+#define ERR_BADCHANMASK(channel)(":localhost 476 " + (channel) + " :Bad Channel Mask" + CRLF)
 #define RPL_ENDOFNAMES(client, channel) (":localhost 366 " + (client) + " " + (channel) + " :End of /NAMES list" + CRLF)
 
 // MODE MD
@@ -154,6 +155,7 @@ std::vector<string>	joinDivisor(string cmd);
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
 #define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
 #define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
+#define MODE_MESSAGE(nick, user, channel, message, target)(":" + (nick) + "!" + (user) + "@localhost MODE " + (channel) +  " " + (message) + " " + (target) +CRLF)
 
 // PART cmd
 #define  ERR_NOTONCHANNEL(client, channel)(":localhost 442 " + (client) + " " + (channel) + " :You're not on that channel" + CRLF)
@@ -167,12 +169,19 @@ std::vector<string>	joinDivisor(string cmd);
 //PRIVMSG cmd
 #define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
 
-#define ERR_USERONCHANNEL(client, nick, channel)(":local host 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+// INVITE cmd
+#define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
+#define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
+#define RPL_INVITING(client, nick, channel)(":localhost 341 " + (client) + " " + (nick) + " " + (channel) + CRLF)
+#define INVITE_MESSAGE(nick, user, client, channel)(":" + (nick) + "!" + (user) + "@localhost INVITE " + (client) + " " + (channel) + CRLF)
+
 // GENERAL ERR
 #define ERR_NEEDMOREPARAMS(client, cmd)(":localhost 461 " + (client) + " " + (cmd) + " :Not enought parameters" + CRLF)
 #define ERR_ALREADYREGISTERED(nick)(":localhost 462 " + (nick) + " :You may not register" + CRLF)
+#define ERR_NOSUCHNICK(client, nick)(":localhost 401 " + (client) + " " + (nick) + " :No such nick" + CRLF)
 
-
+//TOPIC cmd
+#define RPL_NOTOPIC(client, channel)(":localhost 331: "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
 //:localhost 464 marc :Password incorrect
 //nickname
 //:localhost 433 marc mcs :Nickname is already in use

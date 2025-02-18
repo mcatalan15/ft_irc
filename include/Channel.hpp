@@ -3,16 +3,15 @@
 
 # include <string>
 # include <vector>
-# include <set>
 
 #include "Client.hpp"
 #include "Irc.hpp"
 
-/* 
+/*
 MODES
 +/- i -> invite only (default: off = -i)
 +/- t -> topic restricted (default: off = -t)
-+/- k -> password set (default: off = -k) if pass is set Change to +k  
++/- k -> password set (default: off = -k) if pass is set Change to +k
 +/- l -> user limit (default: off = -l)
 */
 enum Mode {
@@ -31,7 +30,9 @@ class Channel {
 		~Channel();
 
 		/*------------ CHANNEL INFO ---------------*/
-		const string getName() const;
+		const string 	getName() const;
+		const string	getTopic() const;
+		void			setTopic(const string& topic);
 
 		// Password management
 		string getPassword() const;
@@ -52,7 +53,7 @@ class Channel {
 		void removeOperator(string clientname);
 		bool isOperator(string clientname) const;
 		void	setMode(Mode mode);
-		void	unsetMode(Mode mode);
+		void	unsetMode(Mode modev);
 		bool	isModeSet(Mode mode);
 
 
@@ -82,7 +83,7 @@ class Channel {
 			size_t					_userLimit;			// max num of clients in the channel
 			std::vector<string>		_operators;			// set of operators in the channel
 			std::vector<string>		_invitedClients;	// set of clients invited to the channel
-			std::vector<string>		_bannedClients;		// set of clients banned 
+			std::vector<string>		_bannedClients;		// set of clients banned
 			string					_password;			// password required to join the channel
 			unsigned int			_modes;
 			string					_creationTime;
