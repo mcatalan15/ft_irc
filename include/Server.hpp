@@ -78,19 +78,22 @@ class Server {
 		string			getCreationTime() { return _creationTime; };
 
 		//MODE
-		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
+		void			modeManagement(Channel* channel, std::vector<string>& cmd, std::vector<string>& modeChar, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
-		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
-		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd);
-		void			flagModeI(bool flag, Channel *channel);
-		void			flagModeT(bool flag, Channel *channel);
+		bool			checkModeFlags(std::vector<string>& modeChar, int fd);
+		bool			isFlagMode(std::vector<string>& modeChar, int num, int fd);
+		void			flagModeI(bool flag, Channel *channel, int fd);
+		void			flagModeT(bool flag, Channel *channel, int fd);
 		void			flagModeO(bool flag, Channel* channel, string cmd, int fd);
-		void			flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd);
-		void			flagModeL(bool flag, Channel* channel, string cmd);
+		void			flagModeK(bool flag, Channel* channel, string cmd, int fd);
+		void			flagModeL(bool flag, Channel* channel, string cmd, int fd);
 		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
 		bool 			isNumber(string cmd);
-		void            sendModeMsg(Channel *channel, string s1, string target, int fd);
-
+		//void            sendModeMsg(Channel *channel, string s1, string target, int fd);
+		void			sendModeGeneralMsg(Channel *channel, string param, string target, int fd);
+		void			modeTypeD(Channel *channel, char modeChar, bool flag, int fd);
+		void			modeTypeC(Channel *channel, char modeChar, string param, bool flag, int fd);
+		
 		//INVITE
 		void			invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag);
 		bool			userOnChannel(Channel* channel, std::vector<string> nickName, int fd);

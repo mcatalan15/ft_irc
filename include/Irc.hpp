@@ -88,6 +88,7 @@ bool validChannel(string& channelName, int fd);
 #define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
 #define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
 #define MAX_CLIENTS 25
+#define MAX_CLIENTS_STR "25"
 #define MAX_CONNECTIONS 5
 #define MAX_CHANNELS 5
 #define CRLF "\r\n"
