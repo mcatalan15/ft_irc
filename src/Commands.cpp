@@ -105,11 +105,11 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	if (cmd.size() < 2)
 		cmd.push_back("");
 	message = "QUIT " + cmd[1];
-	//std::cout << "sale de quit\n"; 
+	//std::cout << "sale de quit\n";
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		Channel*	channel = findChannel(channelsVec[i]);
-		
+
 		if (channel->hasClient(client->getUsername()))
 			channel->removeClient(client->getUsername());
 		if (channel->isOperator(client->getUsername()))
@@ -142,14 +142,15 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 // MODE COMMAND ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
-	if (cmd.size() < 2)
+	printVecStr(cmd);
+    if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "MODE"), fd));
-	
+
 	Channel*	channel = findChannel(cmd[1]);
-	
+
 	if (!isModeCmdValid(channel, cmd, fd))
 		return ;
-	std::vector<string> modeChar = divisor(cmd[2], 1);
+	std::vector<string> modeChar = divisor(cmd[2], false);
 	if (!checkModeFlags(modeChar, fd))
 		return ;
 	if (!validFlags(channel, modeChar, fd))
@@ -202,7 +203,7 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
-	
+
 	channelsVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -273,7 +274,7 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 // PRIVMSG COMMAND
 void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	std::cout << "PRIVMSG cmd" << std::endl;
-	
+
 	Client*		client = getClient(fd);
 	Channel*	channel = NULL;
 	Client*		user = NULL;
@@ -297,7 +298,7 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 			return (sendMsg(ERR_NOSUCHCHANNELORCLIENT(client->getNickname(), destinationVec[i]), fd));
 	}
 }
-/* 
+/*
 // INVITE COMMAND
 void	Server::inviteCmd(std::vector<string>& cmd, int fd){
 	std::cout << "INVITE cmd" << std::endl;

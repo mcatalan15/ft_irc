@@ -46,7 +46,7 @@ class Server {
 		bool			msgEnded(int fd);
 		void			sendMsgToChannel(string message, Channel* channel, int fd);
 		void			sendMsgToClients(string message, std::vector<string> channelnames, int fd);
-		
+
 		//Channel Management
 		Channel*		channelsMng(string& channelName);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
@@ -93,7 +93,7 @@ class Server {
 		void			sendModeGeneralMsg(Channel *channel, string param, string target, int fd);
 		void			modeTypeD(Channel *channel, char modeChar, bool flag, int fd);
 		void			modeTypeC(Channel *channel, char modeChar, string param, bool flag, int fd);
-		
+
 		//INVITE
 		void			invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag);
 		bool			userOnChannel(Channel* channel, std::vector<string> nickName, int fd);
