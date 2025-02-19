@@ -284,11 +284,12 @@ void	Server::msgManagement( int fd) {
 	std::cout << "msgManagement <" << command << ">" << std::endl;
 	if (command.empty())
 		return ;
-	
 	std::vector<string> cmd = splitMsg(command);
+	if (cmd.empty())
+		return ;
 	// Use getCommandInUpper to extract and normalize the command
 	string upperCmd = getCommandInUpper(cmd[0]); //toupper
-	
+
 	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
 	if (it != cmdMap.end()) // Execute the command
 		(this->*(it->second))(cmd, fd);
