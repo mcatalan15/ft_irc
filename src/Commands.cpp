@@ -107,7 +107,6 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	else
 		cmd[1] = ":" + cmd[1];
 	message = "QUIT " + cmd[1];
-	//std::cout << "sale de quit\n"; 
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
 		Channel*	channel = findChannel(channelsVec[i]);
@@ -122,14 +121,21 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		else if (!channel->getOperators().size())
 			channel->addOperator(channel->getClients()[0]);
 	}
+	std::cout << "channels num: " << _channels.size() << std::endl; 
 	sendMsgToClients(message, channelsVec, fd);
 	channelsVec.clear();
+	std::cout << "client name: " << _clients[1].getUsername() << std::endl; 
+	for (size_t i = 0; i < _clients[1].getChannels().size(); i++)
+		std::cout << "channel[" << i << "]: " << _clients[1].getChannels()[i] << std::endl;
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd) {
 			_clients.erase(it);
 			break;
 		}
 	}
+	std::cout << "client name: " << _clients[0].getUsername() << std::endl; 
+	for (size_t i = 0; i < _clients[0].getChannels().size(); i++)
+		std::cout << "channel[" << i << "]: " << _clients[0].getChannels()[i] << std::endl;
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
 		if (it->fd == fd) {
 			_pollFds.erase(it);
@@ -281,7 +287,8 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 					sendMsg("no enviaste contrasenya bro", fd);
 					//channel->setPassword("");
 					//}
-				j++;
+				j++;e day -
+:localhost 372 l : ______  _______    ___
 			}
 			else
 				channel->unsetMode(PASSWORD_SET);
@@ -353,7 +360,10 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 					sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
 			}
 		}
-	}
+	}	
+	for (size_t i = 0; i < getClient(fd)->getChannels().size(); i++)
+		std::cout << "channel[" << i << "]: " << getClient(fd)->getChannels()[i] << std::endl;
+
 }
 
 // PART COMMAND

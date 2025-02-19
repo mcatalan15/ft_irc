@@ -17,7 +17,15 @@ Client::Client(int client_fd) :_fd(client_fd), _state(HANDSHAKE) {
 Client::~Client() {}
 
 // Copy constructor
-Client::Client(Client const &src) { *this = src; }
+Client::Client(Client const &src) 
+{	
+		_fd = src._fd;
+		_nickname = src._nickname;
+		_username = src._username;
+		_realname = src._realname;
+		_hostname = src._hostname;
+		_state = src._state;
+}
 
 // Assignment operator overload "="
 Client &Client::operator=(Client const &src) {
