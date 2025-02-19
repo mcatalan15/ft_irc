@@ -107,8 +107,20 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	else
 		cmd[1] = ":" + cmd[1];
 	message = "QUIT " + cmd[1];
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		std::cout << _clients[i].getNickname() << ": \n";
+		for (size_t j = 0; j < _clients[i].getChannels().size(); j++)
+		{
+			if (!_clients[i].getChannels().empty())
+				std::cout << _clients[i].getChannels()[j] << std::endl;
+		}
+	}
+	// std::cout << "client channels: " << channelsVec.size() << std::endl;
+	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
+		std::cout << "entra XD" << std::endl;
 		Channel*	channel = findChannel(channelsVec[i]);
 		
 		if (channel->hasClient(client->getUsername()))
@@ -121,24 +133,19 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		else if (!channel->getOperators().size())
 			channel->addOperator(channel->getClients()[0]);
 	}
-	std::cout << "channels num: " << _channels.size() << std::endl; 
-	sendMsgToClients(message, channelsVec, fd);
+	// std::cout << "channels num: " << _channels.size() << std::endl; 
+	
 	channelsVec.clear();
-	std::cout << "client name: " << _clients[1].getUsername() << std::endl; 
-	for (size_t i = 0; i < _clients[1].getChannels().size(); i++)
-		std::cout << "channel[" << i << "]: " << _clients[1].getChannels()[i] << std::endl;
+	// std::cout << "client name: " << _clients[1].getUsername() << std::endl; 
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd) {
-			_clients.erase(it);
+			it = _clients.erase(it);
 			break;
 		}
 	}
-	std::cout << "client name: " << _clients[0].getUsername() << std::endl; 
-	for (size_t i = 0; i < _clients[0].getChannels().size(); i++)
-		std::cout << "channel[" << i << "]: " << _clients[0].getChannels()[i] << std::endl;
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
 		if (it->fd == fd) {
-			_pollFds.erase(it);
+			it = _pollFds.erase(it);
 			break;
 		}
 	}

@@ -19,12 +19,7 @@ Client::~Client() {}
 // Copy constructor
 Client::Client(Client const &src) 
 {	
-		_fd = src._fd;
-		_nickname = src._nickname;
-		_username = src._username;
-		_realname = src._realname;
-		_hostname = src._hostname;
-		_state = src._state;
+		*this = src;
 }
 
 // Assignment operator overload "="
@@ -35,7 +30,11 @@ Client &Client::operator=(Client const &src) {
 		_username = src._username;
 		_realname = src._realname;
 		_hostname = src._hostname;
+		_msg =  src._msg;
 		_state = src._state;
+		_channels = src._channels;
+		address = src.address;
+		_registered = src._registered;
 	}
 	return (*this);
 }
