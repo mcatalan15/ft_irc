@@ -6,7 +6,7 @@
 /*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/02/12 13:10:45 by jpaul-kr         ###   ########.fr       */
+/*   Updated: 2025/02/18 12:45:54 by jpaul-kr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,9 +97,10 @@ bool validChannel(string& channelName, int fd);
 #define CHANNEL_MODES	"itkol" // y esto otro?
 #define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
 
-#define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
-#define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421: " + nick + " " + cmd + " :Unknown command" + CRLF)
-#define	ERR_NOTREGISTERED(hostname) (":localhost 451: " + (hostname) + " :You have not registered" + CRLF)
+#define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost:")
+#define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
+#define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
+#define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421 " + nick + " " + cmd + " :Unknown command" + CRLF)
 
 //WELCOME msg (RPL_WELCOME)
 #define RPL_WELCOME(nick, userId) (":localhost 001 " + (nick) + " :Welcome to the Internet Relay Chat Network, " + (userId) + CRLF)
@@ -110,9 +111,9 @@ bool validChannel(string& channelName, int fd);
 #define RPL_ISSUPPORT(client, supportedTokens) (":localhost 005 " + client + " " + supportedTokens + " :are supported by this server" + CRLF)
 
 //MOTD msg
-#define RPL_MOTDSTART(client, servername)(":localhost 375: " + client + " :- " + servername + " Messsage of the day -" + CRLF)
-#define RPL_MOTD(client, line)(":localhost 372: " + client + " :" + line + CRLF)
-#define RPL_ENDOFMOTD(client)(":localhost 376: " + client + " :End of /MOTD command." + CRLF)
+#define RPL_MOTDSTART(client, servername)(":localhost 375 " + client + " :- " + servername + " Message of the day -" + CRLF)
+#define RPL_MOTD(client, line)(":localhost 372 " + client + " :" + line + CRLF)
+#define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
 
 //INFO cmd
 #define RPL_INFO(client, string)(":localhost 371: " + (client) + " :" + (string) + CRLF)

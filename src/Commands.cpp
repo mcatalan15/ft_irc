@@ -102,9 +102,23 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	client->setMsg("");
 	if (cmd.size() < 2)
 		cmd.push_back("");
+	else
+		cmd[1] = ":" + cmd[1];
 	message = "QUIT " + cmd[1];
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		std::cout << _clients[i].getNickname() << ": \n";
+		for (size_t j = 0; j < _clients[i].getChannels().size(); j++)
+		{
+			if (!_clients[i].getChannels().empty())
+				std::cout << _clients[i].getChannels()[j] << std::endl;
+		}
+	}
+	// std::cout << "client channels: " << channelsVec.size() << std::endl;
+	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
+		std::cout << "entra XD" << std::endl;
 		Channel*	channel = findChannel(channelsVec[i]);
 		
 		if (channel->hasClient(client->getUsername()))
@@ -117,17 +131,19 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		else if (!channel->getOperators().size())
 			channel->addOperator(channel->getClients()[0]);
 	}
-	sendMsgToClients(message, channelsVec, fd);
+	// std::cout << "channels num: " << _channels.size() << std::endl; 
+	
 	channelsVec.clear();
+	// std::cout << "client name: " << _clients[1].getUsername() << std::endl; 
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd) {
-			_clients.erase(it);
+			it = _clients.erase(it);
 			break;
 		}
 	}
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
 		if (it->fd == fd) {
-			_pollFds.erase(it);
+			it = _pollFds.erase(it);
 			break;
 		}
 	}
@@ -276,7 +292,8 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, int fd)
 					sendMsg("no enviaste contrasenya bro", fd);
 					//channel->setPassword("");
 					//}
-				j++;
+				j++;e day -
+:localhost 372 l : ______  _______    ___
 			}
 			else
 				channel->unsetMode(PASSWORD_SET);
@@ -364,7 +381,7 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
-	
+	printVecStr(cmd);
 	channelsVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -375,6 +392,8 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (cmd.size() < 3)
 			cmd.push_back("");
+		else
+			cmd[2] = ":" + cmd[2];
 		message = "PART " + channelsVec[i] + " " + cmd[2];
 		sendMsgToChannel(message, channel, fd);
 		channel->removeClient(client->getUsername());
@@ -408,6 +427,7 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 	Channel*		channel;
 	std::vector<string>	clientsVec;
 
+	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"), fd));
 	channel = findChannel(cmd[1]);
@@ -419,6 +439,8 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), cmd[1]), fd));
 	if (cmd.size() < 4)
 		cmd.push_back("");
+	else
+		cmd[3] = ":" + cmd[3];
 	clientsVec = joinDivisor(cmd[2]);
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
@@ -447,14 +469,16 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	string		message;
 	std::vector<string>	destinationVec;
 
+	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"), fd));
+	//std::cout << cmd[2] << std::endl;
 	destinationVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < destinationVec.size(); i++)
 	{
 		channel = findChannel(destinationVec[i]);
 		user = getNick(destinationVec[i]);
-		message = "PRIVMSG " + destinationVec[i] + " " + cmd[2];
+		message = "PRIVMSG " + destinationVec[i] + " :" + cmd[2];
 
 		if (channel)
 			sendMsgToChannel(message, channel, fd);
