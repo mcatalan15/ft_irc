@@ -19,15 +19,17 @@ bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd
 	}
 	if (!channel->hasClient(getClient(fd)->getUsername()))
 	{
-	    sendMsg(ERR_NOTONCHANNEL(getClient(fd)->getUsername(), cmd[2]), fd);
+		sendMsg(ERR_NOTONCHANNEL(getClient(fd)->getUsername(), cmd[2]), fd);
 		return (false);
 	}
-    // Hay que verificar al mismo tiempo si es un canal solo por invitacion
-    // si es solo por invitacion verificar si es opé sino da igual
-	if (!channel->isOperator(getClient(fd)->getUsername()))
-	{
-	   sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getUsername(), cmd[2]), fd);
-		return (false);
+	// Hay que verificar al mismo tiempo si es un canal solo por invitacion
+	// si es solo por invitacion verificar si es opé sino da igual
+	if (channel->isModeSet(INVITE_ONLY)) {
+		if (!channel->isOperator(getClient(fd)->getUsername()))
+		{
+			sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getUsername(), cmd[2]), fd);
+			return (false);
+		}
 	}
 	return (true);
 }

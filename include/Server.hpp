@@ -4,6 +4,7 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include <cstddef>
 #include <string>
 
 class Client;
@@ -103,6 +104,10 @@ class Server {
 		//isUsed commands
 		bool		nickIsUsed(string cmd);
 		bool		userIsUsed(string cmd);
+		
+		//INFO cmd
+		size_t		getActiveClients(void);
+		size_t		getActiveChannels(void);
 
 		//Commands
 		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?
