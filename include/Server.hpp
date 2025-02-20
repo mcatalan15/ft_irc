@@ -78,16 +78,16 @@ class Server {
 		string			getCreationTime() { return _creationTime; };
 
 		//MODE
-		void			modeManagement(Channel* channel, std::vector<string>& cmd, std::vector<string>& modeChar, int fd);
+		void			modeManagement(Channel* channel, std::vector<string>& cmd, string modeChar, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
-		bool			checkModeFlags(std::vector<string>& modeChar, int fd);
-		bool			isFlagMode(std::vector<string>& modeChar, int num, int fd);
+		bool			checkModeFlags(string modeChar, int fd);
+		bool			isFlagMode(char modeChar, int num, int fd);
 		void			flagModeI(bool flag, Channel *channel, int fd);
 		void			flagModeT(bool flag, Channel *channel, int fd);
 		void			flagModeO(bool flag, Channel* channel, string cmd, int fd);
 		void			flagModeK(bool flag, Channel* channel, string cmd, int fd);
 		void			flagModeL(bool flag, Channel* channel, string cmd, int fd);
-		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
+		bool			validFlags(Channel* channel, string modeChar, int fd, bool sign);
 		bool 			isNumber(string cmd);
 		//void            sendModeMsg(Channel *channel, string s1, string target, int fd);
 		void			sendModeGeneralMsg(Channel *channel, string param, string target, int fd);

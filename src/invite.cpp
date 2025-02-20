@@ -121,7 +121,7 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 {
     std::cout << "INVITE cmd" << std::endl;
 	string command = cmd[0];
-
+	
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
 

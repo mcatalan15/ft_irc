@@ -142,7 +142,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 // MODE COMMAND ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
-	printVecStr(cmd);
+	//printVecStr(cmd);
     if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "MODE"), fd));
 
@@ -150,10 +150,12 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 
 	if (!isModeCmdValid(channel, cmd, fd))
 		return ;
-	std::vector<string> modeChar = divisor(cmd[2], false);
+	std::vector<string> vec = divisor(cmd[2], false);
+	string modeChar = vec[0];
 	if (!checkModeFlags(modeChar, fd))
 		return ;
-	if (!validFlags(channel, modeChar, fd))
+	bool sign = (cmd[2][0] != '+' ? false : true);
+	if (!validFlags(channel, modeChar, fd, sign))
 		return ;
 	modeManagement(channel, cmd, modeChar, fd);
 }

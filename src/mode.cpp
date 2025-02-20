@@ -16,20 +16,28 @@ void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, i
 	}
 	std::cout << msg << std::endl;
 	sendMsgToChannel(msg, channel, fd);
+	return ;
 }
 
-bool	Server::validFlags(Channel* channel, std::vector<string>& modeChar, int fd)
+bool	Server::validFlags(Channel* channel, string modeChar, int fd, bool sign)
 {
+	std::cout << "VALID FLAGS" << modeChar << std::endl;
 	std::vector<bool> charactersRepeat(128, false);
-	string str = "";
+	//string str = modeChar[0];
 
-	for (size_t i = 0; i < modeChar.size(); i++)
-		str.append(modeChar[i]);
-	for (std::string::iterator it = str.begin(); it != str.end(); it++)
+	//for (size_t i = 0; i < modeChar.size(); i++)
+	//	str.append(modeChar[i]);
+	string str = "";
+	if (sign == true)
+		str.append("+");
+	else
+		str.append("-");
+	for (std::string::iterator it = modeChar.begin(); it != modeChar.end(); it++)
 	{
 		char c = *it;
 		if (charactersRepeat[static_cast<unsigned char>(c)])
 		{
+			str.append(modeChar);
 			sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getNickname(), channel->getName(), str, c, " Mode Operator is repeat"), fd);
             return (false);
 		}
@@ -38,37 +46,48 @@ bool	Server::validFlags(Channel* channel, std::vector<string>& modeChar, int fd)
     return (true);
 }
 
-bool	Server::isFlagMode(std::vector<string>& modeChar, int num, int fd)
+bool	Server::isFlagMode(char modeChar, int num, int fd)
 {
-	if (num == 1)
-	{
-		for (size_t i = 0; i < modeChar.size(); i++)
-		{
-			if (modeChar[i].find_first_of(CHANNEL_MODES) == string::npos)
+	(void) num;
+	std::cout << "IS FLAG MODE" << std::endl;
+	std::cout << modeChar << std::endl;
+	string str = CHANNEL_MODES;
+	//printVecStr(modeChar);
+	//if (num == 1)
+	//{
+		//for (size_t i = 0; i < modeChar.size(); i++)
+		//{
+			if (str.find_first_of(modeChar) == string::npos)
 			{
 				sendMsg(ERR_UMODEUNKOWNFLAG(getClient(fd)->getUsername()), fd);
 				return (false);
 			}
-		}
-	}
-	if (num == 2)
-	{
-		for (size_t i = 0; i < modeChar.size(); i++)
-		{
-			if (modeChar[i].find_first_of(CHANNEL_MODES_WITH_PARAM) == string::npos)
-				return (false);
-		}
-	}
+			//}
+			//}
+	// if (num == 2)
+	// {
+	// 	for (size_t i = 0; i < modeChar.size(); i++)
+	// 	{
+	// 		if (modeChar.find_first_of(CHANNEL_MODES_WITH_PARAM) == string::npos)
+	// 			return (false);
+	// 	}
+	// }
 	return true;
 }
 
-bool	Server::checkModeFlags(std::vector<string>& modeChar, int fd)
+bool	Server::checkModeFlags(string modeChar, int fd)
 {
-	if (isFlagMode(modeChar, 2, fd))
+	std::cout << "CHECK MODE FLAG" << std::endl;
+	std::cout << modeChar << std::endl;
+	//printVecStr(modeChar);
+	for (size_t i = 0; i < modeChar.size(); i++)
 	{
-		if (isFlagMode(modeChar, 1, fd))
-			return (false);
-		return (true);
+		//if (!isFlagMode(modeChar, 2, fd))
+		//{
+			if (!isFlagMode(modeChar[i], 1, fd))
+				return (false);
+			
+				//}
 	}
 	return (true);
 }
@@ -101,7 +120,8 @@ bool Server::isNumber(string cmd)
 {
     for (size_t i = 1; i <= cmd.size(); i++)
 	{
-		if (cmd.find_first_of("0123456789") == string::npos)
+		if (!isdigit(cmd[i]))
+		//if (cmd.find_first_of("0123456789") == string::npos)
 			return (false);
 	}
 	return (true);
@@ -116,8 +136,12 @@ void	Server::flagModeL(bool flag, Channel* channel, string param, int fd)
 		ss >> num;
 		if (num > MAX_CLIENTS)
 		{
+			std::cout << "NUM ES " << num << "MAX_CLIENTS ES " << MAX_CLIENTS << std::endl;
 			num = MAX_CLIENTS;
 			sendModeGeneralMsg(channel, "+l", MAX_CLIENTS_STR, fd);
+			channel->setUserLimit(num);
+			channel->setMode(USER_LIMIT);
+			return ;
 		}
 		channel->setUserLimit(num);
 		channel->setMode(USER_LIMIT);
@@ -127,13 +151,14 @@ void	Server::flagModeL(bool flag, Channel* channel, string param, int fd)
 	{
 		channel->unsetMode(USER_LIMIT);
 		channel->setUserLimit(MAX_CLIENTS);
-		sendModeGeneralMsg(channel, "-l", NULL, fd);
+		sendModeGeneralMsg(channel, "-l", "", fd);
 	}
+	return ;
 }
 
 void	Server::flagModeK(bool flag, Channel* channel, string param, int fd)
 {
-    if (flag)
+	if (!flag)
 	{
 		if (channel->hasPassword())
 			return (sendMsg(ERR_KEYSET(channel->getName()), fd));
@@ -143,7 +168,7 @@ void	Server::flagModeK(bool flag, Channel* channel, string param, int fd)
 	}
 	else
 	{
-		channel->getPassword().clear();
+		channel->setPassword("");
 		channel->unsetMode(PASSWORD_SET);
 		sendModeGeneralMsg(channel, "-k", "NULL", fd);
 	}
@@ -154,14 +179,21 @@ void	Server::flagModeO(bool flag, Channel* channel, string target, int fd)
 {
 	if (!flag)
 	{
+		if (channel->isOperator(findNickname(target, channel)->getUsername()))
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", target, "Is allready an Operator"), fd)); ;
+			//hay que enviar un error
 		channel->addOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "+o", target, fd);
 	}
 	else
 	{
+		if (!channel->isOperator(findNickname(target, channel)->getUsername()))
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", target, "Is not an Operator"), fd)); ;
+			//hay que enviar un error
 		channel->removeOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "-o", target, fd);
 	}
+	return ;
 }
 
 void	Server::flagModeT(bool flag, Channel *channel, int fd)
@@ -176,6 +208,7 @@ void	Server::flagModeT(bool flag, Channel *channel, int fd)
 		channel->unsetMode(TOPIC_RESTRICTED);
 		sendModeGeneralMsg(channel, "-t", "NULL", fd);
 	}
+	return ;
 }
 
 void	Server::flagModeI(bool flag, Channel *channel, int fd)
@@ -184,16 +217,16 @@ void	Server::flagModeI(bool flag, Channel *channel, int fd)
 	{
 		channel->setMode(INVITE_ONLY);
 		sendModeGeneralMsg(channel, "+i", "NULL", fd);
-		sendMsg("ERRORR", fd);
 	}
 	else
 	{
 		channel->unsetMode(INVITE_ONLY);
 		sendModeGeneralMsg(channel, "-i", "NULL", fd);
 	}
+	return ;
 }
 
-void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vector<string>& modeChar, int fd)
+void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string modeChar, int fd)
 {
 	bool flag = (cmd[2][0] != '+' ? true : false);
 
@@ -201,16 +234,16 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vec
 	std::vector<string> param;
 	if (cmd.size() > 3)
 		param = divisor(cmd[3], true);
-	printVecStr(modeChar);
-	printVecStr(param);
+	//printVecStr(modeChar);
+	//printVecStr(param);
 	size_t j = 0;
 	for (size_t i = 0; i < modeChar.size(); i++)
 	{
-		if (modeChar[i][0] == 'i')
+		if (modeChar[i] == 'i')
 			flagModeI(flag, channel, fd);
-		if (modeChar[i][0] == 't')
+		if (modeChar[i] == 't')
 			flagModeT(flag, channel, fd);
-		if (modeChar[i][0] == 'o')
+		if (modeChar[i] == 'o')
 		{
 			if (param.size() > j)
 			{
@@ -221,7 +254,7 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vec
 					else
 						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
 				}
-				flagModeO(flag, channel, cmd[j], fd);
+				flagModeO(flag, channel, param[j], fd);
 				j++;
 			}
 			else
@@ -232,11 +265,11 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vec
 					return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getUsername(), "-o"), fd));
 			}
 		}
-		if (modeChar[i][0] == 'k')
+		if (modeChar[i] == 'k')
 		{
 			if (!flag)
 			{
-			    if (param.size() > j)
+				if (param.size() > j)
 				{
 					flagModeK(flag, channel, param[j], fd);
 					j++;
@@ -247,12 +280,13 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vec
 			else
 				flagModeK(flag, channel, "NULL", fd);
 		}
-		if (modeChar[i][0] == 'l')
+		if (modeChar[i] == 'l')
 		{
 			if (!flag)
 			{
 				if (param.size() > j)
 				{
+					std::cout << "mode L " << param[j] << std::endl;
 					if (isNumber(param[j]))
 						return (sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+l", param[j], "Invalid limit"), fd));
 					flagModeL(flag, channel, param[j], fd);
@@ -265,4 +299,5 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, std::vec
 				flagModeL(flag, channel, "NULL", fd);
 		}
 	}
+	return ;
 }
