@@ -119,27 +119,27 @@ bool validChannel(string& channelName, int fd);
 #define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
 
 //INFO cmd
-#define RPL_INFO(client, string)(":localhost 371: " + (client) + " :" + (string) + CRLF)
-#define RPL_ENDOFINFO(client)(":localhost 374: " + (client) + " :End of INFO list" + CRLF)
+#define RPL_INFO(client, string)(":localhost 371 " + (client) + " :" + (string) + CRLF)
+#define RPL_ENDOFINFO(client)(":localhost 374 " + (client) + " :End of INFO list" + CRLF)
 
 //PASS cmd
-#define ERR_PASSWDMISMATCH(client)(":localhost 464: " + (client) + " : Password incorrect" + CRLF)
+#define ERR_PASSWDMISMATCH(client)(":localhost 464 " + (client) + " : Password incorrect" + CRLF)
 
 //NICK cmd
-#define ERR_NONICKNAMEGIVEN()(string(":localhost 431: * :No nickname given") + CRLF)
-#define ERR_ERRONEUSNICKNAME(nick)(":localhost 432: * " + (nick) + " :Erroneus nickname" + CRLF)
-#define ERR_NICKNAMEINUSE(nick)(":localhost 433: * " + (nick) + " :Nickname is already in use" + CRLF)
+#define ERR_NONICKNAMEGIVEN()(string(":localhost 431 * :No nickname given") + CRLF)
+#define ERR_ERRONEUSNICKNAME(nick)(":localhost 432 * " + (nick) + " :Erroneus nickname" + CRLF)
+#define ERR_NICKNAMEINUSE(nick)(":localhost 433 * " + (nick) + " :Nickname is already in use" + CRLF)
 
 //USER cmd
-#define ERR_ERRONEUSUSERNAME(user)(":localhost 432: * " + (user) + " :Erroneus nickname" + CRLF)
-#define ERR_USERNAMEINUSE(user)(":localhost 433: * " + (user) + " :Nickname is already in use" + CRLF)
+#define ERR_ERRONEUSUSERNAME(user)(":localhost 432 * " + (user) + " :Erroneus nickname" + CRLF)
+#define ERR_USERNAMEINUSE(user)(":localhost 433 * " + (user) + " :Nickname is already in use" + CRLF)
 
 // JOIN CMD RPL
 #define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
 #define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + (msg) + CRLF)
 #define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
 #define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
-//#define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403: " + (client) + " " + (channel) + " :No such channel" + CRLF)
+#define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403 " + (client) + " " + (channel) + " :No such channel" + CRLF)
 #define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
 #define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
 #define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + " :Cannot join channel (+k)" + CRLF)
@@ -152,7 +152,7 @@ bool validChannel(string& channelName, int fd);
 // MODE MD
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
 #define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329 " + (client) + " " + (channel) + " " + (ctime) + CRLF)
-//#define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482: " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
+#define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
 //#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
 #define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
@@ -184,7 +184,7 @@ bool validChannel(string& channelName, int fd);
 #define ERR_NOSUCHNICK(client, nick)(":localhost 401 " + (client) + " " + (nick) + " :No such nick" + CRLF)
 
 //TOPIC cmd
-#define RPL_NOTOPIC(client, channel)(":localhost 331: "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
+#define RPL_NOTOPIC(client, channel)(":localhost 331 "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
 //:localhost 464 marc :Password incorrect
 //nickname
 //:localhost 433 marc mcs :Nickname is already in use
