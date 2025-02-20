@@ -33,6 +33,8 @@
 #include <algorithm>
 #include <vector>		// -> vector
 #include <cstddef>		// -> size_t
+#include <cstdio>
+#include <cstring>
 
 
 using std::string;
@@ -133,28 +135,28 @@ bool validChannel(string& channelName, int fd);
 
 // JOIN CMD RPL
 #define RPL_CONNECT(nick, user, channel)(USER_ID(nick, user) + " JOIN :" + channel + CRLF)
-#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353: " + (nick) + " = " + (channel) + (msg) + CRLF)
-#define RPL_TOPIC(client, channel, topic)(":localhost 332: "+ (channel) + " :" + (topic) + CRLF)
-#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333: " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
+#define RPL_NAMREPLY(nick, channel, msg)(":localhost 353 " + (nick) + " = " + (channel) + (msg) + CRLF)
+#define RPL_TOPIC(client, channel, topic)(":localhost 332 "+ (channel) + " :" + (topic) + CRLF)
+#define RPL_TOPICWHOTIME(client, channel, nick, setat)(":localhost 333 " + (client) + " " + (channel) +" " + (nick) + " " + (setat) + CRLF)
 //#define ERR_NOSUCHCHANNEL(client, channel)(":localhost 403: " + (client) + " " + (channel) + " :No such channel" + CRLF)
-#define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405: " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
-#define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405: " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
-#define ERR_BADCHANNELKEY(client, channel)(":localhost 475: " + (client) +" " + (channel) + " :Cannot join channel (+k)" + CRLF)
-#define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474: " + (client) + " " + (channel) + " :Cannot join channel (+b)"+ CRLF)
-#define	ERR_CHANNELISFULL(client, channel)(":localhost 471: " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
-#define ERR_INVITEONLYCHAN(client, channel)(":localhost 473: " +(client) + " " + (channel) + " :Cannot join channel (+i)" + CRLF)
-#define ERR_BADCHANMASK(channel)(":localhost 476: " + (channel) + " :Bad Channel Mask" + CRLF)
-#define RPL_ENDOFNAMES(client, channel) (":localhost 366: " + (client) + " " + (channel) + " :End of /NAMES list" + CRLF)
+#define ERR_TOOMANYCHANNELS(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :You have joined too many channels" + CRLF)
+#define ERR_TOOMANYCHANNELSCREATED(client, channel)(":localhost 405 " + (client)+ " " + (channel) + " :too many channels have been created" + CRLF)
+#define ERR_BADCHANNELKEY(client, channel)(":localhost 475 " + (client) +" " + (channel) + " :Cannot join channel (+k)" + CRLF)
+#define ERR_BANNEDFROMCHAN(client, channel)(":localhost 474 " + (client) + " " + (channel) + " :Cannot join channel (+b)"+ CRLF)
+#define	ERR_CHANNELISFULL(client, channel)(":localhost 471 " + (client) + " " + (channel) + " :Cannot join channel (+l)" + CRLF)
+#define ERR_INVITEONLYCHAN(client, channel)(":localhost 473 " +(client) + " " + (channel) + " :Cannot join channel (+i)" + CRLF)
+#define ERR_BADCHANMASK(channel)(":localhost 476 " + (channel) + " :Bad Channel Mask" + CRLF)
+#define RPL_ENDOFNAMES(client, channel) (":localhost 366 " + (client) + " " + (channel) + " :End of /NAMES list" + CRLF)
 
 // MODE MD
-#define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324: " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
-#define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329: " + (client) + " " + (channel) + " " + (ctime) + CRLF)
+#define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
+#define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329 " + (client) + " " + (channel) + " " + (ctime) + CRLF)
 //#define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482: " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
 //#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
-#define ERR_UMODEUNKOWNFLAG(client)(":localhost 501: " + (client) + " :Unknown MODE flag" + CRLF)
-#define ERR_KEYSET(channel)(":localhost 467: " + (channel) + " :Channel key already set" + CRLF)
+#define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
+#define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
 #define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
-#define ERR_INVALIDKEY(client, channel)(":localhost 525: " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
+#define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
 #define MODE_MESSAGE(nick, user, channel, message, target)(":" + (nick) + "!" + (user) + "@localhost MODE " + (channel) +  " " + (message) + " " + (target) +CRLF)
 
 // PART cmd
@@ -188,6 +190,27 @@ bool validChannel(string& channelName, int fd);
 //user
 //USER * * :marc catalan sanchez
 //:localhost 461 marc USER :Not enough parameters
+
+//INFO CMD
+#define UP_LEFT "╔" 
+#define UP_RIGHT "╗"
+#define MIDDLE_LEFT "╠"
+#define MIDDLE_RIGHT "╣"
+#define DOWN_LEFT "╚"
+#define DOWN_RIGHT "╝"
+#define VERTICAL "═"
+#define HORIZONTAL "║"
+#define INFO "Welcome to FT_IRC Server"
+#define INFO2 "Powered by eferre-m jpaul-kr mcatalan"
+#define UP_INFO "Up Time:"
+#define USERS_INFO ""
+#define CHANNELS_INFO ""
+#define RULES_INFO "Rules:"
+#define RULES_INFO1 "1. Be respectful."
+#define RULES_INFO2 "2. No spam or flooding."
+#define RULES_INFO3 "3. No excessive trolling."
+#define RULES_INFO4 "4. Follow mcatalan15 on GitHub."
+
 
 
 #endif

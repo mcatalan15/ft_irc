@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -496,17 +497,84 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd){
 	(void)fd;
 	}*/
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // INFO COMMAND
+string getUpTime(const std::string &creationTime) {
+    struct tm creationTm;
+    memset(&creationTm, 0, sizeof(creationTm)); // Properly zero-initialize
+
+    time_t now = time(0);
+
+    // Parse the input string "YYYY-MM-DD HH:MM:SS"
+    if (sscanf(creationTime.c_str(), "%d-%d-%d %d:%d:%d",
+               &creationTm.tm_year, &creationTm.tm_mon, &creationTm.tm_mday,
+               &creationTm.tm_hour, &creationTm.tm_min, &creationTm.tm_sec) != 6) {
+        return "Invalid Time Format";
+    }
+
+    // Adjust fields to match tm structure
+    creationTm.tm_year -= 1900;
+    creationTm.tm_mon -= 1;
+
+    // Convert to time_t
+    time_t creationTimeT = mktime(&creationTm);
+    if (creationTimeT == -1) {
+        return "Invalid Time";
+    }
+
+    // Calculate the difference in seconds
+    time_t uptime = now - creationTimeT;
+    if (uptime < 0) {
+        return "Future Time Error";
+    }
+
+    // Convert uptime into days, hours, minutes, and seconds
+    int days = uptime / 86400;
+    int hours = (uptime % 86400) / 3600;
+    int minutes = (uptime % 3600) / 60;
+    int seconds = uptime % 60;
+
+    // Format the uptime string
+    std::ostringstream uptimeStr;
+    uptimeStr << days << " days, "
+              << (hours < 10 ? "0" : "") << hours << " hours, "
+              << (minutes < 10 ? "0" : "") << minutes << " minuts, "
+              << (seconds < 10 ? "0" : "") << seconds << " seconds";
+
+    return uptimeStr.str();
+}
+// Usage:
+// std::string uptime = getUptime(_creationTime);
+
+size_t		Server::getActiveClients(void) {
+	size_t i = 0;
+	while (i < _clients.size())
+		i++;
+	return i;
+}
+
+size_t		Server::getActiveChannels(void) {
+	size_t i = 0;
+	while (i < _channels.size())
+		i++;
+	return i;
+}
+
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
-
+	string upTime = getUpTime(_creationTime);
+	std::cout << upTime <<std::endl;
+	std::cout << "Creation time" << _creationTime << std::endl;
+	size_t	activeClients = getActiveClients();
+	std::cout << "Online Users" << activeClients << std::endl;
+	size_t	activeChannels = getActiveChannels();
+	std::cout << "Online Channels" << activeChannels << std::endl;
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Admin: AdminNick  (admin@example.com)  ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Uptime: 12 days, 4 hours, 32 minutes    ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Up Time: " + upTime + "  ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Users Online: 128                       ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Channels: 45                            ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
