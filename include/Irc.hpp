@@ -90,6 +90,7 @@ bool validChannel(string& channelName, int fd);
 #define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
 #define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
 #define MAX_CLIENTS 25
+#define MAX_CLIENTS_STR "25"
 #define MAX_CONNECTIONS 5
 #define MAX_CHANNELS 5
 #define CRLF "\r\n"
@@ -155,7 +156,7 @@ bool validChannel(string& channelName, int fd);
 //#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
 #define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
-#define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
+#define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(":localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
 #define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
 #define MODE_MESSAGE(nick, user, channel, message, target)(":" + (nick) + "!" + (user) + "@localhost MODE " + (channel) +  " " + (message) + " " + (target) +CRLF)
 

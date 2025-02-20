@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include "../include/Channel.hpp"
+#include "../include/Irc.hpp"
 
 /*
 RPL_INVITING (341)
@@ -37,11 +38,12 @@ bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd
 std::vector<string>	Server::divisor(string cmd, bool flag)
 {
 	size_t	i;
-	size_t	init = 0;
+	size_t	init;
 	std::vector<string>	vec;
 	int		num_ch = 0;
 
 	flag ? i = 0 : i = 1;
+	init = i;
 	while (i < cmd.size())
 	{
 		if (cmd[i] == ',')
@@ -121,7 +123,7 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 {
     std::cout << "INVITE cmd" << std::endl;
 	string command = cmd[0];
-
+	
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
 
