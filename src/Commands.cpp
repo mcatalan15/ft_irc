@@ -1,5 +1,6 @@
 #include "../include/Server.hpp"
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +9,6 @@
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
 	if (cmd[1] == "LS")
 		sendMsg("CAP * LS :0\r\n", fd);
-	//std::cout << "message send" << std::endl;
 	(void)cmd;
 }
 
@@ -49,9 +49,9 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_NONICKNAMEGIVEN(), fd));
 	if (client->getState() == NICK || client->getState() == REGISTERED) {
 		if (!nickChecker(cmd[1]))
-			sendMsg(ERR_ERRONEUSNICKNAME(cmd[1]), fd); // cambiar al error q toca
+			sendMsg(ERR_ERRONEUSNICKNAME(cmd[1]), fd);
 		else if (!nickIsUsed(cmd[1]))
-			sendMsg(ERR_NICKNAMEINUSE(cmd[1]), fd); // cambiar al error q toca
+			sendMsg(ERR_NICKNAMEINUSE(cmd[1]), fd);
 		else {
 				client->setState(LOGIN);
 				client->setNickname(cmd[1]);
@@ -73,7 +73,6 @@ bool	Server::userIsUsed(string cmd) {
 void	Server::userCmd(std::vector<string>& cmd, int fd){
 	Client*	client = getClient(fd);
 
-	//printVecStr(cmd);
 	if (cmd.size() < 2 || cmd[1].empty())
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), cmd[1]), fd));
 	if (client->getState() == LOGIN && cmd.size() == 5) {
@@ -89,7 +88,7 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 		}
 	}
 	else
-		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
+		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd); //???
 	return ;
 }
 
@@ -104,10 +103,23 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 	client->setMsg("");
 	if (cmd.size() < 2)
 		cmd.push_back("");
+	else
+		cmd[1] = ":" + cmd[1];
 	message = "QUIT " + cmd[1];
-	//std::cout << "sale de quit\n";
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		std::cout << _clients[i].getNickname() << ": \n";
+		for (size_t j = 0; j < _clients[i].getChannels().size(); j++)
+		{
+			if (!_clients[i].getChannels().empty())
+				std::cout << _clients[i].getChannels()[j] << std::endl;
+		}
+	}
+	// std::cout << "client channels: " << channelsVec.size() << std::endl;
+	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
+		std::cout << "entra XD" << std::endl;
 		Channel*	channel = findChannel(channelsVec[i]);
 
 		if (channel->hasClient(client->getUsername()))
@@ -120,17 +132,19 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		else if (!channel->getOperators().size())
 			channel->addOperator(channel->getClients()[0]);
 	}
-	sendMsgToClients(message, channelsVec, fd);
+	// std::cout << "channels num: " << _channels.size() << std::endl; 
+	
 	channelsVec.clear();
+	// std::cout << "client name: " << _clients[1].getUsername() << std::endl; 
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->getFd() == fd) {
-			_clients.erase(it);
+			it = _clients.erase(it);
 			break;
 		}
 	}
 	for (std::vector<pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); it++) {
 		if (it->fd == fd) {
-			_pollFds.erase(it);
+			it = _pollFds.erase(it);
 			break;
 		}
 	}
@@ -162,37 +176,40 @@ void	Server::modeCmd(std::vector<string>& cmd, int fd)
 
 // JOIN COMMAND
 void	Server::joinCmd(std::vector<string>& cmd, int fd) {
-	if (cmd.size() < 2)
-		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
-
-	std::vector<string> channelName = joinDivisor(cmd[1]);
-	printVecStr(channelName);
-
-	std::vector<string> channelPass;
-	int pass = 0;
-	if (cmd.size() > 2) {
-		channelPass = joinDivisor(cmd[2]);
-		printVecStr(channelPass);
-		pass = channelPass.size();
-	}
-	// Check if channel exist
-	Channel* found = NULL;
-	int flag = 0;
-	for (size_t i = 0; i < channelName.size(); i++) {
-		if (validChannel(channelName[i], fd)) {
-			found = channelsMng(channelName[i]);
-			if (!found)
-				createNewChannel(channelName[i], channelPass[i], pass, i, fd);
-			else {
-				if (!alreadyJoined(found, getClient(fd)->getUsername())) {
-					if (channelPass.empty())
-						flag = 1;
-					existingChannel(found, channelPass[i], channelName[i], fd, flag);
-				} else
-					sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
+	if (getClient(fd)->getState() == REGISTERED) {
+		if (cmd.size() < 2)
+			return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
+	
+		std::vector<string> channelName = joinDivisor(cmd[1]);
+		printVecStr(channelName);
+	
+		std::vector<string> channelPass;
+		int pass = 0;
+		if (cmd.size() > 2) {
+			channelPass = joinDivisor(cmd[2]);
+			printVecStr(channelPass);
+			pass = channelPass.size();
+		}
+		// Check if channel exist
+		Channel* found = NULL;
+		int flag = 0;
+		for (size_t i = 0; i < channelName.size(); i++) {
+			if (validChannel(channelName[i], fd)) {
+				found = channelsMng(channelName[i]);
+				if (!found)
+					createNewChannel(channelName[i], channelPass[i], pass, i, fd);
+				else {
+					if (!alreadyJoined(found, getClient(fd)->getUsername())) {
+						if (channelPass.empty())
+							flag = 1;
+						existingChannel(found, channelPass[i], channelName[i], fd, flag);
+					} else
+						sendMsg(ERR_USERONCHANNEL(getClient(fd)->getNickname(), getClient(fd)->getNickname(), channelName[i]), fd);
+				}
 			}
 		}
-	}
+	} else
+	sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 }
 
 // PART COMMAND
@@ -205,7 +222,7 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
-
+	printVecStr(cmd);
 	channelsVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -216,6 +233,8 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 			return (sendMsg(ERR_NOTONCHANNEL(client->getNickname(), channelsVec[i]), fd));
 		if (cmd.size() < 3)
 			cmd.push_back("");
+		else
+			cmd[2] = ":" + cmd[2];
 		message = "PART " + channelsVec[i] + " " + cmd[2];
 		sendMsgToChannel(message, channel, fd);
 		channel->removeClient(client->getUsername());
@@ -230,10 +249,15 @@ void	Server::partCmd(std::vector<string>& cmd, int fd){
 
 //TOPIC COMMAND
 void	Server::topicCmd(std::vector<string>& cmd, int fd){
-	if (cmd.size() == 2)
-		topicDisplay(cmd[1], fd);
-	if (cmd.size() > 2)
-		topicSetter(cmd, fd);
+	if (getClient(fd)->getState() == REGISTERED) {
+		if (cmd.size() == 2)
+			topicDisplay(cmd[1], fd);
+		else if (cmd.size() > 2)
+			topicSetter(cmd, fd);
+		else
+			sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "TOPIC"), fd);
+	} else
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 }
 
 // KICK COMMAND
@@ -244,6 +268,7 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 	Channel*		channel;
 	std::vector<string>	clientsVec;
 
+	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"), fd));
 	channel = findChannel(cmd[1]);
@@ -255,6 +280,8 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd){
 		return (sendMsg(ERR_CHANOPRIVSNEEDED(client->getNickname(), cmd[1]), fd));
 	if (cmd.size() < 4)
 		cmd.push_back("");
+	else
+		cmd[3] = ":" + cmd[3];
 	clientsVec = joinDivisor(cmd[2]);
 	for (size_t i = 0; i < clientsVec.size(); i++)
 	{
@@ -283,14 +310,16 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	string		message;
 	std::vector<string>	destinationVec;
 
+	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"), fd));
+	//std::cout << cmd[2] << std::endl;
 	destinationVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < destinationVec.size(); i++)
 	{
 		channel = findChannel(destinationVec[i]);
 		user = getNick(destinationVec[i]);
-		message = "PRIVMSG " + destinationVec[i] + " " + cmd[2];
+		message = "PRIVMSG " + destinationVec[i] + " :" + cmd[2];
 
 		if (channel)
 			sendMsgToChannel(message, channel, fd);
@@ -308,31 +337,84 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd){
 	(void)fd;
 	}*/
 
-// WHOIS COMMAND
-void	Server::whoisCmd(std::vector<string>& cmd, int fd){
-	std::cout << "WHOIS cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-}
-
-// ADMIN COMMAND
-void	Server::adminCmd(std::vector<string>& cmd, int fd){
-	std::cout << "ADMIN cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-}
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // INFO COMMAND
+string getUpTime(const std::string &creationTime) {
+    struct tm creationTm;
+    memset(&creationTm, 0, sizeof(creationTm)); // Properly zero-initialize
+
+    time_t now = time(0);
+
+    // Parse the input string "YYYY-MM-DD HH:MM:SS"
+    if (sscanf(creationTime.c_str(), "%d-%d-%d %d:%d:%d",
+               &creationTm.tm_year, &creationTm.tm_mon, &creationTm.tm_mday,
+               &creationTm.tm_hour, &creationTm.tm_min, &creationTm.tm_sec) != 6) {
+        return "Invalid Time Format";
+    }
+
+    // Adjust fields to match tm structure
+    creationTm.tm_year -= 1900;
+    creationTm.tm_mon -= 1;
+
+    // Convert to time_t
+    time_t creationTimeT = mktime(&creationTm);
+    if (creationTimeT == -1) {
+        return "Invalid Time";
+    }
+
+    // Calculate the difference in seconds
+    time_t uptime = now - creationTimeT;
+    if (uptime < 0) {
+        return "Future Time Error";
+    }
+
+    // Convert uptime into days, hours, minutes, and seconds
+    int days = uptime / 86400;
+    int hours = (uptime % 86400) / 3600;
+    int minutes = (uptime % 3600) / 60;
+    int seconds = uptime % 60;
+
+    // Format the uptime string
+    std::ostringstream uptimeStr;
+    uptimeStr << days << " days, "
+              << (hours < 10 ? "0" : "") << hours << " hours, "
+              << (minutes < 10 ? "0" : "") << minutes << " minuts, "
+              << (seconds < 10 ? "0" : "") << seconds << " seconds";
+
+    return uptimeStr.str();
+}
+// Usage:
+// std::string uptime = getUptime(_creationTime);
+
+size_t		Server::getActiveClients(void) {
+	size_t i = 0;
+	while (i < _clients.size())
+		i++;
+	return i;
+}
+
+size_t		Server::getActiveChannels(void) {
+	size_t i = 0;
+	while (i < _channels.size())
+		i++;
+	return i;
+}
+
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
-
+	string upTime = getUpTime(_creationTime);
+	std::cout << upTime <<std::endl;
+	std::cout << "Creation time" << _creationTime << std::endl;
+	size_t	activeClients = getActiveClients();
+	std::cout << "Online Users" << activeClients << std::endl;
+	size_t	activeChannels = getActiveChannels();
+	std::cout << "Online Channels" << activeChannels << std::endl;
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Admin: AdminNick  (admin@example.com)  ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Uptime: 12 days, 4 hours, 32 minutes    ║"), fd);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Up Time: " + upTime + "  ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Users Online: 128                       ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Channels: 45                            ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
@@ -346,13 +428,6 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
 	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
-}
-
-// PONG COMMAND
-void	Server::pongCmd(std::vector<string>& cmd, int fd){
-	std::cout << "PONG cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
 }
 
 // PING COMMAND
