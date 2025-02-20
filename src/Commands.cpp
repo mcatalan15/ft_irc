@@ -157,6 +157,9 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
 	//printVecStr(cmd);
+	if (getClient(fd)->getState() != REGISTERED)
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
+	
     if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "MODE"), fd));
 
@@ -335,6 +338,9 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 {
     std::cout << "INVITE cmd" << std::endl;
 	string command = cmd[0];
+	
+	if (getClient(fd)->getState() != REGISTERED)
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 	
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
