@@ -26,7 +26,7 @@ std::vector<std::string> splitMsg(std::string &str)
 			foundColon = true;
 			if (!currentWord.empty())
 				result.push_back(currentWord);
-		} else if (c == ' ' || c == '\t') {
+		} else if (c == ' ' || c == '\t' || c == '\v') {
 			// Split words on spaces or tabs
 			if (!currentWord.empty()) {
 				result.push_back(currentWord);
