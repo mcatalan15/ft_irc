@@ -79,6 +79,8 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("COMMANDS->");
 	infoLines.push_back("PASS:");
 	infoLines.push_back("  Syntax: PASS <password>");
+	infoLines.push_back("NICK:");
+	infoLines.push_back("  Syntax: NICK <nickname>");
 	infoLines.push_back("USER:");
 	infoLines.push_back("  Syntax: USER <username> <hostname> <servername> :<realname>");
 	infoLines.push_back("QUIT:");
