@@ -360,114 +360,11 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 }
 
 // INFO COMMAND
-string getUpTime(const std::string &creationTime) {
-    struct tm creationTm;
-    memset(&creationTm, 0, sizeof(creationTm)); // Properly zero-initialize
-
-    time_t now = time(0);
-
-    // Parse the input string "YYYY-MM-DD HH:MM:SS"
-    if (sscanf(creationTime.c_str(), "%d-%d-%d %d:%d:%d",
-               &creationTm.tm_year, &creationTm.tm_mon, &creationTm.tm_mday,
-               &creationTm.tm_hour, &creationTm.tm_min, &creationTm.tm_sec) != 6) {
-        return "Invalid Time Format";
-    }
-
-    // Adjust fields to match tm structure
-    creationTm.tm_year -= 1900;
-    creationTm.tm_mon -= 1;
-
-    // Convert to time_t
-    time_t creationTimeT = mktime(&creationTm);
-    if (creationTimeT == -1) {
-        return "Invalid Time";
-    }
-
-    // Calculate the difference in seconds
-    time_t uptime = now - creationTimeT;
-    if (uptime < 0) {
-        return "Future Time Error";
-    }
-
-    // Convert uptime into days, hours, minutes, and seconds
-    int days = uptime / 86400;
-    int hours = (uptime % 86400) / 3600;
-    int minutes = (uptime % 3600) / 60;
-    int seconds = uptime % 60;
-
-    // Format the uptime string
-    std::ostringstream uptimeStr;
-    uptimeStr << days << " days, "
-              << (hours < 10 ? "0" : "") << hours << " hours, "
-              << (minutes < 10 ? "0" : "") << minutes << " minuts, "
-              << (seconds < 10 ? "0" : "") << seconds << " seconds";
-
-    return uptimeStr.str();
-}
-// Usage:
-// std::string uptime = getUptime(_creationTime);
-
-string		Server::getActiveClients(void) {
-	size_t i = 0;
-	if (_clients.size() == 0)
-		return "0";
-	while (i < _clients.size())
-		i++;
-
-	std::ostringstream oss;
-	oss << i;  // Convert size_t to string
-	return oss.str();
-}
-
-string		Server::getActiveChannels(void) {
-	size_t i = 0;
-	if (_channels.size())
-		return "0";
-	while (i < _channels.size())
-		i++;
-	std::ostringstream oss;
-	oss << i;  // Convert size_t to string
-	return oss.str();
-}
-
-string	horizontalChars(size_t maxLen) {
-	string str;
-	for (size_t i = 0; i < maxLen; i++)
-		str.append(HORIZONTAL);
-	return str;
-}
-
-string centerText(const string& text, int width) {
-	int padding = (width - text.length()) / 2;
-	return std::string(padding, ' ') + text + std::string(padding, ' ');
-}
-
-string createTableRow(const string& content, int width) {
-	return string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL);
-}
-
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
 	// Create the vector of strings
-	std::vector<string>	infoLines;
-	infoLines.push_back("Welcome to FT_IRC Server");
-	infoLines.push_back("Powered by eferre-m jpaul-kr mcatalan");
-	infoLines.push_back("line");
-	infoLines.push_back("Up Time: " + getUpTime(_creationTime));
-	infoLines.push_back("Users Online: " + getActiveClients());
-	infoLines.push_back("Channels: " + getActiveChannels());
-	infoLines.push_back("line");
-	infoLines.push_back("Rules:");
-	infoLines.push_back("1. Be respectful.");
-	infoLines.push_back("2. No spam or flooding.");
-	infoLines.push_back("3. No excessive trolling.");
-	infoLines.push_back("4. Follow channel-specific rules.");
-	infoLines.push_back("Need help? /join #help");
-	infoLines.push_back("line");
-	infoLines.push_back(" QUE UTA LOCURA chAVAL");
-	infoLines.push_back("line");
-	infoLines.push_back("Visit: ");
+	std::vector<string>	infoLines = getInfo();
 
 	// Check for max len
 	size_t maxLen = 0;
@@ -480,8 +377,6 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	std::string downBorder = string(DOWN_LEFT) + horizontalChars(maxLen + 2) + string(DOWN_RIGHT);
 	std::string middleBorder = string(MIDDLE_LEFT) + horizontalChars(maxLen + 2) + string(MIDDLE_RIGHT);
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), upBorder),fd);
-	//sendMsg(RPL_INFO(getClient(fd)->getNickname(), middleBorder),fd);
-	//MANDANGA
 	for (size_t i = 0; i < infoLines.size(); i++) {
 		string line = infoLines[i];
 		if (infoLines[i] == "line")
@@ -494,8 +389,6 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 			sendMsg(RPL_INFO(getClient(fd)->getNickname(), createTableRow(line, maxLen + 2)), fd);
 	}
 	sendMsg(RPL_INFO(getClient(fd)->getNickname(), downBorder),fd);
-	
-	
 }
 
 // PING COMMAND

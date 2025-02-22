@@ -77,6 +77,7 @@ class Server {
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
+		std::vector<string>	getInfo(void);
 
 		//MODE
 		void			modeManagement(Channel* channel, std::vector<string>& cmd, string modeChar, int fd);

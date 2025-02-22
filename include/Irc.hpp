@@ -83,7 +83,13 @@ void				sendMsg(string msg, int fd);
 bool				nickChecker(string cmd);
 string				getCurrentDataTime();
 std::vector<string>	joinDivisor(string cmd);
-bool validChannel(string& channelName, int fd);
+bool				validChannel(string& channelName, int fd);
+
+// INFO
+string				getUpTime(const string& creationTime);
+string				horizontalChars(size_t maxLen);
+string				centerText(const string& text, int width);
+string				createTableRow(const string& content, int width);
 
 // Defines
 #define NICK_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-"
