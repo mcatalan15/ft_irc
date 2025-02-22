@@ -23,8 +23,6 @@ bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd
 		sendMsg(ERR_NOTONCHANNEL(getClient(fd)->getUsername(), cmd[2]), fd);
 		return (false);
 	}
-	// Hay que verificar al mismo tiempo si es un canal solo por invitacion
-	// si es solo por invitacion verificar si es opé sino da igual
 	if (channel->isModeSet(INVITE_ONLY)) {
 		if (!channel->isOperator(getClient(fd)->getUsername()))
 		{
@@ -113,29 +111,9 @@ void	Server::invitationManagement(Channel* channel, std::vector<string>& nickNam
 		}
 		else
 		{
+			// ENVIAMOS UN MENSAJE ?
 			if (channel->isInvited(nickName[i]))
 				channel->removeInvitation(nickName[i]);
 		}
 	}
-}
-
-void	Server::inviteCmd(std::vector<string>& cmd, int fd)
-{
-    std::cout << "INVITE cmd" << std::endl;
-	string command = cmd[0];
-	
-	if (cmd.size() < 3)
-		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
-
-	Channel*	channel = findChannel(cmd[2]);
-	if (!isInviteCmdValid(channel, cmd, fd))
-		return ;
-	bool flag = (cmd[1][0] != '-' ? true : false);
-	std::vector<string> nickName = divisor(cmd[1], flag);
-	if (!nicknameExist(nickName, fd))
-		return ;
-	if (userOnChannel(channel, nickName, fd))
-	   return ;
-	invitationManagement(channel, nickName, fd, flag);
-	sendMsg(RPL_ENDOFINVITELIST(getClient(fd)->getNickname()), fd);
 }
