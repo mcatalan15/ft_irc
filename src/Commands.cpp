@@ -115,8 +115,6 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 				std::cout << _clients[i].getChannels()[j] << std::endl;
 		}
 	}
-	// std::cout << "client channels: " << channelsVec.size() << std::endl;
-	
 	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{

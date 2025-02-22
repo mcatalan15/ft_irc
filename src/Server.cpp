@@ -389,10 +389,10 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 	std::vector<string>::const_iterator	it;
 
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "entra en for :  " << std::endl;
-		//std::cout << "entra en for 1  " << std::endl;
+		std::cout << "nickname " << _clients[i].getNickname() << std::endl;
 		if (_clients[i].getNickname() != client->getNickname())
 		{
+			std::cout << "Size de channelnames: " << channelnames.size() << std::endl;
 			for (size_t j = 0; j < channelnames.size(); j++)
 			{
 				it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelnames[j]);
@@ -400,7 +400,7 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 			std::cout << "getChannel: " << _clients[i].getChannels()[0] << std::endl;
 				if (it != _clients[i].getChannels().end())
 				{
-					std::cout << "entra a if\n";
+					std::cout << "Sending msg\n";
 					sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
 					break ;
 				}
