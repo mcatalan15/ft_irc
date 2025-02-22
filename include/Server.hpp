@@ -109,8 +109,8 @@ class Server {
 		bool		userIsUsed(string cmd);
 		
 		//INFO cmd
-		size_t		getActiveClients(void);
-		size_t		getActiveChannels(void);
+		string		getActiveClients(void);
+		string		getActiveChannels(void);
 
 		//Commands
 		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?

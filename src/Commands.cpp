@@ -116,6 +116,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		}
 	}
 	// std::cout << "client channels: " << channelsVec.size() << std::endl;
+	
 	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -406,48 +407,95 @@ string getUpTime(const std::string &creationTime) {
 // Usage:
 // std::string uptime = getUptime(_creationTime);
 
-size_t		Server::getActiveClients(void) {
+string		Server::getActiveClients(void) {
 	size_t i = 0;
+	if (_clients.size() == 0)
+		return "0";
 	while (i < _clients.size())
 		i++;
-	return i;
+
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
 }
 
-size_t		Server::getActiveChannels(void) {
+string		Server::getActiveChannels(void) {
 	size_t i = 0;
+	if (_channels.size())
+		return "0";
 	while (i < _channels.size())
 		i++;
-	return i;
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
+}
+
+string	horizontalChars(size_t maxLen) {
+	string str;
+	for (size_t i = 0; i < maxLen; i++)
+		str.append(HORIZONTAL);
+	return str;
+}
+
+string centerText(const string& text, int width) {
+	int padding = (width - text.length()) / 2;
+	return std::string(padding, ' ') + text + std::string(padding, ' ');
+}
+
+string createTableRow(const string& content, int width) {
+	return string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL);
 }
 
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
-	string upTime = getUpTime(_creationTime);
-	std::cout << upTime <<std::endl;
-	std::cout << "Creation time" << _creationTime << std::endl;
-	size_t	activeClients = getActiveClients();
-	std::cout << "Online Users" << activeClients << std::endl;
-	size_t	activeChannels = getActiveChannels();
-	std::cout << "Online Channels" << activeChannels << std::endl;
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Up Time: " + upTime + "  ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Users Online: 128                       ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Channels: 45                            ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Rules:                                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  1. Be respectful.                      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  2. No spam or flooding.                ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  3. No excessive trolling.               ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
-	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
+	// Create the vector of strings
+	std::vector<string>	infoLines;
+	infoLines.push_back("Welcome to FT_IRC Server");
+	infoLines.push_back("Powered by eferre-m jpaul-kr mcatalan");
+	infoLines.push_back("line");
+	infoLines.push_back("Up Time: " + getUpTime(_creationTime));
+	infoLines.push_back("Users Online: " + getActiveClients());
+	infoLines.push_back("Channels: " + getActiveChannels());
+	infoLines.push_back("line");
+	infoLines.push_back("Rules:");
+	infoLines.push_back("1. Be respectful.");
+	infoLines.push_back("2. No spam or flooding.");
+	infoLines.push_back("3. No excessive trolling.");
+	infoLines.push_back("4. Follow channel-specific rules.");
+	infoLines.push_back("Need help? /join #help");
+	infoLines.push_back("line");
+	infoLines.push_back(" QUE UTA LOCURA chAVAL");
+	infoLines.push_back("line");
+	infoLines.push_back("Visit: ");
+
+	// Check for max len
+	size_t maxLen = 0;
+	for (size_t line = 0; line < infoLines.size(); line++) {
+		if (infoLines[line].length() > maxLen)
+			maxLen = infoLines[line].size();
+	}
+	
+	std::string upBorder = string(UP_LEFT) + horizontalChars(maxLen + 2) + string(UP_RIGHT);
+	std::string downBorder = string(DOWN_LEFT) + horizontalChars(maxLen + 2) + string(DOWN_RIGHT);
+	std::string middleBorder = string(MIDDLE_LEFT) + horizontalChars(maxLen + 2) + string(MIDDLE_RIGHT);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), upBorder),fd);
+	//sendMsg(RPL_INFO(getClient(fd)->getNickname(), middleBorder),fd);
+	//MANDANGA
+	for (size_t i = 0; i < infoLines.size(); i++) {
+		string line = infoLines[i];
+		if (infoLines[i] == "line")
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), middleBorder), fd);
+		else if (i == 0 || i == 1) {
+			line = centerText(line, maxLen);
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), createTableRow(line, maxLen + 2)), fd);
+		}
+		else
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), createTableRow(line, maxLen + 2)), fd);
+	}
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), downBorder),fd);
+	
+	
 }
 
 // PING COMMAND
