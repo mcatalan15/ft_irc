@@ -13,8 +13,10 @@ void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, i
 	{
 		msg.append(" ");
 		msg.append(target);
+		msg.append(" ");
 	}
-	std::cout << msg << std::endl;
+	//std::cout << msg << std::endl;
+	sendMsg(msg, fd);
 	sendMsgToChannel(msg, channel, fd);
 	return ;
 }
@@ -180,16 +182,14 @@ void	Server::flagModeO(bool flag, Channel* channel, string target, int fd)
 	if (!flag)
 	{
 		if (channel->isOperator(findNickname(target, channel)->getUsername()))
-			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", target, "Is allready an Operator"), fd)); ;
-			//hay que enviar un error
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", target, "Is allready an Operator"), fd)); 
 		channel->addOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "+o", target, fd);
 	}
 	else
 	{
 		if (!channel->isOperator(findNickname(target, channel)->getUsername()))
-			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", target, "Is not an Operator"), fd)); ;
-			//hay que enviar un error
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", target, "Is not an Operator"), fd)); 
 		channel->removeOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "-o", target, fd);
 	}
@@ -216,12 +216,12 @@ void	Server::flagModeI(bool flag, Channel *channel, int fd)
 	if (!flag)
 	{
 		channel->setMode(INVITE_ONLY);
-		sendModeGeneralMsg(channel, "+i", "NULL", fd);
+		sendModeGeneralMsg(channel, "+i", "", fd);
 	}
 	else
 	{
 		channel->unsetMode(INVITE_ONLY);
-		sendModeGeneralMsg(channel, "-i", "NULL", fd);
+		sendModeGeneralMsg(channel, "-i", "", fd);
 	}
 	return ;
 }

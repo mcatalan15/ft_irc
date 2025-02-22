@@ -157,6 +157,9 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
 	//printVecStr(cmd);
+	if (getClient(fd)->getState() != REGISTERED)
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
+	
     if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "MODE"), fd));
 
@@ -329,15 +332,32 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 			return (sendMsg(ERR_NOSUCHCHANNELORCLIENT(client->getNickname(), destinationVec[i]), fd));
 	}
 }
-/*
-// INVITE COMMAND
-void	Server::inviteCmd(std::vector<string>& cmd, int fd){
-	std::cout << "INVITE cmd" << std::endl;
-	(void)cmd;
-	(void)fd;
-	}*/
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+// INVITE COMMAND
+void	Server::inviteCmd(std::vector<string>& cmd, int fd)
+{
+    std::cout << "INVITE cmd" << std::endl;
+	string command = cmd[0];
+	
+	if (getClient(fd)->getState() != REGISTERED)
+		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
+	
+	if (cmd.size() < 3)
+		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
+
+	Channel*	channel = findChannel(cmd[2]);
+	if (!isInviteCmdValid(channel, cmd, fd))
+		return ;
+	bool flag = (cmd[1][0] != '-' ? true : false);
+	std::vector<string> nickName = divisor(cmd[1], flag);
+	if (!nicknameExist(nickName, fd))
+		return ;
+	if (userOnChannel(channel, nickName, fd))
+	   return ;
+	invitationManagement(channel, nickName, fd, flag);
+	sendMsg(RPL_ENDOFINVITELIST(getClient(fd)->getNickname()), fd);
+}
+
 // INFO COMMAND
 string getUpTime(const std::string &creationTime) {
     struct tm creationTm;
