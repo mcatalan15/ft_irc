@@ -77,6 +77,7 @@ class Server {
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
 		string			getCreationTime() { return _creationTime; };
+		std::vector<string>	getInfo(void);
 
 		//MODE
 		void			modeManagement(Channel* channel, std::vector<string>& cmd, string modeChar, int fd);
@@ -109,8 +110,8 @@ class Server {
 		bool		userIsUsed(string cmd);
 		
 		//INFO cmd
-		size_t		getActiveClients(void);
-		size_t		getActiveChannels(void);
+		string		getActiveClients(void);
+		string		getActiveChannels(void);
 
 		//Commands
 		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?
