@@ -199,20 +199,8 @@ bool validChannel(string& channelName, int fd);
 #define MIDDLE_RIGHT "╣"
 #define DOWN_LEFT "╚"
 #define DOWN_RIGHT "╝"
-#define VERTICAL "═"
-#define HORIZONTAL "║"
-#define INFO "Welcome to FT_IRC Server"
-#define INFO2 "Powered by eferre-m jpaul-kr mcatalan"
-#define INFO_STATS_1 "Up Time:"
-#define INFO_STATS_2 "Users Online:"
-#define INFO_STATS_3 "Channels:"
-#define CHANNELS_INFO ""
-#define RULES_INFO "Rules:"
-#define RULES_INFO1 "1. Be respectful."
-#define RULES_INFO2 "2. No spam or flooding."
-#define RULES_INFO3 "3. No excessive trolling."
-#define RULES_INFO4 "4. Follow mcatalan15 on GitHub."
-
+#define HORIZONTAL "═"
+#define VERTICAL "║"
 
 
 #endif
