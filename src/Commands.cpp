@@ -116,6 +116,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		}
 	}
 	// std::cout << "client channels: " << channelsVec.size() << std::endl;
+	
 	sendMsgToClients(message, channelsVec, fd);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -359,95 +360,35 @@ void	Server::inviteCmd(std::vector<string>& cmd, int fd)
 }
 
 // INFO COMMAND
-string getUpTime(const std::string &creationTime) {
-    struct tm creationTm;
-    memset(&creationTm, 0, sizeof(creationTm)); // Properly zero-initialize
-
-    time_t now = time(0);
-
-    // Parse the input string "YYYY-MM-DD HH:MM:SS"
-    if (sscanf(creationTime.c_str(), "%d-%d-%d %d:%d:%d",
-               &creationTm.tm_year, &creationTm.tm_mon, &creationTm.tm_mday,
-               &creationTm.tm_hour, &creationTm.tm_min, &creationTm.tm_sec) != 6) {
-        return "Invalid Time Format";
-    }
-
-    // Adjust fields to match tm structure
-    creationTm.tm_year -= 1900;
-    creationTm.tm_mon -= 1;
-
-    // Convert to time_t
-    time_t creationTimeT = mktime(&creationTm);
-    if (creationTimeT == -1) {
-        return "Invalid Time";
-    }
-
-    // Calculate the difference in seconds
-    time_t uptime = now - creationTimeT;
-    if (uptime < 0) {
-        return "Future Time Error";
-    }
-
-    // Convert uptime into days, hours, minutes, and seconds
-    int days = uptime / 86400;
-    int hours = (uptime % 86400) / 3600;
-    int minutes = (uptime % 3600) / 60;
-    int seconds = uptime % 60;
-
-    // Format the uptime string
-    std::ostringstream uptimeStr;
-    uptimeStr << days << " days, "
-              << (hours < 10 ? "0" : "") << hours << " hours, "
-              << (minutes < 10 ? "0" : "") << minutes << " minuts, "
-              << (seconds < 10 ? "0" : "") << seconds << " seconds";
-
-    return uptimeStr.str();
-}
-// Usage:
-// std::string uptime = getUptime(_creationTime);
-
-size_t		Server::getActiveClients(void) {
-	size_t i = 0;
-	while (i < _clients.size())
-		i++;
-	return i;
-}
-
-size_t		Server::getActiveChannels(void) {
-	size_t i = 0;
-	while (i < _channels.size())
-		i++;
-	return i;
-}
-
 void	Server::infoCmd(std::vector<string>& cmd, int fd){
 	(void)cmd;
 	(void)fd;
-	string upTime = getUpTime(_creationTime);
-	std::cout << upTime <<std::endl;
-	std::cout << "Creation time" << _creationTime << std::endl;
-	size_t	activeClients = getActiveClients();
-	std::cout << "Online Users" << activeClients << std::endl;
-	size_t	activeChannels = getActiveChannels();
-	std::cout << "Online Channels" << activeChannels << std::endl;
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╔════════════════════════════════════════╗"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║      Welcome to FT_IRC Server      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║         Powered by eferr-m jpaul-kr mcatalan         ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Up Time: " + upTime + "  ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Users Online: 128                       ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║ Channels: 45                            ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Rules:                                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  1. Be respectful.                      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  2. No spam or flooding.                ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  3. No excessive trolling.               ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  4. Follow channel-specific rules.      ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╠════════════════════════════════════════╣"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Need help? /join #help                 ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "║  Visit:           ║"), fd);
-	sendMsg(RPL_INFO(getClient(fd)->getNickname(), "╚════════════════════════════════════════╝"), fd);
-	sendMsg(RPL_ENDOFINFO(getClient(fd)->getNickname()), fd);
+	// Create the vector of strings
+	std::vector<string>	infoLines = getInfo();
+
+	// Check for max len
+	size_t maxLen = 0;
+	for (size_t line = 0; line < infoLines.size(); line++) {
+		if (infoLines[line].length() > maxLen)
+			maxLen = infoLines[line].size();
+	}
+	
+	std::string upBorder = string(UP_LEFT) + horizontalChars(maxLen + 2) + string(UP_RIGHT);
+	std::string downBorder = string(DOWN_LEFT) + horizontalChars(maxLen + 2) + string(DOWN_RIGHT);
+	std::string middleBorder = string(MIDDLE_LEFT) + horizontalChars(maxLen + 2) + string(MIDDLE_RIGHT);
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), upBorder),fd);
+	for (size_t i = 0; i < infoLines.size(); i++) {
+		string line = infoLines[i];
+		if (infoLines[i] == "line")
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), middleBorder), fd);
+		else if (i == 0 || i == 1) {
+			line = centerText(line, maxLen);
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), createTableRow(line, maxLen + 2)), fd);
+		}
+		else
+			sendMsg(RPL_INFO(getClient(fd)->getNickname(), createTableRow(line, maxLen + 2)), fd);
+	}
+	sendMsg(RPL_INFO(getClient(fd)->getNickname(), downBorder),fd);
 }
 
 // PING COMMAND

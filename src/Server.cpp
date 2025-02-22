@@ -118,11 +118,13 @@ void	Server::client_exist(int fd) {
 	std::cout << "hostname <" << Client->getHostname() << ">" << std::endl;
 	if (bytes_read <= 0) { // Client disconnected or error occurred
 		std::cerr << "Client disconnected or read error, fd: " << fd << std::endl;
-		close(fd);
+		std::vector<string> cmd = joinDivisor("QUIT :leaving");
+		quitCmd(cmd, fd);
+		/*close(fd);
 		// Remove the client from the monitored list
 		// removeClientChannel(fd);
 		removeClient(fd);
-		removeFd(fd);
+		removeFd(fd);*/
 	} else {
 		// Append received data to the client's existing buffer
 		string received_data(buffer, bytes_read);
@@ -405,4 +407,27 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 			}
 		}
 	}
+}
+
+string		Server::getActiveClients(void) {
+	size_t i = 0;
+	if (_clients.size() == 0)
+		return "0";
+	while (i < _clients.size())
+		i++;
+
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
+}
+
+string		Server::getActiveChannels(void) {
+	size_t i = 0;
+	if (_channels.size())
+		return "0";
+	while (i < _channels.size())
+		i++;
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
 }
