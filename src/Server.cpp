@@ -271,10 +271,7 @@ std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::creat
 	map["KICK"] = &Server::kickCmd;
 	map["PRIVMSG"] = &Server::privmsgCmd;
 	map["INVITE"] = &Server::inviteCmd;
-	map["WHOIS"] = &Server::whoisCmd;
-	map["ADMIN"] = &Server::adminCmd;
 	map["INFO"] = &Server::infoCmd;
-	map["PONG"] = &Server::pongCmd;
 	map["PING"] = &Server::pingCmd;
 	return map;
 }
@@ -351,14 +348,16 @@ Client*		Server::getNick(string clientname)
 	return NULL;
 }
 
+// REVISAR SI DA ERROR JOIN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 bool	Server::alreadyJoined(Channel* channel, string user) {
 	std::vector<string> list = channel->getClients();
-	if (channel)
-	for(size_t i = 0; i < list.size(); i++) {
-		if (list[i] == user)
-			return true;
+	if (channel) {
+		for(size_t i = 0; i < list.size(); i++) {
+			if (list[i] == user)
+				return true;
+		}
 	}
-	return false;
+		return false;
 }
 
 std::vector<Client> &Server::getClients() { return (_clients); }
