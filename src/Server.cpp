@@ -408,3 +408,26 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 		}
 	}
 }
+
+string		Server::getActiveClients(void) {
+	size_t i = 0;
+	if (_clients.size() == 0)
+		return "0";
+	while (i < _clients.size())
+		i++;
+
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
+}
+
+string		Server::getActiveChannels(void) {
+	size_t i = 0;
+	if (_channels.size())
+		return "0";
+	while (i < _channels.size())
+		i++;
+	std::ostringstream oss;
+	oss << i;  // Convert size_t to string
+	return oss.str();
+}
