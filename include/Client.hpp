@@ -38,7 +38,7 @@ class Client
 		//struct pollfd			*fds;
 		bool					_registered;
 		//bool					_authentificated;
-
+		
 	public:
 		Client();
 		Client(int client_fd);

@@ -131,6 +131,12 @@ class Server {
 		void		pongCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		pingCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		capCmd(std::vector<string>& cmd, int fd);  //ESTA?
+
+		// Bonus
+		// DCC cmd
+		void		dccCmd(std::vector<string>& cmd, int fd);
+		void		dccSend(string& nick, string& filename, string& port, string& filesize, int fd);
+		void		dccGet(string& nick, string& port, string& filesize, int fd);
 };
 
 #endif
