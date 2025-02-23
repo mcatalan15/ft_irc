@@ -397,7 +397,7 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 			{
 				it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelnames[j]);
 			std::cout << "channelnames[" << j << "] " << channelnames[j] << std::endl;
-			std::cout << "getChannel: " << _clients[i].getChannels()[0] << std::endl;
+			//std::cout << "getChannel: " << _clients[i].getChannels()[0] << std::endl;
 				if (it != _clients[i].getChannels().end())
 				{
 					std::cout << "entra a if\n";

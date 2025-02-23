@@ -16,6 +16,7 @@ void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, i
 		msg.append(" ");
 	}
 	//std::cout << msg << std::endl;
+	msg.append(CRLF);
 	sendMsg(msg, fd);
 	sendMsgToChannel(msg, channel, fd);
 	return ;
