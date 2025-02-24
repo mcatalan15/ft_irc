@@ -43,6 +43,7 @@ Server::Server(int port, string password) {
 	s_poll.revents = 0;
 	_pollFds.push_back(s_poll);
 	setCreationTime();
+	setCreationTimeT();
 	std::cout << "Welcome to the FT_IRC" << "\n" << std::endl;	
 }
 

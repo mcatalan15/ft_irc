@@ -86,7 +86,8 @@ std::vector<string>	joinDivisor(string cmd);
 bool				validChannel(string& channelName, int fd);
 
 // INFO
-string				getUpTime(const string& creationTime);
+//string				getUpTime(const string& creationTime);
+string				getUpTimeT(time_t creationTime);
 string				horizontalChars(size_t maxLen);
 string				centerText(const string& text, int width);
 string				createTableRow(const string& content, int width);
