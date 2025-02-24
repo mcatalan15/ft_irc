@@ -40,7 +40,7 @@ string centerText(const string& text, int width) {
 }
 
 string createTableRow(const string& content, int width) {
-	return string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL);
+	return (string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL));
 }
 
 std::vector<string> Server::getInfo(void) {
@@ -58,7 +58,6 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("3. No excessive trolling.");
 	infoLines.push_back("4. Follow channel-specific rules.");
 	infoLines.push_back("line");
-	infoLines.push_back("COMMANDS->");
 	infoLines.push_back("PASS:");
 	infoLines.push_back("  Syntax: PASS <password>");
 	infoLines.push_back("NICK:");
@@ -85,9 +84,6 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("  Syntax: INFO");
 	infoLines.push_back("PING:");
 	infoLines.push_back("  Syntax: PING <target>");
-	infoLines.push_back("DCC:");
-	infoLines.push_back("  Syntax: DCC <subcommand> [<parameters>]");
-	infoLines.push_back("line");
-	infoLines.push_back("Visit: asdggasdgdasgsasgd ");
 	return infoLines;
 }
+i
