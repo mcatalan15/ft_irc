@@ -1,48 +1,30 @@
 #include "../include/Server.hpp"
 
-string getUpTime(const string &creationTime) {
-	struct tm creationTm;
-	memset(&creationTm, 2, sizeof(creationTm)); // Properly zero-initialize
+string	getUpTimeT(time_t creationTime) {
+	// Get the current time
+ 	std::cout << "crationTime getuptime: " << creationTime << std::endl;
+    time_t now = time(0);
 
-	time_t now = time(0);
+    // Calculate the difference in seconds
+    time_t uptime = now - creationTime;
+    if (uptime < 0) {
+        return "Future Time Error";
+    }
 
-	// Parse the input string "YYYY-MM-DD HH:MM:SS"
-	if (sscanf(creationTime.c_str(), "%d-%d-%d %d:%d:%d",
-				&creationTm.tm_year, &creationTm.tm_mon, &creationTm.tm_mday,
-				&creationTm.tm_hour, &creationTm.tm_min, &creationTm.tm_sec) != 6) {
-		return "Invalid Time Format";
-	}
+    // Convert uptime into days, hours, minutes, and seconds
+    int days = uptime / 86400;
+    int hours = (uptime % 86400) / 3600;
+    int minutes = (uptime % 3600) / 60;
+    int seconds = uptime % 60;
 
-	// Adjust fields to match tm structure
-	creationTm.tm_year -= 1900;
-	creationTm.tm_mon -= 1;
+    // Format the uptime string
+    std::ostringstream uptimeStr;
+    uptimeStr << days << " days, "
+              << (hours < 10 ? "0" : "") << hours << " hours, "
+              << (minutes < 10 ? "0" : "") << minutes << " minutes, "
+              << (seconds < 10 ? "0" : "") << seconds << " seconds";
 
-	// Convert to time_t
-	time_t creationTimeT = mktime(&creationTm);
-	if (creationTimeT == -1) {
-		return "Invalid Time";
-	}
-
-	// Calculate the difference in seconds
-	time_t uptime = now - creationTimeT;
-	if (uptime < 0) {
-		return "Future Time Error";
-	}
-
-	// Convert uptime into days, hours, minutes, and seconds
-	int days = uptime / 86400;
-	int hours = (uptime % 86400) / 3600;
-	int minutes = (uptime % 3600) / 60;
-	int seconds = uptime % 60;
-
-	// Format the uptime string
-	std::ostringstream uptimeStr;
-	uptimeStr << days << " days, "
-		<< (hours < 10 ? "0" : "") << hours << " hours, "
-		<< (minutes < 10 ? "0" : "") << minutes << " minuts, "
-		<< (seconds < 10 ? "0" : "") << seconds << " seconds";
-
-	return uptimeStr.str();
+    return uptimeStr.str();
 }
 
 string	horizontalChars(size_t maxLen) {
@@ -58,7 +40,7 @@ string centerText(const string& text, int width) {
 }
 
 string createTableRow(const string& content, int width) {
-	return string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL);
+	return (string(VERTICAL) + " " + content + string(width - content.length() - 2, ' ') + " " + string(VERTICAL));
 }
 
 std::vector<string> Server::getInfo(void) {
@@ -66,7 +48,7 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("Welcome to FT_IRC Server");
 	infoLines.push_back("Powered by eferre-m jpaul-kr mcatalan");
 	infoLines.push_back("line");
-	infoLines.push_back("Up Time: " + getUpTime(_creationTime));
+	infoLines.push_back("Up Time: " + getUpTimeT(_creationTimeT));
 	infoLines.push_back("Users Online: " + getActiveClients());
 	infoLines.push_back("Channels: " + getActiveChannels());
 	infoLines.push_back("line");
@@ -76,7 +58,6 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("3. No excessive trolling.");
 	infoLines.push_back("4. Follow channel-specific rules.");
 	infoLines.push_back("line");
-	infoLines.push_back("COMMANDS->");
 	infoLines.push_back("PASS:");
 	infoLines.push_back("  Syntax: PASS <password>");
 	infoLines.push_back("NICK:");
@@ -103,9 +84,6 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("  Syntax: INFO");
 	infoLines.push_back("PING:");
 	infoLines.push_back("  Syntax: PING <target>");
-	infoLines.push_back("DCC:");
-	infoLines.push_back("  Syntax: DCC <subcommand> [<parameters>]");
-	infoLines.push_back("line");
-	infoLines.push_back("Visit: asdggasdgdasgsasgd ");
 	return infoLines;
 }
+i
