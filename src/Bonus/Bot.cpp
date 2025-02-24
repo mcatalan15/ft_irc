@@ -9,31 +9,33 @@
 #include <unistd.h>
 #include <algorithm>
 
+using std::string;
+
 class IRCBot {
 	public:
-		IRCBot(const std::string& host, const std::string& port, const std::string& password, const std::string& channel);
+		IRCBot(const string& host, const std::string& port, const std::string& password, const std::string& channel);
 		~IRCBot();
 
 		bool connectToServer();
-		void sendCommand(const std::string& command);
+		void sendCommand(const string& command);
 		void login();
 		void run();
 
 	private:
-		std::string host_;
-		std::string port_;
-		std::string password_;
-		std::string channel_;
+		string host_;
+		string port_;
+		string password_;
+		string channel_;
 		int sockfd_;
-		std::map<std::string, std::string> commands_;
-		std::string toLower(const std::string& str);
-		std::string trim(const std::string& str);
-		std::string extractMessageContent(const std::string& message);
-		std::string removeCRLF(const std::string& str);
+		std::map<string, string> commands_;
+		string toLower(const string& str);
+		string trim(const string& str);
+		string extractMessageContent(const string& message);
+		string removeCRLF(const string& str);
 };
 
 // Constructor
-IRCBot::IRCBot(const std::string& host, const std::string& port, const std::string& password, const std::string& channel)
+IRCBot::IRCBot(const string& host, const string& port, const string& password, const string& channel)
 	: host_(host), port_(port), password_(password), channel_(channel), sockfd_(-1) {
 		// Initialize commands
 		commands_["quien fuma?"] = "el puma";
@@ -55,23 +57,23 @@ IRCBot::~IRCBot() {
 }
 
 // Convert string to lowercase
-std::string IRCBot::toLower(const std::string& str) {
-	std::string lowerStr = str;
+string IRCBot::toLower(const string& str) {
+	string lowerStr = str;
 	std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
 	return lowerStr;
 }
 
 // Trim leading and trailing whitespace
-std::string IRCBot::trim(const std::string& str) {
+string IRCBot::trim(const std::string& str) {
 	size_t first = str.find_first_not_of(' ');
-	if (first == std::string::npos) return "";
+	if (first == string::npos) return "";
 	size_t last = str.find_last_not_of(' ');
 	return str.substr(first, last - first + 1);
 }
 
 // Remove \r\n from the end of the string (C++98 compatible)
-std::string IRCBot::removeCRLF(const std::string& str) {
-	std::string cleanedStr = str;
+string IRCBot::removeCRLF(const std::string& str) {
+	string cleanedStr = str;
 	if (!cleanedStr.empty() && cleanedStr[cleanedStr.size() - 1] == '\n') {
 		cleanedStr.erase(cleanedStr.size() - 1);
 	}
@@ -82,9 +84,9 @@ std::string IRCBot::removeCRLF(const std::string& str) {
 }
 
 // Extract the message content (after the last ':')
-std::string IRCBot::extractMessageContent(const std::string& message) {
+string IRCBot::extractMessageContent(const std::string& message) {
 	size_t colonPos = message.find_last_of(':');
-	if (colonPos == std::string::npos) return "";
+	if (colonPos == string::npos) return "";
 	return trim(message.substr(colonPos + 1));
 }
 
@@ -120,8 +122,8 @@ bool IRCBot::connectToServer() {
 }
 
 // Send a command to the IRC server
-void IRCBot::sendCommand(const std::string& command) {
-	std::string fullCommand = command + "\r\n";
+void IRCBot::sendCommand(const string& command) {
+	string fullCommand = command + "\r\n";
 	if (send(sockfd_, fullCommand.c_str(), fullCommand.length(), 0) == -1)
 		std::cerr << "Error: Failed to send command." << std::endl;
 }
@@ -145,7 +147,7 @@ void IRCBot::run() {
 			break;
 		}
 
-		std::string message(buffer, bytesReceived);
+		string message(buffer, bytesReceived);
 		message = removeCRLF(message);
 		std::cout << "Received: " << message << std::endl;
 
@@ -153,16 +155,16 @@ void IRCBot::run() {
 			sendCommand("PONG" + message.substr(5));
 
 		size_t privmsgPos = message.find("PRIVMSG");
-		if (privmsgPos != std::string::npos) {
+		if (privmsgPos != string::npos) {
 			size_t channelStart = message.find("#", privmsgPos);
 			size_t channelEnd = message.find(" ", channelStart);
-			std::string targetChannel = message.substr(channelStart, channelEnd - channelStart);
+			string targetChannel = message.substr(channelStart, channelEnd - channelStart);
 
 			if (targetChannel == "#" + channel_) {
-				std::string userMessage = extractMessageContent(message);
+				string userMessage = extractMessageContent(message);
 				userMessage = toLower(userMessage); // Convert to lowercase
 
-				std::map<std::string, std::string>::iterator it = commands_.find(userMessage);
+				std::map<string, std::string>::iterator it = commands_.find(userMessage);
 				if (it != commands_.end())
 					sendCommand("PRIVMSG #" + channel_ + " :" + it->second);
 			}
