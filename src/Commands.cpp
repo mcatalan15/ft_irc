@@ -385,38 +385,3 @@ void	Server::pingCmd(std::vector<string>& cmd, int fd){
 		tmp = cmd[1].append(CRLF);
 	sendMsg(pong.append(tmp), fd);
 }
-
-// BONUS
-// DCC cmd --------------------------------------------------------------
-/*void	Server::dccSend(string& nick, string& filename, string& port, string& filesize, int fd) {
-		std::cout << "send" << std::endl;
-		(void)nick;
-		(void)port;
-		(void)filesize;
-		(void)fd;	
-}
-
-void	Server::dccGet(string& nick, string& port, string& filesize, int fd) {
-		std::cout << "get" << std::endl;
-		(void)nick;
-		(void)port;
-		(void)filesize;
-		(void)fd;
-	
-}
-
-void	Server::dccCmd(std::vector<string>& cmd, inf fd) {
-	std::cout << "DCC cmd"<<std::endl;
-	if (getClient(fd)->getState != REGISTERED)
-		return ;
-	if (cmd[1].empty())
-		std::cout << "Need more params" << std::endl;
-	cdm[1] = std::to_upper(cmd[1]);
-	if (cmd[1] == "SEND" && cmd.size() == 6)
-		dccSend(cmd[2], cmd[3], cmd[4], cmd[5], cmd[6], cmd[7]);
-	else if (cmd[1] == "GET" && cmd.size() == 5)
-		std::cout << "get" << std::endl;
-		dccGet(cmd[2], cmd[3], cmd[4], cmd[5], cmd[6]);
-	else
-		std::cout << "Invalid subcomand or wrong params num" << std::endl;
-}*/

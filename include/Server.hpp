@@ -125,18 +125,10 @@ class Server {
 		void		kickCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		privmsgCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		inviteCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		whoisCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		adminCmd(std::vector<string>& cmd, int fd);//ESTA?
 		void		infoCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		pongCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		pingCmd(std::vector<string>& cmd, int fd); //ESTA?
 		void		capCmd(std::vector<string>& cmd, int fd);  //ESTA?
 
-		// Bonus
-		// DCC cmd
-		void		dccCmd(std::vector<string>& cmd, int fd);
-		void		dccSend(string& nick, string& filename, string& port, string& filesize, int fd);
-		void		dccGet(string& nick, string& port, string& filesize, int fd);
 };
 
 #endif
