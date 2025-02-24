@@ -313,7 +313,7 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 		message = "PRIVMSG " + destinationVec[i] + " :" + cmd[2];
 
 		if (channel)
-			sendMsgToChannel(message, channel, fd);
+			channel->hasClient(client->getUsername()) ? sendMsgToChannel(message, channel, fd) : sendMsg(ERR_CANNOTSENDTOCHAN(client->getNickname(), channel->getName()), client->getFd());
 		else if (user)
 			sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, user->getFd());
 		else

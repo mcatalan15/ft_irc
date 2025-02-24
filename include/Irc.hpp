@@ -6,7 +6,7 @@
 /*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/02/18 12:45:54 by jpaul-kr         ###   ########.fr       */
+/*   Updated: 2025/02/24 13:09:20 by jpaul-kr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@ string				createTableRow(const string& content, int width);
 
 //PRIVMSG cmd
 #define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
+#define  ERR_CANNOTSENDTOCHAN(client, arg)(":localhost 404 " + (client) + " " + (arg) + " :cannot send to channel" + CRLF)
 
 // INVITE cmd
 #define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
