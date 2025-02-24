@@ -385,10 +385,3 @@ void	Server::pingCmd(std::vector<string>& cmd, int fd){
 		tmp = cmd[1].append(CRLF);
 	sendMsg(pong.append(tmp), fd);
 }
-
-
-// BONUS
-// DCC cmd
-//void	Server::dccCmd(std::vector<string>& cmd, inf fd) {
-	
-//}
