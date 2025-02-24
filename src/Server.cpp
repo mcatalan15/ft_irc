@@ -275,7 +275,6 @@ std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::creat
 	map["INVITE"] = &Server::inviteCmd;
 	map["INFO"] = &Server::infoCmd;
 	map["PING"] = &Server::pingCmd;
-	//map["DCC"] = &Server::dccCmd;
 	return map;
 }
 
@@ -389,18 +388,13 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 	std::vector<string>::const_iterator	it;
 
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "entra en for :  " << std::endl;
-		//std::cout << "entra en for 1  " << std::endl;
 		if (_clients[i].getNickname() != client->getNickname())
 		{
 			for (size_t j = 0; j < channelnames.size(); j++)
 			{
 				it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelnames[j]);
-			std::cout << "channelnames[" << j << "] " << channelnames[j] << std::endl;
-			std::cout << "getChannel: " << _clients[i].getChannels()[0] << std::endl;
 				if (it != _clients[i].getChannels().end())
 				{
-					std::cout << "entra a if\n";
 					sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
 					break ;
 				}
