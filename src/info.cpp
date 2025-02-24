@@ -86,4 +86,3 @@ std::vector<string> Server::getInfo(void) {
 	infoLines.push_back("  Syntax: PING <target>");
 	return infoLines;
 }
-i
