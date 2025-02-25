@@ -4,8 +4,6 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include <cstddef>
-#include <string>
 
 class Client;
 class Channel;
@@ -14,14 +12,14 @@ class Server {
 	private:
 		int							_serverFd;
 		int							_opt;
-//		int							_port;
 		static bool					_signal;
-		std::vector<Client>			_clients; // Poner puntero?????????!!!!!!!
-		std::vector<struct pollfd>	_pollFds; //buffer. Structura para manejar mas de 1 fd(cliente)
+		std::vector<Client>			_clients;
+		std::vector<struct pollfd>	_pollFds;
 		struct sockaddr_in6			_address;
 		string						_password;
-		std::vector<Channel>		_channels; //Sin puntero guardamos directamente object (no new)
+		std::vector<Channel>		_channels;
 		string						_creationTime;
+		time_t						_creationTimeT;
 		// For map (switch case)
 		static std::map<std::string, void (Server::*)(std::vector<string>&, int)> createCmdMap();
 	    static const std::map<std::string, void (Server::*)(std::vector<string>&, int)> cmdMap;
@@ -40,7 +38,7 @@ class Server {
 
 		//Fds management
 		void			closeFds();
-		void			remove_fd(int fd); // Remove save pollFds
+		void			remove_fd(int fd);
 
 		//Msg management
 		void			msgManagement(int fd);
@@ -76,7 +74,10 @@ class Server {
 
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
+		void			setCreationTimeT() {  time_t now = time(0); _creationTimeT = now; };
 		string			getCreationTime() { return _creationTime; };
+		time_t			getCreationTimeT() { return _creationTimeT; };
+		
 		std::vector<string>	getInfo(void);
 
 		//MODE
@@ -91,7 +92,6 @@ class Server {
 		void			flagModeL(bool flag, Channel* channel, string cmd, int fd);
 		bool			validFlags(Channel* channel, string modeChar, int fd, bool sign);
 		bool 			isNumber(string cmd);
-		//void            sendModeMsg(Channel *channel, string s1, string target, int fd);
 		void			sendModeGeneralMsg(Channel *channel, string param, string target, int fd);
 		void			modeTypeD(Channel *channel, char modeChar, bool flag, int fd);
 		void			modeTypeC(Channel *channel, char modeChar, string param, bool flag, int fd);
@@ -114,21 +114,20 @@ class Server {
 		string		getActiveChannels(void);
 
 		//Commands
-		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		nickCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		userCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		quitCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		modeCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		joinCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		partCmd(std::vector<string>& cmd, int fd);	//ESTA?
-		void		topicCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		kickCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		privmsgCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		inviteCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		infoCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		pingCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		capCmd(std::vector<string>& cmd, int fd);  //ESTA?
-
+		void		passCmd(std::vector<string>& cmd, int fd);
+		void		nickCmd(std::vector<string>& cmd, int fd);
+		void		userCmd(std::vector<string>& cmd, int fd);
+		void		quitCmd(std::vector<string>& cmd, int fd);
+		void		modeCmd(std::vector<string>& cmd, int fd);
+		void		joinCmd(std::vector<string>& cmd, int fd);
+		void		partCmd(std::vector<string>& cmd, int fd);
+		void		topicCmd(std::vector<string>& cmd, int fd);
+		void		kickCmd(std::vector<string>& cmd, int fd);
+		void		privmsgCmd(std::vector<string>& cmd, int fd);
+		void		inviteCmd(std::vector<string>& cmd, int fd);
+		void		infoCmd(std::vector<string>& cmd, int fd);
+		void		pingCmd(std::vector<string>& cmd, int fd);
+		void		capCmd(std::vector<string>& cmd, int fd);
 };
 
 #endif
