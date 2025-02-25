@@ -11,7 +11,7 @@ void	Channel::addBannedClient(string clientname)
 	for (it = _bannedClients.begin(); it != _bannedClients.end(); ++it)
 	{
 		if (*it == clientname)
-			return ; //Client already banned, exit
+			return ;
 	}
 	_bannedClients.push_back(clientname);
 }
@@ -23,7 +23,7 @@ void Channel::addInvitation(string clientname)
 	for (it = _invitedClients.begin(); it != _invitedClients.end(); ++it)
 	{
 		if (*it == clientname)
-			return ; //Already invited
+			return ;
 	}
 	_invitedClients.push_back(clientname);
 }

@@ -18,16 +18,14 @@ void	Server::joinMsg(Channel *channel, int fd) {
 			msg.append("@");
 		msg.append(getUser(usersList[i])->getNickname());
 	}
-	std::cout << msg << std::endl;
 	string msg2 = "JOIN :";
-	std::cout << channel->getCreationTime() << std::endl;
 	msg2.append(channel->getName());
 	sendMsgToChannel(msg2 , channel, fd);
-	sendMsg(RPL_NAMREPLY(getClient(fd)->getNickname(), channel->getName(), msg), fd); //RPL_NAMREPLY 353
-	sendMsg(RPL_ENDOFNAMES(getClient(fd)->getNickname(), channel->getName()), fd); //RPL_ENDOFNAMES 366
-	if (channel->getTopic().empty()) // No topic set
+	sendMsg(RPL_NAMREPLY(getClient(fd)->getNickname(), channel->getName(), msg), fd);
+	sendMsg(RPL_ENDOFNAMES(getClient(fd)->getNickname(), channel->getName()), fd);
+	if (channel->getTopic().empty())
 		sendMsg(RPL_NOTOPIC(getClient(fd)->getNickname(), channel->getName()), fd);
-	else // Topic set
+	else
 		sendMsg(RPL_TOPIC(getClient(fd)->getNickname(), channel->getName(), channel->getTopic()), fd);
 	sendMsg(RPL_TOPICWHOTIME(getClient(fd)->getNickname(), channel->getName(), getClient(fd)->getNickname(), channel->getCreationTime()), fd);
 }
@@ -36,9 +34,9 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	Channel newchannel(channelName);
 	string	username = getClient(fd)->getUsername();
 
-	if (_channels.size() >= MAX_CHANNELS) //User joins max channels
+	if (_channels.size() >= MAX_CHANNELS)
 			return (sendMsg(ERR_TOOMANYCHANNELSCREATED(getClient(fd)->getNickname(), channelName), fd));
-	if (getClient(fd)->clientMaxChannel()) //User joins max channels
+	if (getClient(fd)->clientMaxChannel())
 		return (sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd));
 	if (i < pass) {
 		newchannel.setPassword(channelPass);
@@ -52,30 +50,23 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 	joinMsg(&newchannel, fd);
 }
 
-bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
-	(void)channelPass; // Unused parameter
-	// Check if the user is banned from the channel
+bool	Server::channelConnStatus(int fd, Channel *found, string& channelName) {
 	if (found->isBanned(getClient(fd)->getUsername())) {
 		sendMsg(ERR_BANNEDFROMCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
 
-	// Check if the user has joined too many channels
 	if (getClient(fd)->clientMaxChannel()) {
 		sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
 
-	// Check if the channel is full
 	if (found->isFull()) {
 		sendMsg(ERR_CHANNELISFULL(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
 
-	// Check if the channel is invite-only
-	//for (size_t i = 0; i < found->getInvited)
 	if (found->isModeSet(INVITE_ONLY) && !found->isInvited(getClient(fd)->getUsername())) {
-		std::cout << "entra aqui" << std::endl;
 		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
@@ -90,7 +81,7 @@ void	Server::existingChannel(Channel* found, string& channelPass, string& channe
 		}
 	}
 
-	if (!channelConnStatus(fd, found, channelPass, channelName))
+	if (!channelConnStatus(fd, found, channelName))
 		return;
 
 	found->addClient(getClient(fd)->getUsername());

@@ -54,7 +54,7 @@ bool	Server::findNicknameOnServer(string nickName, int fd)
 		if (lstClients[i].getNickname() == nickName)
 			return (true);
 	}
-	sendMsg(ERR_NOSUCHNICK(getClient(fd)->getUsername(), nickName), fd);// Hay que enviar un mensage si el nickname no existe ??
+	sendMsg(ERR_NOSUCHNICK(getClient(fd)->getUsername(), nickName), fd);
 	return (false);
 }
 
@@ -101,7 +101,6 @@ void	Server::invitationManagement(Channel* channel, std::vector<string>& nickNam
 		}
 		else
 		{
-			// ENVIAMOS UN MENSAJE ?
 			if (channel->isInvited(client->getUsername()))
 				channel->removeInvitation(client->getUsername());
 		}

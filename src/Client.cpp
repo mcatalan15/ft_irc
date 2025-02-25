@@ -48,15 +48,12 @@ string Client::getRealname() const { return (_realname); }
 
 string Client::getHostname() const { return (_hostname); }
 
-//bool Client::getIsOper() const { return (_isOper); }
-
 State Client::getState() const { return (_state); }
 
 string Client::getMsg() const { return (_msg); }
 
 string &Client::getMsgRef() { return (_msg); }
 
-// To build the prefix in IRC format: ":nickname!username@hostname"
 string Client::getPrefix() const {
 	string prefix = ":" + getNickname();
 	if (!getUsername().empty())
@@ -76,8 +73,6 @@ void Client::setRealname(const std::string& realname) { _realname = realname; }
 void Client::setHostname(const std::string& hostname) { _hostname = hostname; }
 
 void Client::setState(State newState) { _state = newState; }
-
-//void Client::setIsOper(bool isOper) { _isOper = isOper; }
 
 void Client::setMsg(const std::string& msg) { _msg = msg; }
 
@@ -103,15 +98,6 @@ void Client::welcome(Server& Server, Client &Client, int fd) {
 	sendMsg(RPL_MOTD(Client.getUsername()," \\$$$$$$ \\$$   \\$$  \\$$$$$$  "), fd);
 	sendMsg(RPL_ENDOFMOTD(Client.getUsername()), fd);
 }
-/* NOT used NOW
-void	Client::clearSpecMsg() {
-	size_t	lp = this->_msg.find_last_of("\r\n");
-	
-	if (lp != this->_msg.size())
-		this->_msg.erase(lp, this->_msg.size());
-	else
-		this->_msg.clear();
-}*/
 
 void	Client::cleanBuff() {
 	this->_msg.clear();
@@ -131,8 +117,7 @@ const std::vector<string> &Client::getChannels() const
 
 bool Client::clientMaxChannel() const
 {
-	std::cout << _channels.size() << " SIZE CLIENTMAXCHANNEL" << std::endl;
-	if(_channels.size() >= MAX_CHANNELS)
+	if(_channels.size() >= MAX_CLIENTS)
 		return (true);
 	return (false);
 }
@@ -140,16 +125,9 @@ bool Client::clientMaxChannel() const
 bool	Client::removeChannel(string channelname)
 {
 	std::vector<string>::iterator		it;
-	//(void)channelname;
-	/*for (size_t i = 0; i < _channels.size(); i++)
-	{
-		std::cout << _channels[i]->getName() << std::endl;
-	}*/
-	//std::cout << _channels[0]->getName() << std::endl;
+
 	for (it = _channels.begin(); it != _channels.end(); it++)
 	{
-		//std::cout << *it << std::endl;
-		std::cout << "name channel from client: " << *it << std::endl;
 		if (*it == channelname)
 		{
 			_channels.erase(it);
