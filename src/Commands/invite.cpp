@@ -1,6 +1,4 @@
-#include "../include/Server.hpp"
-#include "../include/Channel.hpp"
-#include "../include/Irc.hpp"
+#include "../../include/Server.hpp"
 
 bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 {

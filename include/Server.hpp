@@ -4,8 +4,6 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include <cstddef>
-#include <string>
 
 class Client;
 class Channel;
@@ -21,7 +19,7 @@ class Server {
 		string						_password;
 		std::vector<Channel>		_channels;
 		string						_creationTime;
-
+		time_t						_creationTimeT;
 		// For map (switch case)
 		static std::map<std::string, void (Server::*)(std::vector<string>&, int)> createCmdMap();
 	    static const std::map<std::string, void (Server::*)(std::vector<string>&, int)> cmdMap;
@@ -76,7 +74,10 @@ class Server {
 
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
+		void			setCreationTimeT() {  time_t now = time(0); _creationTimeT = now; };
 		string			getCreationTime() { return _creationTime; };
+		time_t			getCreationTimeT() { return _creationTimeT; };
+		
 		std::vector<string>	getInfo(void);
 
 		//MODE

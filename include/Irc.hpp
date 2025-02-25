@@ -1,18 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Irc.hpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/02/24 13:09:20 by jpaul-kr         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef IRC_HPP
 #define IRC_HPP
-
 
 // System includes
 #include <string>
@@ -36,11 +23,7 @@
 #include <cstdio>
 #include <cstring>
 
-
 using std::string;
-
-// Own includes
-//# include "ErrorLog.hpp"
 
 // Colors
 #define BLACK   "\033[30m"
@@ -69,9 +52,8 @@ using std::string;
 #define BACKGROUND_MAGENTA "\033[45m"
 #define BACKGROUND_CYAN    "\033[46m"
 #define BACKGROUND_WHITE   "\033[47m"
-
-// Reset color
 #define RESET "\033[0m"
+
 //Utils functions
 std::vector<string>	splitMsg(string &str);
 string				getCommandInUpper(const string &cmd);
@@ -86,7 +68,7 @@ std::vector<string>	joinDivisor(string cmd);
 bool				validChannel(string& channelName, int fd);
 
 // INFO
-string				getUpTime(const string& creationTime);
+string				getUpTimeT(time_t creationTime);
 string				horizontalChars(size_t maxLen);
 string				centerText(const string& text, int width);
 string				createTableRow(const string& content, int width);
@@ -102,10 +84,9 @@ string				createTableRow(const string& content, int width);
 #define CRLF "\r\n"
 #define SERVER_NAME "FT_IRC"
 #define SERVER_VERSION "1.0"
-#define USER_MODES		"" // que mierdas es esto
-#define CHANNEL_MODES	"itkol" // y esto otro?
-#define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
-
+#define USER_MODES		""
+#define CHANNEL_MODES	"itkol"
+#define CHANNEL_MODES_WITH_PARAM "kol"
 #define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost:")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
@@ -159,7 +140,6 @@ string				createTableRow(const string& content, int width);
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
 #define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329 " + (client) + " " + (channel) + " " + (ctime) + CRLF)
 #define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
-//#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
 #define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
 #define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(":localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
@@ -192,12 +172,6 @@ string				createTableRow(const string& content, int width);
 
 //TOPIC cmd
 #define RPL_NOTOPIC(client, channel)(":localhost 331 "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
-//:localhost 464 marc :Password incorrect
-//nickname
-//:localhost 433 marc mcs :Nickname is already in use
-//user
-//USER * * :marc catalan sanchez
-//:localhost 461 marc USER :Not enough parameters
 
 //INFO CMD
 #define UP_LEFT "╔" 
@@ -208,6 +182,5 @@ string				createTableRow(const string& content, int width);
 #define DOWN_RIGHT "╝"
 #define HORIZONTAL "═"
 #define VERTICAL "║"
-
 
 #endif

@@ -1,14 +1,5 @@
 #include "../include/Irc.hpp"
 
-#include <algorithm>
-#include <cctype>
-#include <cstddef>
-#include <ctime>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
 // CHECK NEW SPLITMSG. CREATES EXTRA VECTOR IN : CASE
 std::vector<std::string> splitMsg(std::string &str)
 {
