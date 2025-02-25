@@ -1,21 +1,7 @@
 #include "../include/Server.hpp"
-#include <algorithm>
-#include <cstddef>
-#include <cstring>
-#include <iostream>
-#include <map>
-#include <string>
-#include <sys/poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <vector>
 
 bool	Server::_signal = false;
 
-/*
-	Constructor
-	This constructor
-*/
 Server::Server(int port, string password) {
 	struct pollfd   s_poll;
 

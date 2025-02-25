@@ -4,8 +4,6 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include <cstddef>
-#include <string>
 
 class Client;
 class Channel;

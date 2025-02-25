@@ -1,8 +1,5 @@
 #include "../../include/Channel.hpp"
 
-#include <stdexcept>
-#include <algorithm>
-
 const std::vector<string> &Channel::getClients() const
 {
 	return (_clients);
