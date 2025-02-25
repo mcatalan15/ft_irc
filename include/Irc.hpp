@@ -1,18 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Irc.hpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mcatalan@student.42barcelona.com <mcata    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/11 06:36:33 by mcatalan@st       #+#    #+#             */
-/*   Updated: 2025/02/12 13:10:45 by jpaul-kr         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef IRC_HPP
 #define IRC_HPP
-
 
 // System includes
 #include <string>
@@ -33,12 +20,10 @@
 #include <algorithm>
 #include <vector>		// -> vector
 #include <cstddef>		// -> size_t
-
+#include <cstdio>
+#include <cstring>
 
 using std::string;
-
-// Own includes
-//# include "ErrorLog.hpp"
 
 // Colors
 #define BLACK   "\033[30m"
@@ -67,9 +52,8 @@ using std::string;
 #define BACKGROUND_MAGENTA "\033[45m"
 #define BACKGROUND_CYAN    "\033[46m"
 #define BACKGROUND_WHITE   "\033[47m"
-
-// Reset color
 #define RESET "\033[0m"
+
 //Utils functions
 std::vector<string>	splitMsg(string &str);
 string				getCommandInUpper(const string &cmd);
@@ -81,23 +65,29 @@ void				sendMsg(string msg, int fd);
 bool				nickChecker(string cmd);
 string				getCurrentDataTime();
 std::vector<string>	joinDivisor(string cmd);
-bool validChannel(string& channelName, int fd);
+bool				validChannel(string& channelName, int fd);
+
+// INFO
+string				getUpTimeT(time_t creationTime);
+string				horizontalChars(size_t maxLen);
+string				centerText(const string& text, int width);
+string				createTableRow(const string& content, int width);
 
 // Defines
 #define NICK_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-"
 #define USER_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-*. "
 #define CHANNEL_CHARSET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_[]\\{}|-* #@"
 #define MAX_CLIENTS 25
+#define MAX_CLIENTS_STR "25"
 #define MAX_CONNECTIONS 5
 #define MAX_CHANNELS 5
 #define CRLF "\r\n"
 #define SERVER_NAME "FT_IRC"
 #define SERVER_VERSION "1.0"
-#define USER_MODES		"" // que mierdas es esto
-#define CHANNEL_MODES	"itkol" // y esto otro?
-#define CHANNEL_MODES_WITH_PARAM "kol" //copiada historica
-
-#define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost")
+#define USER_MODES		""
+#define CHANNEL_MODES	"itkol"
+#define CHANNEL_MODES_WITH_PARAM "kol"
+#define USER_ID(nick, user) (":" + (nick) + "!" + (user) + "@localhost:")
 #define ERR_NOTREGISTERED(x) ("You are not registered: " + (x) + CRLF)
 #define ERR_CMDNOTFOUND(nick, cmd) ("Command not found: " + (nick) + " -> " + (cmd) + CRLF)
 #define ERR_UNKNOWNCOMMAND(nick, cmd) (":localhost 421 " + nick + " " + cmd + " :Unknown command" + CRLF)
@@ -111,7 +101,7 @@ bool validChannel(string& channelName, int fd);
 #define RPL_ISSUPPORT(client, supportedTokens) (":localhost 005 " + client + " " + supportedTokens + " :are supported by this server" + CRLF)
 
 //MOTD msg
-#define RPL_MOTDSTART(client, servername)(":localhost 375 " + client + " :- " + servername + " Messsage of the day -" + CRLF)
+#define RPL_MOTDSTART(client, servername)(":localhost 375 " + client + " :- " + servername + " Message of the day -" + CRLF)
 #define RPL_MOTD(client, line)(":localhost 372 " + client + " :" + line + CRLF)
 #define RPL_ENDOFMOTD(client)(":localhost 376 " + client + " :End of /MOTD command." + CRLF)
 
@@ -150,10 +140,9 @@ bool validChannel(string& channelName, int fd);
 #define RPL_CHANNELMODEIS(client, channel, modestring, modeargs)(":localhost 324 " + (client) + " " + (channel) + " " + (modestring) + " " + (modeargs) + CRLF)
 #define RPL_CREATIONTIME(client, channel, ctime)(":localhost 329 " + (client) + " " + (channel) + " " + (ctime) + CRLF)
 #define ERR_CHANOPRIVSNEEDED(client, channel)(":localhost 482 " + (client) + " " + (channel) + " :You're not channel operator" + CRLF)
-//#define ERR_UNKNOWNMODE(client, modechar)(":localhost 472 " + (client) + " " + (modechar) + " :is unknown mode char to me" + CRLF)
 #define ERR_UMODEUNKOWNFLAG(client)(":localhost 501 " + (client) + " :Unknown MODE flag" + CRLF)
 #define ERR_KEYSET(channel)(":localhost 467 " + (channel) + " :Channel key already set" + CRLF)
-#define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(" :localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
+#define ERR_INVALIDMODEPARAM(client, channel, modechar, parameter, description)(":localhost 696 " + (client) + " " + (channel) + " " + (modechar) + " " + (parameter) + " :" + (description) + CRLF)
 #define ERR_INVALIDKEY(client, channel)(":localhost 525 " + (client) + " " + (channel) + " :Key is not well-formed" + CRLF)
 #define MODE_MESSAGE(nick, user, channel, message, target)(":" + (nick) + "!" + (user) + "@localhost MODE " + (channel) +  " " + (message) + " " + (target) +CRLF)
 
@@ -168,10 +157,11 @@ bool validChannel(string& channelName, int fd);
 
 //PRIVMSG cmd
 #define  ERR_NOSUCHCHANNELORCLIENT(client, arg)(":localhost 401 " + (client) + " " + (arg) + " :No such channel or client" + CRLF)
+#define  ERR_CANNOTSENDTOCHAN(client, arg)(":localhost 404 " + (client) + " " + (arg) + " :cannot send to channel" + CRLF)
 
 // INVITE cmd
 #define ERR_USERONCHANNEL(client, nick, channel)(":localhost 443 " + (client) + " " + (nick) + " " + (channel) + " :is already on channel" + CRLF)
-#define RPL_ENDOFINVITELIST(client)(": localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
+#define RPL_ENDOFINVITELIST(client)(":localhost 337 " + (client) + " :End of /INVITE list" + CRLF)
 #define RPL_INVITING(client, nick, channel)(":localhost 341 " + (client) + " " + (nick) + " " + (channel) + CRLF)
 #define INVITE_MESSAGE(nick, user, client, channel)(":" + (nick) + "!" + (user) + "@localhost INVITE " + (client) + " " + (channel) + CRLF)
 
@@ -181,13 +171,16 @@ bool validChannel(string& channelName, int fd);
 #define ERR_NOSUCHNICK(client, nick)(":localhost 401 " + (client) + " " + (nick) + " :No such nick" + CRLF)
 
 //TOPIC cmd
-#define RPL_NOTOPIC(client, channel)(":localhost 331: "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
-//:localhost 464 marc :Password incorrect
-//nickname
-//:localhost 433 marc mcs :Nickname is already in use
-//user
-//USER * * :marc catalan sanchez
-//:localhost 461 marc USER :Not enough parameters
+#define RPL_NOTOPIC(client, channel)(":localhost 331 "+ (client) + " " + (channel) + " :No topic is set" + CRLF)
 
+//INFO CMD
+#define UP_LEFT "╔" 
+#define UP_RIGHT "╗"
+#define MIDDLE_LEFT "╠"
+#define MIDDLE_RIGHT "╣"
+#define DOWN_LEFT "╚"
+#define DOWN_RIGHT "╝"
+#define HORIZONTAL "═"
+#define VERTICAL "║"
 
 #endif

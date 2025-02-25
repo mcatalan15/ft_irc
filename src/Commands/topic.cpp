@@ -1,4 +1,4 @@
-#include "../include/Server.hpp"
+#include "../../include/Server.hpp"
 
 bool Server::isOnChan(string& cmd, int fd) {
 	(void)fd;
@@ -47,6 +47,11 @@ void	Server::topicSetter(std::vector<string>& cmd, int fd) {
 		if (findChannel(cmd[1])->isOperator(getClient(fd)->getUsername())) {
 			//is operator
 			findChannel(cmd[1])->setTopic(cmd[2]);
+			string msg = "TOPIC ";
+			msg.append(cmd[1]);
+			msg.append(" ");
+			msg.append(cmd[2]);
+			sendMsgToChannel(msg, findChannel(cmd[1]), fd);
 		} else {
 			//no es operador, a cagarrrrr
 			sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getNickname(), cmd[1]), fd);

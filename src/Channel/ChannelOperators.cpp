@@ -1,9 +1,5 @@
 #include "../../include/Channel.hpp"
 
-#include <algorithm>
-#include <iostream>
-#include <stdexcept>
-
 // Return the username of the operators
 const std::vector<string> &Channel::getOperators() const
 {

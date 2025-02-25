@@ -3,7 +3,6 @@
 
 #include "Irc.hpp"
 #include "Channel.hpp"
-//#include "MessageHandler.hpp"
 
 // Definition of possible client state
 // We can move it to Irc.hpp maybe ?
@@ -38,7 +37,7 @@ class Client
 		//struct pollfd			*fds;
 		bool					_registered;
 		//bool					_authentificated;
-
+		
 	public:
 		Client();
 		Client(int client_fd);

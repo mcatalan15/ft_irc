@@ -1,11 +1,6 @@
-#include "../include/Server.hpp"
-#include <iostream>
-#include <iterator>
-#include <ostream>
-#include <string>
+#include "../../include/Server.hpp"
 
 Channel* Server::channelsMng(string& channelName) {
-	//(void)fd; // WTF
 	for (size_t j = 0; j < _channels.size(); j++)
 	{
 		if (_channels[j].getName() == channelName)
@@ -58,54 +53,45 @@ void	Server::createNewChannel(string& channelName, string& channelPass, int pass
 }
 
 bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, string& channelName) {
-	(void)channelPass;
-	if (found->isBanned(getClient(fd)->getUsername())) { //User is banned from channel
+	(void)channelPass; // Unused parameter
+	// Check if the user is banned from the channel
+	if (found->isBanned(getClient(fd)->getUsername())) {
 		sendMsg(ERR_BANNEDFROMCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
-	if (getClient(fd)->clientMaxChannel()) { //User joins max channels
+
+	// Check if the user has joined too many channels
+	if (getClient(fd)->clientMaxChannel()) {
 		sendMsg(ERR_TOOMANYCHANNELS(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
-	if (found->isFull()) { //Channel is full
+
+	// Check if the channel is full
+	if (found->isFull()) {
 		sendMsg(ERR_CHANNELISFULL(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}
-	if (found->isModeSet(INVITE_ONLY)) { // IF channel is invite only
-		if (found->isInvited(getClient(fd)->getUsername())) {
-			return true;
-		}
-		else {
-			sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
-			return false;
-		}
+
+	// Check if the channel is invite-only
+	if (found->isModeSet(INVITE_ONLY) && !found->isInvited(getClient(fd)->getUsername())) {
+		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
+		return false;
 	}
 	return true;
 }
 
 void	Server::existingChannel(Channel* found, string& channelPass, string& channelName, int fd, int flag) {
-	//(void)i; //WTF
 	if (found->isModeSet(PASSWORD_SET)) {
-		if (flag == 1) {
-			string channelPass = "";
+		if (flag == 1 || channelPass != found->getPassword()) {
 			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
-			return ;
-		}
-		if (channelPass == found->getPassword()) {
-			if (channelConnStatus(fd, found, channelPass, channelName)) {
-				found->addClient(getClient(fd)->getUsername());
-				getClient(fd)->addChannel(found->getName());
-				joinMsg(found, fd);
-			}
-		}
-		else
-			sendMsg(ERR_BADCHANNELKEY(getClient(fd)->getNickname(), channelName), fd);
-	}
-	else {
-		if (channelConnStatus(fd, found, channelPass, channelName)) {
-			found->addClient(getClient(fd)->getUsername());
-			getClient(fd)->addChannel(found->getName());
-			joinMsg(found, fd);
+			return;
 		}
 	}
+
+	if (!channelConnStatus(fd, found, channelPass, channelName))
+		return;
+
+	found->addClient(getClient(fd)->getUsername());
+	getClient(fd)->addChannel(found->getName());
+	joinMsg(found, fd);
 }

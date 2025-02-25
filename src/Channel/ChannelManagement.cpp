@@ -1,8 +1,5 @@
 #include "../../include/Channel.hpp"
 
-#include <stdexcept>
-#include <algorithm>
-
 const std::vector<string> &Channel::getClients() const
 {
 	return (_clients);
@@ -32,6 +29,7 @@ void Channel::removeClient(string clientname)
 bool Channel::hasClient(string clientname) const
 {
 	std::vector<string>::const_iterator it = std::find(_clients.begin(), _clients.end(), clientname);
+	std::cout << "llega\n";
 	if (it == _clients.end())
 		return (false);
 	return (true);

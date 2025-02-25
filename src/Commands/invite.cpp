@@ -1,14 +1,4 @@
-#include "../include/Server.hpp"
-#include "../include/Channel.hpp"
-
-/*
-RPL_INVITING (341)
-ERR_NEEDMOREPARAMS (461)
-ERR_NOSUCHCHANNEL (403)
-ERR_NOTONCHANNEL (442) // tengo que verificarlo
-ERR_CHANOPRIVSNEEDED (482)
-ERR_USERONCHANNEL (443)
-*/
+#include "../../include/Server.hpp"
 
 bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 {
@@ -19,15 +9,15 @@ bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd
 	}
 	if (!channel->hasClient(getClient(fd)->getUsername()))
 	{
-	    sendMsg(ERR_NOTONCHANNEL(getClient(fd)->getUsername(), cmd[2]), fd);
+		sendMsg(ERR_NOTONCHANNEL(getClient(fd)->getUsername(), cmd[2]), fd);
 		return (false);
 	}
-    // Hay que verificar al mismo tiempo si es un canal solo por invitacion
-    // si es solo por invitacion verificar si es opé sino da igual
-	if (!channel->isOperator(getClient(fd)->getUsername()))
-	{
-	   sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getUsername(), cmd[2]), fd);
-		return (false);
+	if (channel->isModeSet(INVITE_ONLY)) {
+		if (!channel->isOperator(getClient(fd)->getUsername()))
+		{
+			sendMsg(ERR_CHANOPRIVSNEEDED(getClient(fd)->getUsername(), cmd[2]), fd);
+			return (false);
+		}
 	}
 	return (true);
 }
@@ -35,11 +25,12 @@ bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd
 std::vector<string>	Server::divisor(string cmd, bool flag)
 {
 	size_t	i;
-	size_t	init = 0;
+	size_t	init;
 	std::vector<string>	vec;
 	int		num_ch = 0;
 
 	flag ? i = 0 : i = 1;
+	init = i;
 	while (i < cmd.size())
 	{
 		if (cmd[i] == ',')
@@ -109,29 +100,9 @@ void	Server::invitationManagement(Channel* channel, std::vector<string>& nickNam
 		}
 		else
 		{
+			// ENVIAMOS UN MENSAJE ?
 			if (channel->isInvited(nickName[i]))
 				channel->removeInvitation(nickName[i]);
 		}
 	}
-}
-
-void	Server::inviteCmd(std::vector<string>& cmd, int fd)
-{
-    std::cout << "INVITE cmd" << std::endl;
-	string command = cmd[0];
-
-	if (cmd.size() < 3)
-		return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), command), fd));
-
-	Channel*	channel = findChannel(cmd[2]);
-	if (!isInviteCmdValid(channel, cmd, fd))
-		return ;
-	bool flag = (cmd[1][0] != '-' ? true : false);
-	std::vector<string> nickName = divisor(cmd[1], flag);
-	if (!nicknameExist(nickName, fd))
-		return ;
-	if (userOnChannel(channel, nickName, fd))
-	   return ;
-	invitationManagement(channel, nickName, fd, flag);
-	sendMsg(RPL_ENDOFINVITELIST(getClient(fd)->getNickname()), fd);
 }

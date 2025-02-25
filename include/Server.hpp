@@ -4,7 +4,6 @@
 #include "Irc.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include <string>
 
 class Client;
 class Channel;
@@ -13,14 +12,14 @@ class Server {
 	private:
 		int							_serverFd;
 		int							_opt;
-//		int							_port;
 		static bool					_signal;
-		std::vector<Client>			_clients; // Poner puntero?????????!!!!!!!
-		std::vector<struct pollfd>	_pollFds; //buffer. Structura para manejar mas de 1 fd(cliente)
+		std::vector<Client>			_clients;
+		std::vector<struct pollfd>	_pollFds;
 		struct sockaddr_in6			_address;
 		string						_password;
-		std::vector<Channel>		_channels; //Sin puntero guardamos directamente object (no new)
+		std::vector<Channel>		_channels;
 		string						_creationTime;
+		time_t						_creationTimeT;
 		// For map (switch case)
 		static std::map<std::string, void (Server::*)(std::vector<string>&, int)> createCmdMap();
 	    static const std::map<std::string, void (Server::*)(std::vector<string>&, int)> cmdMap;
@@ -39,14 +38,14 @@ class Server {
 
 		//Fds management
 		void			closeFds();
-		void			remove_fd(int fd); // Remove save pollFds
+		void			remove_fd(int fd);
 
 		//Msg management
 		void			msgManagement(int fd);
 		bool			msgEnded(int fd);
 		void			sendMsgToChannel(string message, Channel* channel, int fd);
 		void			sendMsgToClients(string message, std::vector<string> channelnames, int fd);
-		
+
 		//Channel Management
 		Channel*		channelsMng(string& channelName);
 		void			createNewChannel(string& channelName, string& channelPass, int pass, int i, int fd);
@@ -75,21 +74,27 @@ class Server {
 
 		// Time
 		void			setCreationTime() { _creationTime = getCurrentDataTime(); };
+		void			setCreationTimeT() {  time_t now = time(0); _creationTimeT = now; };
 		string			getCreationTime() { return _creationTime; };
+		time_t			getCreationTimeT() { return _creationTimeT; };
+		
+		std::vector<string>	getInfo(void);
 
 		//MODE
-		void			modeManagement(Channel* channel, std::vector<string>& cmd, int fd);
+		void			modeManagement(Channel* channel, std::vector<string>& cmd, string modeChar, int fd);
 		bool			isModeCmdValid (Channel* channel, std::vector<string>& cmd, int fd);
-		bool			checkModeFlags(Channel* channel, std::vector<string>& cmd, int fd);
-		bool			isFlagMode(Channel* channel, std::vector<string>& cmd, int num, int fd);
-		void			flagModeI(bool flag, Channel *channel);
-		void			flagModeT(bool flag, Channel *channel);
+		bool			checkModeFlags(string modeChar, int fd);
+		bool			isFlagMode(char modeChar, int num, int fd);
+		void			flagModeI(bool flag, Channel *channel, int fd);
+		void			flagModeT(bool flag, Channel *channel, int fd);
 		void			flagModeO(bool flag, Channel* channel, string cmd, int fd);
-		void			flagModeK(bool flag, Channel* channel, std::vector<string>& cmd, int fd);
-		void			flagModeL(bool flag, Channel* channel, string cmd);
-		bool			validFlags(Channel* channel, std::vector<string>& cmd, int fd);
+		void			flagModeK(bool flag, Channel* channel, string cmd, int fd);
+		void			flagModeL(bool flag, Channel* channel, string cmd, int fd);
+		bool			validFlags(Channel* channel, string modeChar, int fd, bool sign);
 		bool 			isNumber(string cmd);
-		void            sendModeMsg(Channel *channel, string s1, string target, int fd);
+		void			sendModeGeneralMsg(Channel *channel, string param, string target, int fd);
+		void			modeTypeD(Channel *channel, char modeChar, bool flag, int fd);
+		void			modeTypeC(Channel *channel, char modeChar, string param, bool flag, int fd);
 
 		//INVITE
 		void			invitationManagement(Channel* channel, std::vector<string>& nickName, int fd, bool flag);
@@ -103,25 +108,26 @@ class Server {
 		//isUsed commands
 		bool		nickIsUsed(string cmd);
 		bool		userIsUsed(string cmd);
+		
+		//INFO cmd
+		string		getActiveClients(void);
+		string		getActiveChannels(void);
 
 		//Commands
-		void		passCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		nickCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		userCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		quitCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		modeCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		joinCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		partCmd(std::vector<string>& cmd, int fd);	//ESTA?
-		void		topicCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		kickCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		privmsgCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		inviteCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		whoisCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		adminCmd(std::vector<string>& cmd, int fd);//ESTA?
-		void		infoCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		pongCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		pingCmd(std::vector<string>& cmd, int fd); //ESTA?
-		void		capCmd(std::vector<string>& cmd, int fd);  //ESTA?
+		void		passCmd(std::vector<string>& cmd, int fd);
+		void		nickCmd(std::vector<string>& cmd, int fd);
+		void		userCmd(std::vector<string>& cmd, int fd);
+		void		quitCmd(std::vector<string>& cmd, int fd);
+		void		modeCmd(std::vector<string>& cmd, int fd);
+		void		joinCmd(std::vector<string>& cmd, int fd);
+		void		partCmd(std::vector<string>& cmd, int fd);
+		void		topicCmd(std::vector<string>& cmd, int fd);
+		void		kickCmd(std::vector<string>& cmd, int fd);
+		void		privmsgCmd(std::vector<string>& cmd, int fd);
+		void		inviteCmd(std::vector<string>& cmd, int fd);
+		void		infoCmd(std::vector<string>& cmd, int fd);
+		void		pingCmd(std::vector<string>& cmd, int fd);
+		void		capCmd(std::vector<string>& cmd, int fd);
 };
 
 #endif
