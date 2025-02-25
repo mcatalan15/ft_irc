@@ -2,7 +2,6 @@
 
 string	getUpTimeT(time_t creationTime) {
 	// Get the current time
- 	std::cout << "crationTime getuptime: " << creationTime << std::endl;
     time_t now = time(0);
 
     // Calculate the difference in seconds

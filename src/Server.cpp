@@ -388,3 +388,11 @@ string		Server::getActiveChannels(void) {
 	oss << i;  // Convert size_t to string
 	return oss.str();
 }
+
+void	Server::setCreationTime() { _creationTime = getCurrentDataTime(); }
+
+void	Server::setCreationTimeT() {  time_t now = time(0); _creationTimeT = now; }
+
+string	Server::getCreationTime() { return _creationTime; }
+
+time_t	Server::getCreationTimeT() { return _creationTimeT; }

@@ -1,7 +1,5 @@
 #include "../../include/Channel.hpp"
 
-//#include <stdexcept>
-
 const std::vector<string> &Channel::getBannedClients() const { return (_bannedClients); }
 
 const std::vector<string> &Channel::getInvitedClients() const { return (_invitedClients); }
@@ -49,8 +47,6 @@ bool Channel::isInvited(string clientname) const
 
 	for (it = _invitedClients.begin(); it != _invitedClients.end(); ++it)
 	{
-		std::cout << "invited: " << *it << std::endl;
-		std::cout << "clientname: " << clientname << std::endl;
 		if (*it == clientname)
 			return true;
 	}

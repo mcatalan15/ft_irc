@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
 		signal(SIGPIPE, SIG_IGN);
 		server.client_process();
 	} catch (const std::exception &e) {
-		//server.closeFds(); -> uncomment + finish...
 		std::cerr << e.what() << std::endl;
 	}
 	std::cout << "\nServer closed" << std::endl;
