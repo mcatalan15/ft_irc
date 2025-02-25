@@ -47,7 +47,7 @@ all: $(NAME)
 
 bonus: all $(BOT_NAME)
 
-$(PATH_OBJ)%.o: $(SRC_DIR)%.cpp
+$(PATH_OBJ)%.o: $(SRC_DIR)%.cpp 
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 
@@ -55,7 +55,7 @@ $(BOT_PATH_OBJ)%.o: $(BOT_DIR)%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -MMD $(INCLUDE) -c $< -o $@
 
-$(NAME): $(OBJ) 
+$(NAME): $(OBJ) Makefile
 	$(CC) $(CFLAGS) $(OBJ) -o $@
 	@echo ${GREEN}$(NAME) "compiled!\n"${NC};
 
