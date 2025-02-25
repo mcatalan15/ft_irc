@@ -81,9 +81,10 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 			client->welcome(*this, *getClient(fd), fd);
 		}
 	}
-	else
+	else {
 		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
 		return ;
+	}
 }
 
 // QUIT COMMAND

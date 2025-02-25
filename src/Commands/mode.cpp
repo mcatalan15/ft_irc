@@ -149,7 +149,7 @@ void	Server::flagModeO(bool flag, Channel* channel, string target, int fd)
 {
 	if (!flag)
 	{
-		if (channel->isOperator(findNickname(target, channel)->getUsername()))
+		if (channel->isOperator((findNickname(target, channel))->getUsername()))
 			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", target, "Is allready an Operator"), fd)); 
 		channel->addOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "+o", target, fd);
@@ -212,15 +212,14 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 		{
 			if (param.size() > j)
 			{
-				if (!channel->hasClient(param[j]))
+				if (!channel->hasClient(getNick(param[j])->getUsername()))
 				{
 					if (!flag)
 						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
 					else
 						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
 				}
-				flagModeO(flag, channel, param[j], fd);
-				j++;
+				flagModeO(flag, channel, param[j++], fd);
 			}
 			else
 			{
