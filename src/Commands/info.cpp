@@ -1,4 +1,4 @@
-#include "../include/Server.hpp"
+#include "../../include/Server.hpp"
 
 string	getUpTimeT(time_t creationTime) {
 	// Get the current time

@@ -1,9 +1,4 @@
 #include "../include/Server.hpp"
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <string>
-#include <vector>
 
 // CAP COMMAND
 void	Server::capCmd(std::vector<std::string>& cmd, int fd) {
@@ -137,7 +132,7 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 }
 
 
-// MODE COMMAND ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MODE COMMAND 
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
 	//printVecStr(cmd);

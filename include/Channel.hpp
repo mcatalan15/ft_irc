@@ -1,10 +1,6 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <string>
-# include <vector>
-
-#include "Client.hpp"
 #include "Irc.hpp"
 
 /*
@@ -14,6 +10,7 @@ MODES
 +/- k -> password set (default: off = -k) if pass is set Change to +k
 +/- l -> user limit (default: off = -l)
 */
+
 enum Mode {
 	INVITE_ONLY = (1 << 0), 	//0001 (+i/-i) -> 1
 	TOPIC_RESTRICTED = (1 << 1),//0010 (+t/-t) -> 2
