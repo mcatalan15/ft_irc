@@ -73,7 +73,9 @@ bool	Server::channelConnStatus(int fd, Channel *found, string& channelPass, stri
 	}
 
 	// Check if the channel is invite-only
+	//for (size_t i = 0; i < found->getInvited)
 	if (found->isModeSet(INVITE_ONLY) && !found->isInvited(getClient(fd)->getUsername())) {
+		std::cout << "entra aqui" << std::endl;
 		sendMsg(ERR_INVITEONLYCHAN(getClient(fd)->getNickname(), channelName), fd);
 		return false;
 	}

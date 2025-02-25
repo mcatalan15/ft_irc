@@ -49,6 +49,8 @@ bool Channel::isInvited(string clientname) const
 
 	for (it = _invitedClients.begin(); it != _invitedClients.end(); ++it)
 	{
+		std::cout << "invited: " << *it << std::endl;
+		std::cout << "clientname: " << clientname << std::endl;
 		if (*it == clientname)
 			return true;
 	}

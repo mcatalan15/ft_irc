@@ -92,17 +92,18 @@ void	Server::invitationManagement(Channel* channel, std::vector<string>& nickNam
 {
     for (size_t i = 0; i < nickName.size(); i++)
 	{
+		Client*	client = getNick(nickName[i]);
 		if (flag)
 		{
-			channel->addInvitation(nickName[i]);
+			channel->addInvitation(client->getUsername());
 			sendMsg(RPL_INVITING(getClient(fd)->getNickname(), nickName[i], channel->getName()), fd); //RPL_INVITING (341)
 			sendInvitationMsg(channel, nickName[i], fd);
 		}
 		else
 		{
 			// ENVIAMOS UN MENSAJE ?
-			if (channel->isInvited(nickName[i]))
-				channel->removeInvitation(nickName[i]);
+			if (channel->isInvited(client->getUsername()))
+				channel->removeInvitation(client->getUsername());
 		}
 	}
 }
