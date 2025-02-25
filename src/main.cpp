@@ -5,8 +5,8 @@ int main(int argc, char **argv) {
 		std::cerr << "Usage: ./irc <port> <password>" << std::endl;
 		return (1);
 	}
-	Server	server(std::atoi(argv[1]), (string)argv[2]);
 	try {
+		Server	server(std::atoi(argv[1]), (string)argv[2]);
 		signal(SIGINT, Server::signalHandler);
 		signal(SIGQUIT, Server::signalHandler);
 		signal(SIGPIPE, SIG_IGN);

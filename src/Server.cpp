@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include <stdexcept>
 
 bool	Server::_signal = false;
 
@@ -14,15 +15,15 @@ Server::Server(int port, string password) {
 	_opt = 1; //opciones que se le puede dar al server en setsocketopt
 
 	if ((_serverFd = socket(AF_INET6, SOCK_STREAM, 0)) < 0) //creates listening FD for the server
-		std::cerr << "error: socket connection" << std::endl;
+		throw std::runtime_error("error: socket connection");
 	if (setsockopt(_serverFd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
-		std::cerr << "error: setstockopt error" << std::endl;
+		throw std::runtime_error("error: setstockopt error");
 	if (fcntl(_serverFd, F_SETFL, O_NONBLOCK) == -1)
-		std::cerr << "error: failed to set option (O_NONBLOCK) on socket" << std::endl;
+		throw std::runtime_error("error: failed to set option (O_NONBLOCK) on socket");
 	if (bind(_serverFd, (struct sockaddr*)&_address, sizeof(_address)) < 0)
-		std::cerr << "error: binding error" << std::endl; //bind connecta al puerto
+		throw std::runtime_error("error: binding error"); //bind connecta al puerto
 	if (listen(_serverFd, MAX_CONNECTIONS) < 0) // deja abierto el puerto
-		std::cerr << "error: server not listening" << std::endl;
+		throw std::runtime_error("error: server not listening");
 
 	s_poll.fd = _serverFd;
 	s_poll.events = POLLIN; //cada input al terminal
