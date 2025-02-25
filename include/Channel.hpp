@@ -27,51 +27,51 @@ class Channel {
 		~Channel();
 
 		/*------------ CHANNEL INFO ---------------*/
-		const string 	getName() const;
-		const string	getTopic() const;
-		void			setTopic(const string& topic);
+		const string 				getName() const;
+		const string				getTopic() const;
+		void						setTopic(const string& topic);
 
 		// Password management
-		string getPassword() const;
-		void setPassword(const string& password);
-		bool hasPassword() const;
+		string 						getPassword() const;
+		void 						setPassword(const string& password);
+		bool 						hasPassword() const;
 
 		/*---------- CHANNEL MANAGEMENT -----------*/
 		// Client management
-		const std::vector<string> &getClients() const;
-		void addClient(string clientname);
-		void removeClient(string clientname);
-		bool hasClient(string clientname) const;
-		Client*	findNickname(string nick);
+		const std::vector<string> 	&getClients() const;
+		void 						addClient(string clientname);
+		void 						removeClient(string clientname);
+		bool 						hasClient(string clientname) const;
+		Client*						findNickname(string nick);
 
 		/*---------- CHANNEL OPERATORS ---------------*/
-		const std::vector<string> &getOperators() const;
-		void addOperator(string clientname);
-		void removeOperator(string clientname);
-		bool isOperator(string clientname) const;
-		void	setMode(Mode mode);
-		void	unsetMode(Mode modev);
-		bool	isModeSet(Mode mode);
+		const std::vector<string> 	&getOperators() const;
+		void 						addOperator(string clientname);
+		void						removeOperator(string clientname);
+		bool						isOperator(string clientname) const;
+		void						setMode(Mode mode);
+		void						unsetMode(Mode modev);
+		bool						isModeSet(Mode mode);
 
 
 		/*---------- CHANNEL LIMITS ---------------*/
-		int getUserLimit() const;
-		int setUserLimit(int limit);
-		bool isFull() const;
+		int 						getUserLimit() const;
+		int 						setUserLimit(int limit);
+		bool 						isFull() const;
 
 
 		/*----------- CHANNEL INVITATIONS ----------*/
-		const std::vector<string> &getInvitedClients() const;
-		const std::vector<string> &getBannedClients() const;
-		void addBannedClient(string clientname);
-		void addInvitation(string clientname);
-		void removeInvitation(string clientname);
-		bool isInvited(string clientname) const;
-		bool isBanned(string clientname) const;
+		const std::vector<string> 	&getInvitedClients() const;
+		const std::vector<string> 	&getBannedClients() const;
+		void 						addBannedClient(string clientname);
+		void 						addInvitation(string clientname);
+		void 						removeInvitation(string clientname);
+		bool 						isInvited(string clientname) const;
+		bool 						isBanned(string clientname) const;
 
 		/*----------CHANNEL TIME ------------------ */
-		void	setCreationTime() { _creationTime = getCurrentDataTime(); };
-		string	getCreationTime() { return _creationTime; };
+		void						setCreationTime() { _creationTime = getCurrentDataTime(); };
+		string						getCreationTime() { return _creationTime; };
 
 		private:
 			string					_name;				// name of the channel

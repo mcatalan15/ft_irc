@@ -61,15 +61,15 @@ void Server::signalHandler(int signum) {
 	Creates
 */
 void Server::new_client(int &numfd) {    
-	struct sockaddr_in	client_addr; // Struct needed to save the client address.
-	socklen_t client_len = sizeof(client_addr); // The size of the struct for the address. 
-	int client_fd = accept(_serverFd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
+	struct sockaddr_in		client_addr; // Struct needed to save the client address.
+	socklen_t client_len = 	sizeof(client_addr); // The size of the struct for the address. 
+	int client_fd = 		accept(_serverFd, (struct sockaddr*)&client_addr, &client_len); // Accepts the connection and recives the fd of the client
+	
 	if (client_fd < 0) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 			return; // Not a real error, just no clients to accept
 		std::cerr << "accept() failed: " << strerror(errno) << std::endl;
 	}
-	std::cout << "clientfd: " << client_fd << std::endl;
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) == -1) {
 		std::cerr << "fcntl failed" << std::endl;
 		close(client_fd);
@@ -79,6 +79,7 @@ void Server::new_client(int &numfd) {
 	Client	newClient(client_fd);
 	
 	struct pollfd		newpoll = {};
+	
 	newpoll.fd = client_fd; // Adds the new client fd to the list of monitored fd's.
 	newpoll.events = POLLIN; // Marks the fd
 	newpoll.revents = 0; // Initialize revents 0
@@ -90,21 +91,23 @@ void Server::new_client(int &numfd) {
 		_pollFds[numfd] = newpoll; // Replace an existance entry (if any)
 	_clients.push_back(newClient); // Add client to the Client vector
 	numfd++; // Increment the number of Fds
-	std::cout << GREEN << "Client <" << client_fd << "> Connected" << WHITE << std::endl;
+	std::cout << GREEN << "Client <" << client_fd - 3 << "> Connected" << WHITE << std::endl;
 }
 
-// If client exists
 void	Server::client_exist(int fd) {
 	char buffer[1024];
 	ssize_t	bytes_read = recv(fd, buffer, sizeof(buffer), 0); //function to read buff
 	Client *Client = getClient(fd);
 	std::vector<string>	command;
+	
 	Client->setHostname(addHostname());
-	if (bytes_read <= 0) { // Client disconnected or error occurred
+	if (bytes_read <= 0) {
 		std::cerr << "Client disconnected or read error, fd: " << fd << std::endl;
 		std::vector<string> cmd = joinDivisor("QUIT :leaving");
 		quitCmd(cmd, fd);
-	} else {
+	} 
+	else
+	{
 		// Append received data to the client's existing buffer
 		string received_data(buffer, bytes_read);
 		Client->appendToMsg(received_data);
@@ -135,10 +138,10 @@ void	Server::client_process() {
 		numfd = std::min(numfd, static_cast<int>(_pollFds.size())); //std::min returns the min val of 2 values
 		
 		//Wait for events on Fds
-		int numEvents = poll(&_pollFds[0], numfd, -1); //
+		int numEvents = poll(&_pollFds[0], numfd, -1);
 		if (numEvents < 0 && _signal == false) {
 			std::cerr << "polling failed" << std::endl;
-			continue; //Skip the loop in case of error
+			continue; //Skip the loop in case of err
 		}
 		// Iterate through the fds USING vector IT in case _pollFds change inside the for to be updated
 		for (size_t i = 0; i < _pollFds.size(); i++) { //si hay eventos entra (si hay clientes conectados)
@@ -165,10 +168,8 @@ Client *Server::getClient(int fd) {
 }
 
 void Server::closeFds() {
-	//Temporary vector
 	std::vector<int>to_remove;
 	
-	// Close all clients Fds except the server socket
 	for (size_t i = 1; i < _pollFds.size(); i++) {
 		std::cout << "Client <" << _pollFds[i].fd << "> Disconnected" << std::endl;
 		string message = "Server has disconnected\n";
@@ -176,14 +177,12 @@ void Server::closeFds() {
 		close(_pollFds[i].fd);
 		to_remove.push_back(_pollFds[i].fd);
 	}
-	// Remove clients closed in _pollFds
 	for (std::vector<int>::size_type i = 0; i < to_remove.size(); ++i)
-		remove_fd(to_remove[i]); // Safe removal function for fds
-	//Close server Fd if valid
+		remove_fd(to_remove[i]);
 	if (_serverFd != -1) {
 		std::cout << "Server <" << _serverFd << "> Disconnected" << std::endl;
 		close(_serverFd);
-		_serverFd = -1; // Mark server as closed in case any error
+		_serverFd = -1;
 	}
 }
 
@@ -191,7 +190,7 @@ void	Server::remove_fd(int fd) {
 	for (std::vector<struct pollfd>::iterator it = _pollFds.begin(); it != _pollFds.end(); ++it) {
 		if (it->fd == fd) {
 			_pollFds.erase(it);
-			break; // Exit the loop once the fd is removed
+			break;
 		}
 	}
 }
@@ -255,21 +254,18 @@ void	Server::msgManagement( int fd) {
 	std::vector<string> cmd = splitMsg(command);
 	if (cmd.empty())
 		return ;
-	// Use getCommandInUpper to extract and normalize the command
-	string upperCmd = getCommandInUpper(cmd[0]); //toupper
+
+	string upperCmd = getCommandInUpper(cmd[0]);
 
 	std::map<string, void (Server::*)(std::vector<string>&, int)>::const_iterator it = cmdMap.find(upperCmd);
-	if (it != cmdMap.end()) // Execute the command
+	if (it != cmdMap.end())
 		(this->*(it->second))(cmd, fd);
-	else {
-			//CUIDADO PETA!!!!!
-			// Unknown command    !!!!!! VERIFICAR SI NO ES ERR_CMDNOTFOUND
+	else
 		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[0]), fd);
-	}
 }
 
-bool Server::isRegistered(int fd) {
-	//
+bool Server::isRegistered(int fd) 
+{
 	if (getClient(fd)->getState() == REGISTERED)
 		return true;
 	return false;
@@ -329,18 +325,12 @@ bool	Server::alreadyJoined(Channel* channel, string user) {
 
 std::vector<Client> &Server::getClients() { return (_clients); }
 
-// QUE COJONES ES ESTO???
 Client*	Server::findNickname(string nick, Channel* channel)
 {
 	const std::vector<string>&	lstClients = channel->getClients();
-	(void)nick;
-	(void)channel;
-	if (lstClients.size() <= 0) {
-		std::cout << "No hay clients en este channel" << std::endl;
+	if (lstClients.size() <= 0)
 		return NULL;
-	}
-	for (size_t i = 0; i < lstClients.size(); i++)
-	{
+	for (size_t i = 0; i < lstClients.size(); i++) {
 		if (getUser(lstClients[i])->getNickname() == nick)
 			return getUser(lstClients[i]);
 	}
@@ -352,21 +342,25 @@ void	Server::sendMsgToClients(string message, std::vector<string> channelnames, 
 	Client*								client = getClient(fd);
 	std::vector<string>::const_iterator	it;
 
-	for (size_t i = 0; i < _clients.size(); i++) {
-		if (_clients[i].getNickname() != client->getNickname()) {
-			for (size_t j = 0; j < channelnames.size(); j++) {
+	for (size_t i = 0; i < _clients.size(); i++) 
+	{
+		if (_clients[i].getNickname() != client->getNickname()) 
+		{
+			for (size_t j = 0; j < channelnames.size(); j++) 
+			{
 				it = std::find(_clients[i].getChannels().begin(), _clients[i].getChannels().end(), channelnames[j]);
-				if (it != _clients[i].getChannels().end()) {
+				if (it != _clients[i].getChannels().end()) 
+				{
 					sendMsg(USER_ID(client->getNickname(), client->getUsername()) + " " + message + CRLF, _clients[i].getFd());
 					break ;
 				}
-
 			}
 		}
 	}
 }
 
-string		Server::getActiveClients(void) {
+string		Server::getActiveClients(void) 
+{
 	size_t i = 0;
 	if (_clients.size() == 0)
 		return "0";
@@ -374,17 +368,26 @@ string		Server::getActiveClients(void) {
 		i++;
 
 	std::ostringstream oss;
-	oss << i;  // Convert size_t to string
+	oss << i;
 	return oss.str();
 }
 
-string		Server::getActiveChannels(void) {
+string		Server::getActiveChannels(void) 
+{
 	size_t i = 0;
 	if (_channels.size())
 		return "0";
 	while (i < _channels.size())
 		i++;
 	std::ostringstream oss;
-	oss << i;  // Convert size_t to string
+	oss << i;
 	return oss.str();
 }
+
+void	Server::setCreationTime() { _creationTime = getCurrentDataTime(); }
+
+void	Server::setCreationTimeT() {  time_t now = time(0); _creationTimeT = now; }
+
+string	Server::getCreationTime() { return _creationTime; }
+
+time_t	Server::getCreationTimeT() { return _creationTimeT; }

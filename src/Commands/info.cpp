@@ -1,23 +1,18 @@
 #include "../../include/Server.hpp"
 
 string	getUpTimeT(time_t creationTime) {
-	// Get the current time
- 	std::cout << "crationTime getuptime: " << creationTime << std::endl;
     time_t now = time(0);
 
-    // Calculate the difference in seconds
     time_t uptime = now - creationTime;
     if (uptime < 0) {
         return "Future Time Error";
     }
 
-    // Convert uptime into days, hours, minutes, and seconds
     int days = uptime / 86400;
     int hours = (uptime % 86400) / 3600;
     int minutes = (uptime % 3600) / 60;
     int seconds = uptime % 60;
 
-    // Format the uptime string
     std::ostringstream uptimeStr;
     uptimeStr << days << " days, "
               << (hours < 10 ? "0" : "") << hours << " hours, "
