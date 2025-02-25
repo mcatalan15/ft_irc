@@ -1,6 +1,4 @@
 #include "../include/Server.hpp"
-#include <cstddef>
-#include <iostream>
 
 // Default constructor
 Client::Client() : _fd(-1), _state(HANDSHAKE) {}

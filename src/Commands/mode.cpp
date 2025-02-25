@@ -1,7 +1,4 @@
-#include "../include/Server.hpp"
-#include "../include/Channel.hpp"
-#include <cstddef>
-#include <string>
+#include "../../include/Server.hpp"
 
 void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, int fd)
 {

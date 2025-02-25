@@ -1,4 +1,4 @@
-#include "../include/Server.hpp"
+#include "../../include/Server.hpp"
 
 bool Server::isOnChan(string& cmd, int fd) {
 	(void)fd;

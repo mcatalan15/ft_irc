@@ -1,15 +1,4 @@
-#include "../include/Server.hpp"
-#include "../include/Channel.hpp"
-#include "../include/Irc.hpp"
-
-/*
-RPL_INVITING (341)
-ERR_NEEDMOREPARAMS (461)
-ERR_NOSUCHCHANNEL (403)
-ERR_NOTONCHANNEL (442) // tengo que verificarlo
-ERR_CHANOPRIVSNEEDED (482)
-ERR_USERONCHANNEL (443)
-*/
+#include "../../include/Server.hpp"
 
 bool	Server::isInviteCmdValid(Channel* channel, std::vector<string>& cmd, int fd)
 {

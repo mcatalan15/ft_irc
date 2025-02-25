@@ -3,7 +3,6 @@
 
 #include "Irc.hpp"
 #include "Channel.hpp"
-//#include "MessageHandler.hpp"
 
 // Definition of possible client state
 // We can move it to Irc.hpp maybe ?
