@@ -21,7 +21,6 @@ class Client
 {
 	private:
 		int						_fd;
-		//bool					_isOper;
 		string					_IPv6;
 		string					_nickname;
 		string					_username;
@@ -30,13 +29,8 @@ class Client
 		string					_msg;			// To manage messages
 		State					_state;			// Connection state
 		std::vector<string>		_channels;
-		//std::vector<Client>	_clients;		// List of all clients
-
-		//string				_password;		// HACE FALTA ?*/
 		struct sockaddr_in6		address;		// DE QUE SIRVE ??
-		//struct pollfd			*fds;
 		bool					_registered;
-		//bool					_authentificated;
 		
 	public:
 		Client();
@@ -45,39 +39,37 @@ class Client
 		Client(const Client &src);
 		Client &operator=(const Client &src);
 
-		//void			newClient(int &numfd);
 		//GETTERS
-		struct sockaddr_in6	getAddr(); // PARA QUE LO NECESITAMOS ?
-		int				getFd();
-		string			getNickname() const;
-		string			getUsername() const;
-		string			getRealname() const;
-		string			getHostname() const;
-		string			getMsg() const; //tengo que implementarlo
-		string			&getMsgRef();
-		string			getPrefix() const;
-		bool			getIsOper() const;
-		State			getState() const;
-		const std::vector<string> &getChannels() const;
-		bool			clientMaxChannel() const;
+		struct sockaddr_in6			getAddr();
+		int							getFd();
+		string						getNickname() const;
+		string						getUsername() const;
+		string						getRealname() const;
+		string						getHostname() const;
+		string						getMsg() const;
+		string						&getMsgRef();
+		string						getPrefix() const;
+		bool						getIsOper() const;
+		State						getState() const;
+		const std::vector<string> 	&getChannels() const;
+		bool						clientMaxChannel() const;
 
 		//SETTERS
-		void setNickname(const string& nickname);
-		void setUsername(const string& username);
-		void setRealname(const string& realname);
-		void setHostname(const string& hostname);
-		void setMsg(const string& newMsg);
-		void setState(State newState);
-		void setIsOper(bool isOper);
+		void 						setNickname(const string& nickname);
+		void 						setUsername(const string& username);
+		void 						setRealname(const string& realname);
+		void 						setHostname(const string& hostname);
+		void 						setMsg(const string& newMsg);
+		void 						setState(State newState);
+		void 						setIsOper(bool isOper);
 
 		//FUNCTIONS
-		void welcome(Server& Server, Client &Client, int fd);          // Need to implement
-		void reply(string msg);    //Need to implement*/
-		//void	clearSpecMsg();		//Not used NOW
-		void	cleanBuff();
-		void	addChannel(string channelname);
-		bool	removeChannel(string channelname);
-		void	appendToMsg(const string &msg);
+		void 						welcome(Server& Server, Client &Client, int fd);          // Need to implement
+		void 						reply(string msg);    //Need to implement*/
+		void						cleanBuff();
+		void						addChannel(string channelname);
+		bool						removeChannel(string channelname);
+		void						appendToMsg(const string &msg);
 };
 
 #endif

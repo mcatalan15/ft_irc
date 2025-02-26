@@ -12,7 +12,6 @@ void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, i
 		msg.append(target);
 		msg.append(" ");
 	}
-	//std::cout << msg << std::endl;
 	msg.append(CRLF);
 	sendMsg(msg, fd);
 	sendMsgToChannel(msg, channel, fd);
@@ -21,12 +20,8 @@ void	Server::sendModeGeneralMsg(Channel *channel, string param, string target, i
 
 bool	Server::validFlags(Channel* channel, string modeChar, int fd, bool sign)
 {
-	std::cout << "VALID FLAGS" << modeChar << std::endl;
 	std::vector<bool> charactersRepeat(128, false);
-	//string str = modeChar[0];
 
-	//for (size_t i = 0; i < modeChar.size(); i++)
-	//	str.append(modeChar[i]);
 	string str = "";
 	if (sign == true)
 		str.append("+");
@@ -49,45 +44,22 @@ bool	Server::validFlags(Channel* channel, string modeChar, int fd, bool sign)
 bool	Server::isFlagMode(char modeChar, int num, int fd)
 {
 	(void) num;
-	std::cout << "IS FLAG MODE" << std::endl;
-	std::cout << modeChar << std::endl;
 	string str = CHANNEL_MODES;
-	//printVecStr(modeChar);
-	//if (num == 1)
-	//{
-		//for (size_t i = 0; i < modeChar.size(); i++)
-		//{
-			if (str.find_first_of(modeChar) == string::npos)
-			{
-				sendMsg(ERR_UMODEUNKOWNFLAG(getClient(fd)->getUsername()), fd);
-				return (false);
-			}
-			//}
-			//}
-	// if (num == 2)
-	// {
-	// 	for (size_t i = 0; i < modeChar.size(); i++)
-	// 	{
-	// 		if (modeChar.find_first_of(CHANNEL_MODES_WITH_PARAM) == string::npos)
-	// 			return (false);
-	// 	}
-	// }
+	
+	if (str.find_first_of(modeChar) == string::npos)
+	{
+		sendMsg(ERR_UMODEUNKOWNFLAG(getClient(fd)->getUsername()), fd);
+		return (false);
+	}
 	return true;
 }
 
 bool	Server::checkModeFlags(string modeChar, int fd)
 {
-	std::cout << "CHECK MODE FLAG" << std::endl;
-	std::cout << modeChar << std::endl;
-	//printVecStr(modeChar);
 	for (size_t i = 0; i < modeChar.size(); i++)
 	{
-		//if (!isFlagMode(modeChar, 2, fd))
-		//{
-			if (!isFlagMode(modeChar[i], 1, fd))
-				return (false);
-			
-				//}
+		if (!isFlagMode(modeChar[i], 1, fd))
+			return (false);	
 	}
 	return (true);
 }
@@ -121,7 +93,6 @@ bool Server::isNumber(string cmd)
     for (size_t i = 1; i <= cmd.size(); i++)
 	{
 		if (!isdigit(cmd[i]))
-		//if (cmd.find_first_of("0123456789") == string::npos)
 			return (false);
 	}
 	return (true);
@@ -136,7 +107,6 @@ void	Server::flagModeL(bool flag, Channel* channel, string param, int fd)
 		ss >> num;
 		if (num > MAX_CLIENTS)
 		{
-			std::cout << "NUM ES " << num << "MAX_CLIENTS ES " << MAX_CLIENTS << std::endl;
 			num = MAX_CLIENTS;
 			sendModeGeneralMsg(channel, "+l", MAX_CLIENTS_STR, fd);
 			channel->setUserLimit(num);
@@ -179,7 +149,7 @@ void	Server::flagModeO(bool flag, Channel* channel, string target, int fd)
 {
 	if (!flag)
 	{
-		if (channel->isOperator(findNickname(target, channel)->getUsername()))
+		if (channel->isOperator((findNickname(target, channel))->getUsername()))
 			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", target, "Is allready an Operator"), fd)); 
 		channel->addOperator(findNickname(target, channel)->getUsername());
 		sendModeGeneralMsg(channel, "+o", target, fd);
@@ -228,12 +198,9 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 {
 	bool flag = (cmd[2][0] != '+' ? true : false);
 
-	std::cout << flag << std::endl;
 	std::vector<string> param;
 	if (cmd.size() > 3)
 		param = divisor(cmd[3], true);
-	//printVecStr(modeChar);
-	//printVecStr(param);
 	size_t j = 0;
 	for (size_t i = 0; i < modeChar.size(); i++)
 	{
@@ -245,15 +212,14 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 		{
 			if (param.size() > j)
 			{
-				if (!channel->hasClient(param[j]))
+				if (!channel->hasClient(getNick(param[j])->getUsername()))
 				{
 					if (!flag)
 						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
 					else
 						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
 				}
-				flagModeO(flag, channel, param[j], fd);
-				j++;
+				flagModeO(flag, channel, param[j++], fd);
 			}
 			else
 			{
@@ -284,7 +250,6 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 			{
 				if (param.size() > j)
 				{
-					std::cout << "mode L " << param[j] << std::endl;
 					if (isNumber(param[j]))
 						return (sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+l", param[j], "Invalid limit"), fd));
 					flagModeL(flag, channel, param[j], fd);

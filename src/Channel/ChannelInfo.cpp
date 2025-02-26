@@ -5,7 +5,6 @@ const string Channel::getName() const
 	return (_name);
 }
 
-// Password management
 string Channel::getPassword() const
 {
     return (_password);

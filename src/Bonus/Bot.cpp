@@ -22,12 +22,12 @@ class IRCBot {
 		void run();
 
 	private:
-		string host_;
-		string port_;
-		string password_;
-		string channel_;
-		int sockfd_;
-		std::map<string, string> commands_;
+		string _host;
+		string _port;
+		string _passwd;
+		string _channel;
+		int _sockfd;
+		std::map<string, string> _cmds;
 		string toLower(const string& str);
 		string trim(const string& str);
 		string extractMessageContent(const string& message);
@@ -36,34 +36,31 @@ class IRCBot {
 
 // Constructor
 IRCBot::IRCBot(const string& host, const string& port, const string& password, const string& channel)
-	: host_(host), port_(port), password_(password), channel_(channel), sockfd_(-1) {
-		// Initialize commands
-		commands_["quien fuma?"] = "el puma";
-		commands_["8"] = "bingo";
-		commands_["7"] = "linea!!!!";
-		commands_["klk"] = "manin";
-		commands_["pain au chocolat o chocolatine?"] = "napolitana";
-		commands_["coca y keta?"] = "VOLTERETA";
-		commands_["BOOOMBA"] = "sensual";
-		commands_["quien lo peta?"] = "el mas fumeta";
-		commands_["amor porreta?"] = "pal que lo peta";
-		commands_["Maestro yoda, que es la fuerza?"] = "Es la p...a que cada manana te almuerzas";
+	: _host(host), _port(port), _passwd(password), _channel(channel), _sockfd(-1) {
+		_cmds["quien fuma?"] = "el puma";
+		_cmds["8"] = "bingo";
+		_cmds["7"] = "linea!!!!";
+		_cmds["klk"] = "manin";
+		_cmds["pain au chocolat o chocolatine?"] = "napolitana";
+		_cmds["coca y keta?"] = "VOLTERETA";
+		_cmds["BOOOMBA"] = "sensual";
+		_cmds["quien lo peta?"] = "el mas fumeta";
+		_cmds["amor porreta?"] = "pal que lo peta";
+		_cmds["Maestro yoda, que es la fuerza?"] = "Es la p...a que cada mañana te almuerzas";
+		_cmds["quien lo mata?"] = "el mas rata";
 }
 
-// Destructor
 IRCBot::~IRCBot() {
-	if (sockfd_ != -1)
-		close(sockfd_);
+	if (_sockfd != -1)
+		close(_sockfd);
 }
 
-// Convert string to lowercase
 string IRCBot::toLower(const string& str) {
 	string lowerStr = str;
 	std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
 	return lowerStr;
 }
 
-// Trim leading and trailing whitespace
 string IRCBot::trim(const std::string& str) {
 	size_t first = str.find_first_not_of(' ');
 	if (first == string::npos) return "";
@@ -71,7 +68,6 @@ string IRCBot::trim(const std::string& str) {
 	return str.substr(first, last - first + 1);
 }
 
-// Remove \r\n from the end of the string (C++98 compatible)
 string IRCBot::removeCRLF(const std::string& str) {
 	string cleanedStr = str;
 	if (!cleanedStr.empty() && cleanedStr[cleanedStr.size() - 1] == '\n') {
@@ -83,37 +79,35 @@ string IRCBot::removeCRLF(const std::string& str) {
 	return cleanedStr;
 }
 
-// Extract the message content (after the last ':')
 string IRCBot::extractMessageContent(const std::string& message) {
 	size_t colonPos = message.find_last_of(':');
 	if (colonPos == string::npos) return "";
 	return trim(message.substr(colonPos + 1));
 }
 
-// Connect to the IRC server
 bool IRCBot::connectToServer() {
 	struct addrinfo hints, *res;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (getaddrinfo(host_.c_str(), port_.c_str(), &hints, &res) != 0) {
+	if (getaddrinfo(_host.c_str(), _port.c_str(), &hints, &res) != 0) {
 		std::cerr << "Error: Could not resolve hostname." << std::endl;
 		return false;
 	}
 
-	sockfd_ = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sockfd_ == -1) {
+	_sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if (_sockfd == -1) {
 		std::cerr << "Error: Could not create socket." << std::endl;
 		freeaddrinfo(res);
 		return false;
 	}
 
-	if (connect(sockfd_, res->ai_addr, res->ai_addrlen) == -1) {
+	if (connect(_sockfd, res->ai_addr, res->ai_addrlen) == -1) {
 		std::cerr << "Error: Could not connect to server." << std::endl;
 		freeaddrinfo(res);
-		close(sockfd_);
-		sockfd_ = -1;
+		close(_sockfd);
+		_sockfd = -1;
 		return false;
 	}
 
@@ -121,27 +115,24 @@ bool IRCBot::connectToServer() {
 	return true;
 }
 
-// Send a command to the IRC server
 void IRCBot::sendCommand(const string& command) {
 	string fullCommand = command + "\r\n";
-	if (send(sockfd_, fullCommand.c_str(), fullCommand.length(), 0) == -1)
+	if (send(_sockfd, fullCommand.c_str(), fullCommand.length(), 0) == -1)
 		std::cerr << "Error: Failed to send command." << std::endl;
 }
 
-// Log in to the IRC server and join the channel
 void IRCBot::login() {
-	sendCommand("PASS " + password_);
+	sendCommand("PASS " + _passwd);
 	sendCommand("NICK IRCBot");
 	sendCommand("USER IRCBot 0 * :IRC Bot");
-	sendCommand("JOIN #" + channel_); // Join the channel directly
+	sendCommand("JOIN #" + _channel);
 }
 
-// Main loop to handle incoming messages
 void IRCBot::run() {
 	char buffer[512];
 	while (true) {
 		memset(buffer, 0, sizeof(buffer));
-		int bytesReceived = recv(sockfd_, buffer, sizeof(buffer) - 1, 0);
+		int bytesReceived = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
 		if (bytesReceived <= 0) {
 			std::cerr << "Error: Connection lost." << std::endl;
 			break;
@@ -160,13 +151,13 @@ void IRCBot::run() {
 			size_t channelEnd = message.find(" ", channelStart);
 			string targetChannel = message.substr(channelStart, channelEnd - channelStart);
 
-			if (targetChannel == "#" + channel_) {
+			if (targetChannel == "#" + _channel) {
 				string userMessage = extractMessageContent(message);
 				userMessage = toLower(userMessage); // Convert to lowercase
 
-				std::map<string, std::string>::iterator it = commands_.find(userMessage);
-				if (it != commands_.end())
-					sendCommand("PRIVMSG #" + channel_ + " :" + it->second);
+				std::map<string, std::string>::iterator it = _cmds.find(userMessage);
+				if (it != _cmds.end())
+					sendCommand("PRIVMSG #" + _channel + " :" + it->second);
 			}
 		}
 	}

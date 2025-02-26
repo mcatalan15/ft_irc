@@ -24,7 +24,4 @@ Channel::Channel(const Channel& cpy)
 	_creationTime = cpy._creationTime;
 }
 
-Channel::~Channel()
-{
-	//NEED TO IMPLEMENT
-}
+Channel::~Channel() {}

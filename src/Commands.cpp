@@ -57,7 +57,6 @@ void	Server::nickCmd(std::vector<string>& cmd, int fd){
 
 // USER COMMAND
 bool	Server::userIsUsed(string cmd) {
-	// REALMENTE CUAL DEBERIA DE TODOS LOS NOMBRES DEBE MIRAR???
 	for (size_t i = 0; i < _clients.size(); i++) {
 		if (_clients[i].getUsername() == cmd)
 			return false;
@@ -82,9 +81,10 @@ void	Server::userCmd(std::vector<string>& cmd, int fd){
 			client->welcome(*this, *getClient(fd), fd);
 		}
 	}
-	else
-		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd); //???
-	return ;
+	else {
+		sendMsg(ERR_ALREADYREGISTERED(client->getNickname()), fd);
+		return ;
+	}
 }
 
 // QUIT COMMAND
@@ -131,11 +131,10 @@ void	Server::quitCmd(std::vector<string>& cmd, int fd){
 		close(fd);
 }
 
-
 // MODE COMMAND 
 void	Server::modeCmd(std::vector<string>& cmd, int fd)
 {
-	//printVecStr(cmd);
+	
 	if (getClient(fd)->getState() != REGISTERED)
 		sendMsg(ERR_NOTREGISTERED(getClient(fd)->getHostname()), fd);
 	
@@ -163,16 +162,13 @@ void	Server::joinCmd(std::vector<string>& cmd, int fd) {
 			return (sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), cmd[0]), fd));
 	
 		std::vector<string> channelName = joinDivisor(cmd[1]);
-		printVecStr(channelName);
 	
 		std::vector<string> channelPass;
 		int pass = 0;
 		if (cmd.size() > 2) {
 			channelPass = joinDivisor(cmd[2]);
-			printVecStr(channelPass);
 			pass = channelPass.size();
 		}
-		// Check if channel exist
 		Channel* found = NULL;
 		int flag = 0;
 		for (size_t i = 0; i < channelName.size(); i++) 
@@ -210,7 +206,6 @@ void	Server::partCmd(std::vector<string>& cmd, int fd)
 
 	if (cmd.size() < 2)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PART"), fd));
-	printVecStr(cmd);
 	channelsVec = joinDivisor(cmd[1]);
 	for (size_t i = 0; i < channelsVec.size(); i++)
 	{
@@ -257,7 +252,6 @@ void	Server::kickCmd(std::vector<string>& cmd, int fd)
 	Channel*		channel;
 	std::vector<string>	clientsVec;
 
-	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "KICK"), fd));
 	channel = findChannel(cmd[1]);
@@ -297,7 +291,6 @@ void	Server::privmsgCmd(std::vector<string>& cmd, int fd){
 	string		message;
 	std::vector<string>	destinationVec;
 
-	printVecStr(cmd);
 	if (cmd.size() < 3)
 		return (sendMsg(ERR_NEEDMOREPARAMS(client->getNickname(), "PRIVMSG"), fd));
 	destinationVec = joinDivisor(cmd[1]);
@@ -372,7 +365,6 @@ void	Server::infoCmd(std::vector<string>& cmd, int fd){
 
 // PING COMMAND
 void	Server::pingCmd(std::vector<string>& cmd, int fd){
-	std::cout << "PING cmd" << std::endl;
 	string tmp = "\0";
 	string pong = "PONG ";
 
