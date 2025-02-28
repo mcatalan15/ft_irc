@@ -245,6 +245,7 @@ std::map<std::string, void (Server::*)(std::vector<string>&, int)> Server::creat
 	map["INVITE"] = &Server::inviteCmd;
 	map["INFO"] = &Server::infoCmd;
 	map["PING"] = &Server::pingCmd;
+	map["DCC"] = &Server::dccCmd;
 	return map;
 }
 

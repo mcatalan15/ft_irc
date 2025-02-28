@@ -128,6 +128,8 @@ class Server {
 		void				infoCmd(std::vector<string>& cmd, int fd);
 		void				pingCmd(std::vector<string>& cmd, int fd);
 		void				capCmd(std::vector<string>& cmd, int fd);
+		// BONUS
+		void				dccCmd(std::vector<string>& cmd, int fd);
 };
 
 #endif
