@@ -1,9 +1,6 @@
 #include "../../include/Channel.hpp"
 
-const std::vector<string> &Channel::getClients() const
-{
-	return (_clients);
-}
+const std::vector<string> &Channel::getClients() const { return (_clients); }
 
 void Channel::addClient(string clientname)
 {

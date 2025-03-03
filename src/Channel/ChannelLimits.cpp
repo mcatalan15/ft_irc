@@ -1,9 +1,6 @@
 #include "../../include/Channel.hpp"
 
-int Channel::getUserLimit() const
-{
-	return (_userLimit);
-}
+int Channel::getUserLimit() const { return (_userLimit); }
 
 int Channel::setUserLimit(int userLimit)
 {

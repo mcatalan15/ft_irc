@@ -390,7 +390,6 @@ void	Server::dccCmd(std::vector<string>& cmd, int fd){
 		char ctcpDelimiter = '\x01';
 		string ctcpMsg = "PRIVMSG " + recipient + ctcpDelimiter + "DCC SEND " + filename + " <ip> <port> <size>\x01";
 		sendMsg(ctcpMsg, fd);
-	} else {
+	} else
 		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[1]), fd);
-	}
 }
