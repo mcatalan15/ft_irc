@@ -46,8 +46,8 @@ IRCBot::IRCBot(const string& host, const string& port, const string& password, c
 		_cmds["BOOOMBA"] = "sensual";
 		_cmds["quien lo peta?"] = "el mas fumeta";
 		_cmds["amor porreta?"] = "pal que lo peta";
-		_cmds["Maestro yoda, que es la fuerza?"] = "Es la p...a que cada mañana te almuerzas";
 		_cmds["quien lo mata?"] = "el mas rata";
+		_cmds["tot el camp"] = "és un clam\nsom la gent blaugrana.\nTant se val d’on venim\nsi del sud o del nord\nara estem d’acord, estem d’acord,\nuna bandera ens agermana.\nBlaugrana al vent\nun crit valent\ntenim un nom\nel sap tothom:\nBarça, Barça, Barça!\n\nJugadors\nSeguidors\ntots units fem força.\nSón molts anys plens d’afanys,\nsón molts gols que hem cridat\ni s’ha demostrat, s’ha demostrat,\nque mai ningú no ens podrà tòrcer.\nBlaugrana al vent\nun crit valent\ntenim un nom\nel sap tothom:\nBarça, Barça, Barça!";
 }
 
 IRCBot::~IRCBot() {

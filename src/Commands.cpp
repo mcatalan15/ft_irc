@@ -372,3 +372,25 @@ void	Server::pingCmd(std::vector<string>& cmd, int fd){
 		tmp = cmd[1].append(CRLF);
 	sendMsg(pong.append(tmp), fd);
 }
+
+// BONUS
+// DCC
+void	Server::dccCmd(std::vector<string>& cmd, int fd){
+	if (cmd.size() < 2) {
+		sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "DCC"), fd);
+		return ;
+	}
+	if (cmd[1] == "SEND") {
+		if (cmd.size() < 4) {
+			sendMsg(ERR_NEEDMOREPARAMS(getClient(fd)->getNickname(), "DCC SEND"), fd);
+			return ;
+		}
+		string recipient = cmd[2];
+		string filename = cmd[3];
+		char ctcpDelimiter = '\x01';
+		string ctcpMsg = "PRIVMSG " + recipient + ctcpDelimiter + "DCC SEND " + filename + " <ip> <port> <size>\x01";
+		sendMsg(ctcpMsg, fd);
+	} else {
+		sendMsg(ERR_UNKNOWNCOMMAND(getClient(fd)->getNickname(), cmd[1]), fd);
+	}
+}
