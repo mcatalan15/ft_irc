@@ -14,3 +14,10 @@ bool Channel::isFull() const
 		return (true);
 	return (false);
 }
+
+int Channel::getChannelSize() const
+{
+	int size = 0;
+	size = _clients.size();
+	return (size);
+}

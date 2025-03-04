@@ -105,6 +105,7 @@ void	Server::flagModeL(bool flag, Channel* channel, string param, int fd)
 		std::stringstream ss(param);
 		int num;
 		ss >> num;
+		std::cout << num << std::endl;
 		if (num > MAX_CLIENTS)
 		{
 			num = MAX_CLIENTS;
@@ -113,6 +114,10 @@ void	Server::flagModeL(bool flag, Channel* channel, string param, int fd)
 			channel->setMode(USER_LIMIT);
 			return ;
 		}
+		if (num <= 0)
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+l", param, "Is invalid"), fd));
+		if (num < channel->getChannelSize())
+			return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+l", param, "Is too low"), fd));
 		channel->setUserLimit(num);
 		channel->setMode(USER_LIMIT);
 		sendModeGeneralMsg(channel, "+l", param, fd);
@@ -212,13 +217,19 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 		{
 			if (param.size() > j)
 			{
-				if (!channel->hasClient(getNick(param[j])->getUsername()))
+				Client* client = getNick(param[j]);
+				if (client)
 				{
-					if (!flag)
-						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
-					else
-						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
+					if (!channel->hasClient(client->getUsername()))
+					{
+						if (!flag)
+							return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
+						else
+							return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
+					}
 				}
+				else 
+					return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
 				flagModeO(flag, channel, param[j++], fd);
 			}
 			else

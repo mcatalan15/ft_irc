@@ -58,7 +58,8 @@ class Channel {
 		int 						getUserLimit() const;
 		int 						setUserLimit(int limit);
 		bool 						isFull() const;
-
+		int							getChannelSize() const;
+		
 
 		/*----------- CHANNEL INVITATIONS ----------*/
 		const std::vector<string> 	&getInvitedClients() const;

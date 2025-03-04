@@ -41,7 +41,7 @@ IRCBot::IRCBot(const string& host, const string& port, const string& password, c
 		_cmds["8"] = "bingo";
 		_cmds["7"] = "linea!!!!";
 		_cmds["klk"] = "manin";
-		_cmds["pain au chocolat o chocolatine?"] = "napolitana";
+		_cmds["pain au chocolat ou chocolatine?"] = "napolitana";
 		_cmds["coca y keta?"] = "VOLTERETA";
 		_cmds["BOOOMBA"] = "sensual";
 		_cmds["quien lo peta?"] = "el mas fumeta";
