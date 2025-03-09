@@ -103,7 +103,7 @@ void	Server::client_exist(int fd) {
 	
 	Client->setHostname(addHostname());
 	if (bytes_read <= 0) {
-		std::cerr << "Client disconnected or read error, fd: " << fd << std::endl;
+		std::cerr << "Client disconnected or read error, fd: " << fd - 3 << std::endl;
 		std::vector<string> cmd = joinDivisor("QUIT :leaving");
 		quitCmd(cmd, fd);
 	} 

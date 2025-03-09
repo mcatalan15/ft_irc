@@ -228,8 +228,13 @@ void	Server::modeManagement(Channel* channel, std::vector<string>& cmd, string m
 							return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
 					}
 				}
-				else 
-					return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
+				else
+				{
+					if (!flag)
+						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "+o", param[j], "Is not on that channel"), fd));
+					else
+						return(sendMsg(ERR_INVALIDMODEPARAM(getClient(fd)->getUsername(), channel->getName(), "-o", param[j], "Is not on that channel"), fd));
+				}
 				flagModeO(flag, channel, param[j++], fd);
 			}
 			else
